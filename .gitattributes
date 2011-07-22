@@ -1,0 +1,9 @@
+*.opensdf binary
+*.sdf binary
+*.sln binary
+*.sln.docstates.suo binary
+*.suo binary
+*.ipch binary
+*.vcxproj binary
+*.vcxproj.filters binary
+*.vcxproj.user binary
