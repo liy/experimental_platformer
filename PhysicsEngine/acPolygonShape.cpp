@@ -34,7 +34,7 @@ void acPolygonShape::SetVertices(const Vec2f* vs, int count){
 		// ccw edge, direction pointed to the next vertex
 		Vec2f edge = vertices[nextIndex] - vertices[i];
 		// if the edge's length is close enough to 0. Then report an error.... Input vertices error.
-		assert(edge.LengthSquared() > FLT_EPSILON * FLT_EPSILON);
+		assert(edge.Len2() > FLT_EPSILON * FLT_EPSILON);
 
 		// since this is CCW polygon, the normal should lay on the right of the edge
 		normals[i] = Cross(edge, 1.0f);

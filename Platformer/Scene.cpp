@@ -119,6 +119,8 @@ void Scene::Render(){
 	//std::cout << "render called\n";
 	actor->Draw();
 
+	std::cout << actor->body_ptr->velocity << "\n";
+
 	for(int i=0; i<NUM_TILES; ++i){
 		tiles[i].Draw();
 	}
