@@ -21,8 +21,11 @@ Game::~Game(void)
 	_renderer = NULL;
 }
 
-void Game::Init(HDC hDC, HWND hWnd){
+void Game::Init(HDC hDC, HWND hWnd, int screenWidth, int screenHeight){
 	_hDC = hDC;
+
+	_screenWidth = screenWidth;
+	_screenHeight = screenHeight;
 
 	// You must initialize the TextureManager first before use.
 	ATextureManager::GetInstance()->Init();
@@ -33,11 +36,13 @@ void Game::Init(HDC hDC, HWND hWnd){
 
 	// create simple a game scene
 	_currentScene = new Scene(*this);
-	_currentScene->Init();
+	_currentScene->Init(_screenWidth, _screenHeight);
 
 	// create renderer
 	_renderer = new RenderModule(_hDC);
 	_renderer->Init(this);
+	// setup projection
+	_renderer->SetupProjection(_screenWidth, _screenHeight);
 
 	
 	_gameInputHandler->AddMouseEventListener(_currentScene);

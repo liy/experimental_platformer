@@ -30,7 +30,7 @@ LRESULT	CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);				// Declaration For WndP
 const char WND_CLASS_NAME[] = "Platformer";
 char WINDOW_NAME[] = "正义的城管";
 
-Game* _game = new Game();
+Game* _game;
 
 static const unsigned int SCREEN_WIDTH = 1024;
 static const unsigned int SCREEN_HEIGHT = 788;
@@ -161,6 +161,8 @@ BOOL CreateGLWindow(char* title, int width, int height, int bits)
 	// the window will be made larger to account for the pixels needed to draw the window border. In fullscreen mode, this command has no effect. 
 	AdjustWindowRectEx(&WindowRect, dwStyle, FALSE, dwExStyle);		// Adjust Window To True Requested Size
 
+	
+
 	// Create the window
 	// WS_CLIPSIBLINGS and WS_CLIPCHILDREN along with the style of window we've decided to use. WS_CLIPSIBLINGS and WS_CLIPCHILDREN are both REQUIRED for OpenGL to work properly. 
 	// These styles prevent other windows from drawing over or into our OpenGL Window. 
@@ -244,6 +246,14 @@ BOOL CreateGLWindow(char* title, int width, int height, int bits)
 		return FALSE;							// Return FALSE
 	}
 
+	// Note: Original specified width and height cannot be used.
+	// alway get the real window rectangle, after the window is upated. 
+	GetClientRect(hWnd, &WindowRect);
+
+	// initialize the game
+	_game->Init(hDC, hWnd, WindowRect.right-WindowRect.left, WindowRect.bottom-WindowRect.top);
+	
+	
 	// show the window
 	ShowWindow(hWnd,SW_SHOW);						// Show The Window
 	// What is this for?? update windows???? update what??
@@ -252,16 +262,6 @@ BOOL CreateGLWindow(char* title, int width, int height, int bits)
 	SetForegroundWindow(hWnd);						// Slightly Higher Priority
 	// set focus
 	SetFocus(hWnd);								// Sets Keyboard Focus To The Window
-
-	// initialize the game
-	_game->Init(hDC, hWnd);
-	
-	// Note: Original specified width and height cannot be used.
-	// alway get the real window rectangle, after the window is upated. 
-	GetClientRect(hWnd, &WindowRect);
-
-	// resize, fullscreen mode will also resize the scene
-	_game->Resize(WindowRect.right-WindowRect.left, WindowRect.bottom-WindowRect.top);
 
 	return TRUE;
 }
@@ -353,6 +353,9 @@ int WINAPI WinMain(	HINSTANCE	hInstance,				// Instance
 	freopen("conin$","r",stdin);
 	freopen("conout$","w",stdout);
 	freopen("conout$","w",stderr);
+
+	// create the game
+	_game = new Game();
 
 	// FIXME: Rearrange the window creation process!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// Create Our OpenGL Window

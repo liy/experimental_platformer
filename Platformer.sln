@@ -11,6 +11,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GraphicsEngine", "GraphicsEngine\GraphicsEngine.vcxproj", "{49E1B397-F49F-4ED2-AB96-F1F2D5554F9F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhysicsEngine", "PhysicsEngine\PhysicsEngine.vcxproj", "{7BD022BB-A440-45BA-B0ED-AEACAB29D802}"
+	ProjectSection(ProjectDependencies) = postProject
+		{49E1B397-F49F-4ED2-AB96-F1F2D5554F9F} = {49E1B397-F49F-4ED2-AB96-F1F2D5554F9F}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MathLib", "MathLib\MathLib.vcxproj", "{81E06CC5-AE46-43A1-8620-D917F0676499}"
 EndProject

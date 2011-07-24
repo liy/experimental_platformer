@@ -25,15 +25,14 @@ void acBody::SetShape(const acShape* shape){
 
 void acBody::DrawAABB(float r, float g, float b){
 	glPushMatrix();
-	glLoadIdentity();
 
 	glColor3f(r, g, b);
 
 	glBegin(GL_LINE_LOOP);
-	glVertex2f(aabb.lowerBound.x, aabb.lowerBound.y);
-	glVertex2f(aabb.lowerBound.x, aabb.upperBound.y);
-	glVertex2f(aabb.upperBound.x, aabb.upperBound.y);
-	glVertex2f(aabb.upperBound.x, aabb.lowerBound.y);
+	glVertex3f(aabb.lowerBound.x, aabb.lowerBound.y, 0.0f);
+	glVertex3f(aabb.lowerBound.x, aabb.upperBound.y, 0.0f);
+	glVertex3f(aabb.upperBound.x, aabb.upperBound.y, 0.0f);
+	glVertex3f(aabb.upperBound.x, aabb.lowerBound.y, 0.0f);
 	glEnd();
 
 	glPopMatrix();

@@ -9,6 +9,7 @@
 #include "acPolygonShape.h"
 #include "AAnimation.h"
 #include "Tile.h"
+#include "Camera.h"
 
 Scene::Scene(Game& $game): _game($game)
 {
@@ -21,7 +22,10 @@ Scene::~Scene(void)
 	
 }
 
-void Scene::Init(){
+void Scene::Init(int screenWidth, int screenHeight){
+	// initialize camera
+	camera = new Camera(screenWidth, screenHeight);
+
 	// create actor's rigid body
 	acBody* body = new acBody();
 	acPolygonShape shape;
@@ -50,16 +54,6 @@ void Scene::Init(){
 	actor->image_ptr = image;
 
 	_game.getGameInputHandler().AddGamepadListener(actor);
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -96,16 +90,11 @@ void Scene::Init(){
 		tiles[i] = Tile();
 		tiles[i].position().Set(int((unifRand()*1024.0f)/32.0f)*32.0f, int((unifRand()*768.0f)/32.0f)*32.0f);
 	}
-
-
-
-
-
-
 }
 
 void Scene::Update(unsigned short deltaTime){
 	actor->Update(deltaTime);
+	camera->TweenTo(actor->GetPosition());
 
 	for(int i=0; i<NUM_TILES; ++i){
 		tiles[i].Update();
@@ -116,10 +105,10 @@ void Scene::Update(unsigned short deltaTime){
 // After user input handled(Game class delegate the input to GameInputHandler class), followed by Update method.
 // All the game object rendering should appear here.
 void Scene::Render(){
+	camera->Setup();
+
 	//std::cout << "render called\n";
 	actor->Draw();
-
-	std::cout << actor->body_ptr->velocity << "\n";
 
 	for(int i=0; i<NUM_TILES; ++i){
 		tiles[i].Draw();

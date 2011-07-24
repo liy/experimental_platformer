@@ -683,9 +683,16 @@ typedef class Vec2<float> Vec2f;
 typedef class Vec2<double> Vec2d;
 typedef class Vec2<int> Vec2i;
 typedef class Vec2<short> Vec2s;
+
+typedef class Vec3<float> Vec3f;
+typedef class Vec3<double> Vec3d;
+typedef class Vec3<int> Vec3i;
+typedef class Vec3<short> Vec3s;
+
 typedef class Mat2<float> Mat2f;
 typedef class Mat2<double> Mat2d;
 typedef class Mat2<int> Mat2i;
+
 typedef class Transform2<float> Transform2f;
 typedef class Transform2<double> Transform2d;
 typedef class Transform2<int> Transform2i;
@@ -697,8 +704,6 @@ typedef class Transform2<int> Transform2i;
 const Vec2f vec2_zero(0.0f, 0.0f);
 const Mat2f mat2_identity(1.0f, 0.0f, 0.0f, 1.0f);
 const Transform2f transform2_identity(vec2_zero, mat2_identity);
-
-
 
 
 

@@ -4,8 +4,9 @@
 #include "AImage.h"
 #include "Game.h"
 #include "Scene.h"
+#include <sstream>
 
-RenderModule::RenderModule(HDC $hDC): _hDC($hDC)
+RenderModule::RenderModule(HDC $hDC): _hDC($hDC), _fps(0)
 {
 
 }
@@ -23,8 +24,8 @@ int RenderModule::Init(Game* $game){
 	_game = $game;
 	_scene = &_game->getCurrentScene();
 
-	// use arial font for opengl text displaying.
-	BuildFont("Arial");
+	// do not render the back of the texture.
+	glPolygonMode(GL_BACK, GL_LINE);
 
 	glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_LEQUAL);
@@ -39,60 +40,55 @@ int RenderModule::Init(Game* $game){
 	return 0;
 }
 
-void RenderModule::BuildFont(LPCSTR fontName){
-	HFONT font;
-	HFONT oldfont;
+void RenderModule::DrawString(int x, int y, const char *str, ...){
+	char buffer[128];
 
-	_base = glGenLists(96);
-	
-	font = CreateFont(-14, 0, 0, 0, FW_HEAVY, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_DONTCARE | DEFAULT_PITCH, fontName);
+	va_list arg;
+	va_start(arg, str);
+	vsprintf(buffer, str, arg);
+	va_end(arg);
 
-	oldfont = (HFONT)SelectObject(_hDC, font);		// Selects The Font We Want
-	wglUseFontBitmaps(_hDC, 32, 96, _base);			// Builds 96 Characters Starting At Character 32
-	SelectObject(_hDC, oldfont);				// Selects The Font We Want
-	DeleteObject(font);					// Delete The Font
+	int w = _game->screenWidth();
+	int h = _game->screenHeight();
+
+	glPushMatrix();
+
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glRasterPos3i(x, y, 0);
+	int length = (int)strlen(buffer);
+	for (int i = 0; i < length; ++i){
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, buffer[i]);
+	}
+
+	glPopMatrix();
 }
 
 void RenderModule::DrawFPS(){
+
 	_frameCount++;
 	//  Get the number of milliseconds since glutInit called
 	//  (or first call to glutGet(GLUT ELAPSED TIME)).
-	_currentTime = glutGet(GLUT_ELAPSED_TIME);
+	DWORD currentTime = GetTickCount();
 	//  Calculate time passed
-	int timeInterval = _currentTime - _previousTime;
+	int timeInterval = currentTime - _previousTime;
+	// every half second do a FPS update.
 	if(timeInterval > 500)
 	{
 		//  calculate the number of frames per second
 		_fps = _frameCount / (timeInterval / 1000.0f);
 
-							// Pops The Display List Bits	( NEW )
-
 		//  Set time
-		_previousTime = _currentTime;
+		_previousTime = currentTime;
 		//  Reset frame count
 		_frameCount = 0;
 	}
 
-	glPushMatrix();
-	glLoadIdentity();
+	// conver to string
+	std::stringstream ss;
+	ss << _fps;
 
-	glColor3f(1.0f, 1.0f, 1.0f);
-
-	// Position The Text On The Screen
-	glRasterPos2f(10.0f, _game->screenHeight() - 24.0f);
-	char fmt[10];
-	itoa(_fps, fmt, 10); // conver integer to char
-	char  text[10];				// Holds Our String
-	va_list	ap;					// Pointer To List Of Arguments
-	va_start(ap, fmt);					// Parses The String For Variables
-	vsprintf(text, fmt, ap);				// And Converts Symbols To Actual Numbers
-	va_end(ap);						// Results Are Stored In Text
-	glPushAttrib(GL_LIST_BIT);				// Pushes The Display List Bits		( NEW )
-	glListBase(_base-32);					// Sets The Base Character to 32	( NEW )
-	glCallLists(strlen(text), GL_UNSIGNED_BYTE, text);	// Draws The Display List Text	( NEW )
-	glPopAttrib();
-
-	glPopMatrix();
+	// draw the string
+	DrawString(-_game->screenWidth()/2 + 5, _game->screenHeight()/2 - 12 - 5, ss.str().c_str());
 }
 
 int RenderModule::Render(){
@@ -110,16 +106,21 @@ int RenderModule::Render(){
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	DrawFPS();
+
 	// render current scene
 	_scene->Render();
 
-	DrawFPS();
 
 	// By using double buffering, we are drawing everything to a hidden screen that we can not see. When we swap the buffer, the screen we see becomes the hidden screen, 
 	// and the screen that was hidden becomes visible. This way we don't see our scene being drawn out. It just instantly appears. 
 	SwapBuffers(_hDC);
 
 	return 0;
+}
+
+void RenderModule::SetupProjection(int $w, int $h){
+	Resize($w, $h);
 }
 
 void RenderModule::Resize(int $w, int $h){
@@ -131,38 +132,13 @@ void RenderModule::Resize(int $w, int $h){
 	// start modify projection matrix
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	// orthogonal projection
-	glOrtho(0.0f, $w, 0.0f, $h, -1.0f, 1.0f);
+	// Set the correct ortho project.
+	//glOrtho(-$w/2.0f, $w/2.0f, -$h/2.0f, $h/2.0f, 0.0f, 200.0f);
+
+	glOrtho(0.0f, $w, 0.0f, $h, 0.0f, 200.0f);
 
 	//start model view transformations
 	glMatrixMode(GL_MODELVIEW);
+	// reset the module view matrix
 	glLoadIdentity();
-
-	/*
-	float zoom = 1.0f/2.0f;
-	float MTP = 1.7f/32.0f;
-
-	int w = $w;
-	int h = $h;
-
-	Vec2f viewCenter = vec2_zero;
-
-	glViewport(0.0f, 0.0f, w, h);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	Vec2f extents(w, h);
-	extents *= MTP * zoom;
-
-	Vec2f lower = viewCenter - extents;
-	Vec2f upper = viewCenter + extents;
-
-	// L/R/B/T
-	gluOrtho2D(lower.x, upper.x, lower.y, upper.y);
-
-	//start model view transformations
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	*/
 }

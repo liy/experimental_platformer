@@ -13,30 +13,36 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Shape">
+      <UniqueIdentifier>{b2fa0346-e309-45d9-aa04-17c5df3954ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shape">
+      <UniqueIdentifier>{1c6c92c0-1fe9-47a3-950d-79d492b761e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="acBody.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="acPolygonShape.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Shape</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="acBody.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="acCollision.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="acPolygonShape.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="acSettings.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="acPolygonShape.h">
+      <Filter>Header Files\Shape</Filter>
     </ClInclude>
     <ClInclude Include="acShape.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files\Shape</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -31,20 +31,19 @@ public:
 
 	int Init(Game* $game);
 
-	void BuildFont(LPCSTR fontName);
-
 	// HDC: Handler for Device context
 	int Render();
 
+	void SetupProjection(int $w, int $h);
 	void Resize(int $w, int $h);
 
 protected:
 	long _frameCount;
-	GLint _currentTime;
-	GLint _previousTime;
+	DWORD _previousTime;
 	int _fps;
 	GLuint _base;
 
 	void DrawFPS();
+	void DrawString(int x, int y, const char *str, ...);
 };
 

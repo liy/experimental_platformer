@@ -1,6 +1,7 @@
 #pragma once
 #include "ATextureManager.h"
 #include "AImage.h"
+#include "Camera.h"
 #include <GL\glut.h>
 #include <GL\GL.h>
 
@@ -8,6 +9,7 @@ float angle = 0.0f;
 float red=1.0f, blue=1.0f, green=1.0f;
 
 AImage* image;
+Camera* camera;
 
 void changeSize(int w, int h) {
 
@@ -22,15 +24,14 @@ void changeSize(int w, int h) {
 
 	// Use the Projection Matrix
 	glMatrixMode(GL_PROJECTION);
-
-	// Reset Matrix
+	// Reset projection matrix
 	glLoadIdentity();
 
 	// Set the correct perspective.
 	//gluPerspective(90.0f, ratio, 0.1f, 2000.0f);
 
 	// Set the correct perspective.
-	glOrtho(-w/2.0f, w/2.0f, -h/2.0f, h/2.0f, -70.0f, 100.0f);
+	glOrtho(-w/2.0f, w/2.0f, -h/2.0f, h/2.0f, 0.0f, 160.0f);
 
 	// Get Back to the Modelview
 	glMatrixMode(GL_MODELVIEW);
@@ -53,8 +54,11 @@ void renderScene(void) {
 	glEnable(GL_BLEND);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	//image->Draw(vec2_zero, 0);
+	// setup camera
+	camera->Setup();
 
+
+	// model position
 	glRotatef(angle, 0.0f, 1.0f, 0.0f);
 
 	glBegin(GL_POLYGON);
@@ -62,7 +66,6 @@ void renderScene(void) {
 	glVertex3f(-80.0f, -100.0f, 0.0f);
 	glVertex3f(80.0f, -100.0f, 0.0f);
 	glEnd();
-
 
 	angle+=1.4f;
 
@@ -76,7 +79,6 @@ void processNormalKeys(unsigned char key, int x, int y) {
 }
 
 void processSpecialKeys(int key, int x, int y) {
-
 	switch(key) {
 		case GLUT_KEY_F1 :
 				red = 1.0;
@@ -91,16 +93,22 @@ void processSpecialKeys(int key, int x, int y) {
 				green = 0.0;
 				blue = 1.0; break;
 		case GLUT_KEY_UP:
+			camera->position.z -= 5;
 			break;
 		case GLUT_KEY_DOWN:
+			camera->position.z += 5;
 			break;
 		case GLUT_KEY_LEFT:
+			camera->Move(Vec2f(-5.0f, 0.0f));
 			break;
 		case GLUT_KEY_RIGHT:
+			camera->Move(Vec2f(5.0f, 0.0f));
 			break;
 		case GLUT_KEY_PAGE_DOWN:
+			camera->Move(Vec2f(0.0f, -5.0f));
 			break;
 		case GLUT_KEY_PAGE_UP:
+			camera->Move(Vec2f(0.0f, 5.0f));
 			break;
 	}
 }
@@ -112,6 +120,8 @@ void Init(){
 	ATextureManager::GetInstance()->Init();
 
 	image = new AImage("screen.jpg");
+
+	camera = new Camera();
 }
 
 void main(int argc, char **argv) {

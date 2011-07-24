@@ -21,7 +21,6 @@ AFrame::~AFrame(void){
 void AFrame::Draw(const Vec2f& position, float rotation){
 	//std::cout << "draw: " << _texture_sp->fileName() << "\n";
 	glPushMatrix();
-	glLoadIdentity();
 
 	//bind the texture
 	ATextureManager::GetInstance()->Bind(_texture_sp->fileName());

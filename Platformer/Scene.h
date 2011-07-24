@@ -4,6 +4,7 @@
 class Game;
 class Actor;
 class Tile;
+class Camera;
 
 static const int NUM_TILES = 100;
 
@@ -14,9 +15,11 @@ public:
 	Scene(Game& $game);
 	~Scene(void);
 
+	Camera* camera;
+
 	Tile* tiles;
 
-	void Init();
+	void Init(int screenWidth, int screenHeight);
 
 	// update the game logic, physic engine, together with animation, graphics update
 	// provide the a delta time.

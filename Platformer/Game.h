@@ -35,7 +35,7 @@ public:
 
 	HDC _hDC;
 
-	void Init(HDC hDC, HWND hWnd);
+	void Init(HDC hDC, HWND hWnd, int screenWidth, int screenHeight);
 
 	// The main game loop
 	MSG MainGameLoop();
