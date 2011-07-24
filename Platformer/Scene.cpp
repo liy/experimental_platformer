@@ -24,7 +24,8 @@ Scene::~Scene(void)
 
 void Scene::Init(int screenWidth, int screenHeight){
 	// initialize camera
-	camera = new Camera(screenWidth, screenHeight);
+	camera = new Camera();
+	camera->Init(screenWidth, screenHeight, 0.5, 0.3);
 
 	// create actor's rigid body
 	acBody* body = new acBody();
@@ -52,9 +53,10 @@ void Scene::Init(int screenWidth, int screenHeight){
 	// created a actor
 	actor = new Actor(this, body);
 	actor->image_ptr = image;
+	actor->SetPosition(Vec2f(400.0f, 200.0f));
 
 	_game.getGameInputHandler().AddGamepadListener(actor);
-
+	_game.getGameInputHandler().AddGamepadListener(this);
 
 
 	// intialize tiles
@@ -90,15 +92,20 @@ void Scene::Init(int screenWidth, int screenHeight){
 		tiles[i] = Tile();
 		tiles[i].position().Set(int((unifRand()*1024.0f)/32.0f)*32.0f, int((unifRand()*768.0f)/32.0f)*32.0f);
 	}
+
+	// lock the camera to the actor
+	
+	camera->LockOn(*actor);
 }
 
 void Scene::Update(unsigned short deltaTime){
 	actor->Update(deltaTime);
-	camera->TweenTo(actor->GetPosition());
 
 	for(int i=0; i<NUM_TILES; ++i){
 		tiles[i].Update();
 	}
+
+	camera->Update();
 }
 
 
@@ -123,4 +130,47 @@ void Scene::MouseDownHandler(short x, short y){
 
 void Scene::MouseMoveHandler(short x, short y){
 	
+}
+
+void Scene::Move(float xRatio, float yRatio){
+
+}
+
+void Scene::UpdateCamera(float xRatio, float yRatio){
+	if(yRatio < 0.0f){
+		Vec2f size = camera->GetViewportSize();
+		size -= size*0.01;
+		camera->ResizeViewport(size.x, size.y);
+	}
+	else if(yRatio > 0.0f){
+		Vec2f size = camera->GetViewportSize();
+		size += size*0.01;
+		camera->ResizeViewport(size.x, size.y);
+	}
+
+	if(xRatio < 0.0f){
+		camera->rotation += 0.4f;
+	}
+	else if(xRatio > 0.0f){
+		camera->rotation -= 0.4f;
+	}
+}
+
+void Scene::Jump(){
+
+}
+void Scene::JumpRelease(){
+
+}
+void Scene::Stop(){
+
+}
+
+void Scene::LockOn(){
+	if(camera->GetLockedTarget() == NULL){
+		camera->LockOn(*actor);
+	}
+	else{
+		camera->Unlock();
+	}
 }

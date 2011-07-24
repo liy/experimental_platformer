@@ -94,50 +94,6 @@ LRESULT CALLBACK GameInputHandler::MsgHandler(HWND hWnd, UINT uMsg, WPARAM wPara
 		{
 			GLdouble x, y;
 
-
-
-			/*
-			float zoom = ((short)HIWORD(lParam)/768.0f);
-			float MTP = 1.7f/32.0f;
-
-			int w = 1024.0f;
-			int h = 768.0f;
-
-			b2Vec2 viewCenter = b2Vec2_zero;
-
-			glViewport(0.0f, 0.0f, w, h);
-
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-
-			b2Vec2 extents(w, h);
-			extents *= MTP * zoom;
-
-			b2Vec2 lower = viewCenter - extents;
-			b2Vec2 upper = viewCenter + extents;
-
-			// L/R/B/T
-			gluOrtho2D(lower.x, upper.x, lower.y, upper.y);
-
-			//start model view transformations
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity();
-			*/
-
-
-
-
-			
-
-
-
-
-
-
-
-
-
-
 			//std::cout << "move: [x:" << (short)LOWORD(lParam) <<", y:"<< (short)HIWORD(lParam) <<"]\n";
 
 			GetOGLPos((short)LOWORD(lParam), (short)HIWORD(lParam), x, y);
@@ -209,21 +165,34 @@ HRESULT GameInputHandler::HandleGamepadInput()
 		std::cout << "Get device state error\n";
 		return hr;
 	}
-
 	
-	for(int i=0; i<_mouseEventListeners.size(); ++i){
+	// left tick control, for movement
+	for(int i=0; i<_gamepadListeners.size(); ++i){
 		_gamepadListeners[i]->Move(gp.lX/100.0f, gp.lY/100.0f);
+	}
+
+	// right tick control, for panning camera, debuging etc.
+	for(int i=0; i<_gamepadListeners.size(); ++i){
+		_gamepadListeners[i]->UpdateCamera(gp.lZ/100.0f, gp.lRz/100.0f);
 	}
 
 	if(gp.rgbButtons[0]&0x80){
 		//std::cout << "jump\n";
-		for(int i=0; i<_mouseEventListeners.size(); ++i){
+		for(int i=0; i<_gamepadListeners.size(); ++i){
 			_gamepadListeners[i]->Jump();
 		}
 	}
 	else{
-		for(int i=0; i<_mouseEventListeners.size(); ++i){
+		for(int i=0; i<_gamepadListeners.size(); ++i){
 			_gamepadListeners[i]->JumpRelease();
+		}
+	}
+
+	// another button
+	if(gp.rgbButtons[1]&0x80){
+		std::cout << "lock pressed \n";
+		for(int i=0; i<_gamepadListeners.size(); ++i){
+			_gamepadListeners[i]->LockOn();
 		}
 	}
 

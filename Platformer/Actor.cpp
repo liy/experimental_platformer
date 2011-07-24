@@ -279,7 +279,7 @@ void Actor::Stop(){
 
 }
 
-const Vec2f& Actor::GetPosition(){
+const Vec2f& Actor::GetPosition() const{
 	return body_ptr->position;
 }
 

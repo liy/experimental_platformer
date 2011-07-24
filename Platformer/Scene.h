@@ -1,5 +1,6 @@
 #pragma once
 #include "IMouseEventListener.h"
+#include "GamepadEventListener.h"
 
 class Game;
 class Actor;
@@ -8,7 +9,7 @@ class Camera;
 
 static const int NUM_TILES = 100;
 
-class Scene : public IMouseEventListener
+class Scene : public IMouseEventListener, public GamepadEventListener
 {
 public:
 
@@ -32,6 +33,16 @@ public:
 	// override mouse down handler  function in MouseListener
 	void MouseDownHandler(short x, short y);
 	void MouseMoveHandler(short x, short y);
+	
+
+	// game pad functions
+	void Move(float xRatio, float yRatio);
+	void UpdateCamera(float xRatio, float yRatio);
+	void Jump();
+	void JumpRelease();
+	void Stop();
+	void LockOn();
+
 protected:
 	// TODO: just for testing pointer and reference, if we want to have a class scoped Game reference, we have to initialize the reference in the constructor parameter list.
 	// Because a reference is invalid with out a referant.

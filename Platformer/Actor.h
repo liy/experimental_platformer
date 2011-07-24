@@ -28,7 +28,7 @@ public:
 	// rigid body, dynamic memory allocation is needed
 	acBody* body_ptr;
 
-	const Vec2f& Actor::GetPosition();
+	const Vec2f& Actor::GetPosition() const;
 	void SetPosition(const Vec2f& p);
 
 	void Update(unsigned short deltaTime);

@@ -13,6 +13,10 @@ void GamepadEventListener::Move(float xRatio, float yRatio){
 
 }
 
+void GamepadEventListener::UpdateCamera(float xRatio, float yRatio){
+
+}
+
 void GamepadEventListener::Stop(){
 
 }
@@ -31,4 +35,9 @@ void GamepadEventListener::JumpRelease(){
 		std::cout << "jump released\n";
 		_jumpRelased = true;
 	}
+}
+
+// testing functions
+void GamepadEventListener::LockOn(){
+
 }
