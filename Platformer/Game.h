@@ -7,6 +7,7 @@
 class GameInputHandler;
 class Scene;
 class RenderModule;
+class Camera;
 
 class Game
 {
@@ -45,6 +46,7 @@ public:
 
 	LRESULT CALLBACK MsgRouter(HWND	hWnd, UINT	uMsg, WPARAM wParam, LPARAM lParam);
 
+	// delegate to render module
 	void Resize(int $w, int $h);
 
 	RenderModule& getRenderer() const;
@@ -53,17 +55,9 @@ public:
 
 	Scene& getCurrentScene();
 
-	int screenWidth();
-	int screenHeight();
+	Camera* camera;
 
 protected:
-	// MUST NOT be changed from the class. Other than MainWindow.cpp
-	int _screenWidth;
-	int _screenHeight;
-
-	// whether game finish initialization or not.
-	bool _initilized;
-
 	Scene* _currentScene;
 };
 

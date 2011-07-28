@@ -5,8 +5,9 @@
 #include "ATextureManager.h"
 #include "Scene.h"
 #include "RenderModule.h"
+#include "Camera.h"
 
-Game::Game(void): quit(false), _initilized(false)
+Game::Game(void): quit(false)
 {
 
 }
@@ -24,30 +25,25 @@ Game::~Game(void)
 void Game::Init(HDC hDC, HWND hWnd, int screenWidth, int screenHeight){
 	_hDC = hDC;
 
-	_screenWidth = screenWidth;
-	_screenHeight = screenHeight;
+	// initialize camera
+	camera = new Camera(this);
+	camera->Init(screenWidth, screenHeight, 0.5, 0.3);
 
 	// You must initialize the TextureManager first before use.
 	ATextureManager::GetInstance()->Init();
 
 	// create input handler
 	_gameInputHandler = new GameInputHandler();
-	_gameInputHandler->Init(hWnd, this);
+	_gameInputHandler->Init(this, hWnd);
 
 	// create simple a game scene
-	_currentScene = new Scene(*this);
-	_currentScene->Init(_screenWidth, _screenHeight);
-
-	// create renderer
-	_renderer = new RenderModule(_hDC);
-	_renderer->Init(this);
-	// setup projection
-	_renderer->SetupProjection(_screenWidth, _screenHeight);
-
-	
+	_currentScene = new Scene();
+	_currentScene->Init(this);
 	_gameInputHandler->AddMouseEventListener(_currentScene);
 
-	_initilized = true;
+	// create renderer, by default using orthogonal projection
+	_renderer = new RenderModule();
+	_renderer->Init(this, _hDC, screenWidth, screenHeight);
 }
 
 MSG Game::Start(){
@@ -63,12 +59,7 @@ LRESULT CALLBACK Game::MsgRouter(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 }
 
 void Game::Resize(int $w, int $h){
-	if(_initilized){
-		_screenWidth = $w;
-		_screenHeight = $h;
-
-		_renderer->Resize(_screenWidth, _screenHeight);
-	}
+	_renderer->Resize($w, $h);
 }
 
 MSG Game::MainGameLoop(){
@@ -162,12 +153,4 @@ GameInputHandler& Game::getGameInputHandler() const{
 
 Scene& Game::getCurrentScene(){
 	return *_currentScene;
-}
-
-int Game::screenWidth(){
-	return _screenWidth;
-}
-
-int Game::screenHeight(){
-	return _screenHeight;
 }

@@ -24,9 +24,10 @@ GameInputHandler::~GameInputHandler(void)
 	SAFE_RELEASE(_di8Obj);
 }
 
-void GameInputHandler::Init(HWND hWnd, Game* $game){
-	_hWnd = hWnd;
+void GameInputHandler::Init(Game* $game, HWND& hWnd){
 	_game = $game;
+
+	_hWnd = hWnd;
 
 	// zero num of  force feedback
 	_numOfFeedbackAxis = 0;

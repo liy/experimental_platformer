@@ -2,11 +2,12 @@
 #include "acMath.h"
 
 class Actor;
+class Game;
 
 class Camera
 {
 public:
-	Camera();
+	Camera(Game* gm);
 	~Camera(void);
 
 	void Init(float viewportWidth, float viewportHeight, float anchorRatioX = 0.5f, float anchorRatioY = 0.5f);
@@ -23,7 +24,7 @@ public:
 	// Resize the camera's viewport 
 	void ResizeViewport(float w, float h);
 
-	// update camera, such as, position, ratiion...
+	// update camera, such as, position, rotation...
 	void Update();
 
 	// Setup the camera before we transform any models.
@@ -42,9 +43,11 @@ public:
 	Vec2f GetViewportSize() const;
 
 	// lock camera to a actor.
-	void LockOn(const Actor& actor);
+	void Follows(const Actor& actor);
 	void Unlock();
 	const Actor* GetLockedTarget();
+
+	void ZoomTo(const Rectf& rect);
 
 protected:
 	float currentWidth;
@@ -60,5 +63,7 @@ protected:
 
 	// You can lock the camera to the target so the camera will always follows to it.
 	const Actor* lockedTarget;
+
+	Game* game;
 };
 

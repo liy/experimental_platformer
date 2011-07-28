@@ -13,14 +13,12 @@ class Scene : public IMouseEventListener, public GamepadEventListener
 {
 public:
 
-	Scene(Game& $game);
+	Scene(void);
 	~Scene(void);
-
-	Camera* camera;
 
 	Tile* tiles;
 
-	void Init(int screenWidth, int screenHeight);
+	void Init(Game* $game);
 
 	// update the game logic, physic engine, together with animation, graphics update
 	// provide the a delta time.
@@ -46,7 +44,7 @@ public:
 protected:
 	// TODO: just for testing pointer and reference, if we want to have a class scoped Game reference, we have to initialize the reference in the constructor parameter list.
 	// Because a reference is invalid with out a referant.
-	Game& _game;
+	Game* _game;
 	
 	Actor* actor;
 };

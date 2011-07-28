@@ -21,7 +21,7 @@ public:
 	GameInputHandler(void);
 	~GameInputHandler(void);
 
-	void Init(HWND hWnd, Game* game);
+	void Init(Game* game, HWND& hWnd);
 
 	void ProcessInput();
 

@@ -6,7 +6,7 @@
 #include "Scene.h"
 #include <sstream>
 
-RenderModule::RenderModule(HDC $hDC): _hDC($hDC), _fps(0)
+RenderModule::RenderModule(void): _fps(0)
 {
 
 }
@@ -18,8 +18,11 @@ RenderModule::~RenderModule(void)
 	_scene = NULL;
 }
 
-int RenderModule::Init(Game* $game){
+int RenderModule::Init(Game* $game, HDC& $hDC, unsigned int sw, unsigned int sh){
 	std::cout << "Render init\n";
+	_hDC = $hDC;
+
+	Resize(sw, sh);
 
 	_game = $game;
 	_scene = &_game->getCurrentScene();
@@ -37,6 +40,8 @@ int RenderModule::Init(Game* $game){
 	//set the background colour
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
+	UseOrthogonal();
+
 	return 0;
 }
 
@@ -47,9 +52,6 @@ void RenderModule::DrawString(int x, int y, const char *str, ...){
 	va_start(arg, str);
 	vsprintf(buffer, str, arg);
 	va_end(arg);
-
-	int w = _game->screenWidth();
-	int h = _game->screenHeight();
 
 	glPushMatrix();
 
@@ -88,7 +90,7 @@ void RenderModule::DrawFPS(){
 	ss << _fps;
 
 	// draw the string
-	DrawString(-_game->screenWidth()/2 + 5, _game->screenHeight()/2 - 12 - 5, ss.str().c_str());
+	DrawString(-_screenWidth/2 + 5, _screenHeight/2 - 12 - 5, ss.str().c_str());
 }
 
 int RenderModule::Render(){
@@ -109,8 +111,9 @@ int RenderModule::Render(){
 	DrawFPS();
 
 	// render current scene
+	// reset the matrix
+	glLoadIdentity();
 	_scene->Render();
-
 
 	// By using double buffering, we are drawing everything to a hidden screen that we can not see. When we swap the buffer, the screen we see becomes the hidden screen, 
 	// and the screen that was hidden becomes visible. This way we don't see our scene being drawn out. It just instantly appears. 
@@ -119,26 +122,36 @@ int RenderModule::Render(){
 	return 0;
 }
 
-void RenderModule::SetupProjection(int $w, int $h){
-	Resize($w, $h);
-}
-
-void RenderModule::Resize(int $w, int $h){
-	std::cout << "Render resize \n";
-
-	// setup viewport
-	glViewport(0, 0, $w, $h);
-
+void RenderModule::UsePerspective(){
 	// start modify projection matrix
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	// Set the correct ortho project.
 	//glOrtho(-$w/2.0f, $w/2.0f, -$h/2.0f, $h/2.0f, 0.0f, 200.0f);
 
-	glOrtho(0.0f, $w, 0.0f, $h, 0.0f, 200.0f);
+	gluPerspective(60.0f, _screenWidth/_screenHeight, 0.0f, 200.0f);
 
 	//start model view transformations
 	glMatrixMode(GL_MODELVIEW);
-	// reset the module view matrix
+}
+
+void RenderModule::UseOrthogonal(){
+	// start modify projection matrix
+	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
+	// Set the correct ortho project.
+	//glOrtho(-$w/2.0f, $w/2.0f, -$h/2.0f, $h/2.0f, 0.0f, 200.0f);
+
+	glOrtho(0.0f, _screenWidth, 0.0f, _screenHeight, 0.0f, 200.0f);
+
+	//start model view transformations
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void RenderModule::Resize(unsigned int sw, unsigned int sh){
+	_screenWidth = sw;
+	_screenHeight = sh;
+
+	// setup viewport
+	glViewport(0, 0, _screenWidth, _screenHeight);
 }

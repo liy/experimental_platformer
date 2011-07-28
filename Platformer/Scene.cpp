@@ -11,7 +11,7 @@
 #include "Tile.h"
 #include "Camera.h"
 
-Scene::Scene(Game& $game): _game($game)
+Scene::Scene(void)
 {
 
 }
@@ -22,10 +22,8 @@ Scene::~Scene(void)
 	
 }
 
-void Scene::Init(int screenWidth, int screenHeight){
-	// initialize camera
-	camera = new Camera();
-	camera->Init(screenWidth, screenHeight, 0.5, 0.3);
+void Scene::Init(Game* $game){
+	 _game = $game;
 
 	// create actor's rigid body
 	acBody* body = new acBody();
@@ -55,8 +53,8 @@ void Scene::Init(int screenWidth, int screenHeight){
 	actor->image_ptr = image;
 	actor->SetPosition(Vec2f(400.0f, 200.0f));
 
-	_game.getGameInputHandler().AddGamepadListener(actor);
-	_game.getGameInputHandler().AddGamepadListener(this);
+	_game->getGameInputHandler().AddGamepadListener(actor);
+	_game->getGameInputHandler().AddGamepadListener(this);
 
 
 	// intialize tiles
@@ -66,7 +64,7 @@ void Scene::Init(int screenWidth, int screenHeight){
 	tiles = new Tile[NUM_TILES];
 
 	tiles[0] = Tile();
-	tiles[0].position().Set(tx, 65.0f);
+	tiles[0].position().Set(0, 0);
 
 	tx += 64.0f;
 
@@ -95,7 +93,9 @@ void Scene::Init(int screenWidth, int screenHeight){
 
 	// lock the camera to the actor
 	
-	camera->LockOn(*actor);
+	_game->camera->Follows(*actor);
+
+	
 }
 
 void Scene::Update(unsigned short deltaTime){
@@ -105,14 +105,18 @@ void Scene::Update(unsigned short deltaTime){
 		tiles[i].Update();
 	}
 
-	camera->Update();
+	//Vec2f p = actor->GetPosition();
+	//Rectf rect = Rectf(p.x, p.y, 32.0f, 32.0f);
+	//camera->ZoomTo(rect);
+
+	_game->camera->Update();
 }
 
 
 // After user input handled(Game class delegate the input to GameInputHandler class), followed by Update method.
 // All the game object rendering should appear here.
 void Scene::Render(){
-	camera->Setup();
+	_game->camera->Setup();
 
 	//std::cout << "render called\n";
 	actor->Draw();
@@ -120,6 +124,13 @@ void Scene::Render(){
 	for(int i=0; i<NUM_TILES; ++i){
 		tiles[i].Draw();
 	}
+
+
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glPointSize(10.0f);
+	glBegin(GL_POINTS);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glEnd();
 }
 
 void Scene::MouseDownHandler(short x, short y){
@@ -138,22 +149,23 @@ void Scene::Move(float xRatio, float yRatio){
 
 void Scene::UpdateCamera(float xRatio, float yRatio){
 	if(yRatio < 0.0f){
-		Vec2f size = camera->GetViewportSize();
+		Vec2f size = _game->camera->GetViewportSize();
 		size -= size*0.01;
-		camera->ResizeViewport(size.x, size.y);
+		_game->camera->ResizeViewport(size.x, size.y);
 	}
 	else if(yRatio > 0.0f){
-		Vec2f size = camera->GetViewportSize();
+		Vec2f size = _game->camera->GetViewportSize();
 		size += size*0.01;
-		camera->ResizeViewport(size.x, size.y);
+		_game->camera->ResizeViewport(size.x, size.y);
 	}
 
 	if(xRatio < 0.0f){
-		camera->rotation += 0.4f;
+		_game->camera->rotation += 0.4f;
 	}
 	else if(xRatio > 0.0f){
-		camera->rotation -= 0.4f;
+		_game->camera->rotation -= 0.4f;
 	}
+
 }
 
 void Scene::Jump(){
@@ -167,10 +179,10 @@ void Scene::Stop(){
 }
 
 void Scene::LockOn(){
-	if(camera->GetLockedTarget() == NULL){
-		camera->LockOn(*actor);
+	if(_game->camera->GetLockedTarget() == NULL){
+		_game->camera->Follows(*actor);
 	}
 	else{
-		camera->Unlock();
+		_game->camera->Unlock();
 	}
 }

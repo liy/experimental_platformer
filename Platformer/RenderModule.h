@@ -15,7 +15,7 @@ class Scene;
 class RenderModule
 {
 public:
-	RenderModule(HDC $hDC);
+	RenderModule(void);
 	~RenderModule(void);
 
 	// game pointer
@@ -29,21 +29,30 @@ public:
 	// viewport size
 	GLint _viewportRect[4];
 
-	int Init(Game* $game);
+	int Init(Game* $game, HDC& $hDC, unsigned int sw, unsigned int sh);
 
 	// HDC: Handler for Device context
 	int Render();
 
-	void SetupProjection(int $w, int $h);
-	void Resize(int $w, int $h);
+	// When screen resized, this function will be triggered
+	void Resize(unsigned int sw, unsigned int sh);
+
+	// Use perspective projection
+	void UsePerspective();
+	// Use orthogonal projection
+	void UseOrthogonal();
 
 protected:
 	long _frameCount;
 	DWORD _previousTime;
 	int _fps;
-	GLuint _base;
 
 	void DrawFPS();
 	void DrawString(int x, int y, const char *str, ...);
+
+	// screen width
+	unsigned int _screenWidth;
+	// screen height
+	unsigned int _screenHeight;
 };
 

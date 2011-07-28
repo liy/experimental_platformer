@@ -2,8 +2,9 @@
 #include <GL\glut.h>
 #include <GL\GL.h>
 #include "Actor.h"
+#include "Game.h"
 
-Camera::Camera()
+Camera::Camera(Game* gm): game(gm)
 {
 	
 }
@@ -44,6 +45,16 @@ void Camera::ResizeViewport(float w, float h){
 	SetAnchorRatio(anchorRatio.x, anchorRatio.y);
 }
 
+void Camera::ZoomTo(const Rectf& rect){
+	float targetScale = oHeight/rect.height;
+	scale += (targetScale - scale) * 0.0001f;
+
+	currentWidth = oWidth*scale;
+	currentHeight = oHeight*scale;
+
+	SetAnchorRatio(anchorRatio.x, anchorRatio.y);
+}
+
 void Camera::TweenTo(const Vec2f& tp){
 	// delta vector.
 	Vec2f dis = (tp - position);
@@ -70,40 +81,20 @@ void Camera::Update(){
 }
 
 void Camera::Setup(){
-	// cuztomized camera transformation.
-	/*
-	glScalef(scale, scale, 1.0f);
-
-	glTranslatef(-anchorShift.x, -anchorShift.y, 0.0f);
-	glRotatef(rotation, 0.0f, 0.0f, 1.0f);
-	
-	glTranslatef(-position.x, -position.y, 0.0f);
-	*/
-
-	// glutlookat, without rotation.
-	/*
-	glScalef(scale, scale, 1.0f);
-	
-	// for now hard code the camera's z position
-	gluLookAt(position.x + anchorShift.x, position.y + anchorShift.y, 1.0f,
-		position.x + anchorShift.x, position.y + anchorShift.y, 0.0f,
-		0.0f, 1.0f, 0.0f);
-	*/
-
-	// glulookat with rotation. Needs to seperate the shift translation.
+	// glulookat with rotation. Needs to separate the shift translation.
 	// scale, related the shifted position.
 	glScalef(scale, scale, 1.0f);
 	// do further shift translation.
 	glTranslatef(-anchorShift.x, -anchorShift.y, 0.0f);
 	// rotate about the position
 	glRotatef(rotation, 0.0f, 0.0f, 1.0f);
-	// move the camera to specified positon, ready for rotation.
+	// move the camera to specified position, ready for rotation.
 	gluLookAt(position.x, position.y, 1.0f,
 		position.x, position.y, 0.0f,
 		0.0f, 1.0f, 0.0f);
 }
 
-void Camera::LockOn(const Actor& actor){
+void Camera::Follows(const Actor& actor){
 	lockedTarget = &actor;
 }
 
