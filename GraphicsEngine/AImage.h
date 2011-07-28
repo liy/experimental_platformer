@@ -2,13 +2,13 @@
 
 #include <iostream>
 #include <memory>
-#include "acMath.h"
+#include "AIGraphics.h"
 
 class ATexture;
 class ATextureManager;
 class AQuad;
 
-class AImage
+class AImage : public AIGraphics
 {
 public:
 	AImage(void);
@@ -17,7 +17,7 @@ public:
 	virtual ~AImage(void);
 	
 	// Should not be use!!! Too dangerous!! My feeling.
-	// You can always achive the smae thing through reference or create brand new AImage
+	// You can always achieve the same thing through reference or create brand new AImage
 	//AImage(const AImage& $image);
 
 	// DIsallowed, Too dangerous!! My feeling. 

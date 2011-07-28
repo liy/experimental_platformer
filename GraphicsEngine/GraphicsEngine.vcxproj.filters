@@ -30,9 +30,6 @@
     <ClCompile Include="ATextureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AGraphics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AAnimation.h">
@@ -50,7 +47,7 @@
     <ClInclude Include="ATextureManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AGraphics.h">
+    <ClInclude Include="AIGraphics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

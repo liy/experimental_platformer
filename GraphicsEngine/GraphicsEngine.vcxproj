@@ -68,7 +68,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AAnimation.cpp" />
-    <ClCompile Include="AGraphics.cpp" />
     <ClCompile Include="AImage.cpp" />
     <ClCompile Include="AQuad.cpp" />
     <ClCompile Include="ATexture.cpp" />
@@ -76,7 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AAnimation.h" />
-    <ClInclude Include="AGraphics.h" />
+    <ClInclude Include="AIGraphics.h" />
     <ClInclude Include="AImage.h" />
     <ClInclude Include="AQuad.h" />
     <ClInclude Include="ATexture.h" />
