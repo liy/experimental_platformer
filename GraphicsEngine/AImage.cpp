@@ -45,7 +45,7 @@ AImage::AImage(const std::string& $fileName, const Recti& $rect): depth(0.0f), s
 
 /*
 // Programmer should not use Copy constructor to copy any AImage instance.
-// They have to mannually create a new instance, or just using the referenece
+// They have to manually create a new instance, or just using the reference
 AImage::AImage(const AImage& $image) : _fileName($image._fileName)
 {
 	std::cout << "copy constructor called\n";
@@ -61,7 +61,7 @@ AImage::~AImage(void)
 	// keep a copy record of the filename, to remove the 
 	std::string fileName = _texture_sp->fileName();
 	std::cout << "AImage["<< fileName <<"] destroy!\n";
-	// Null the reference, so we can try to remve th texture
+	// Null the reference, so we can try to remove th texture
 	_texture_sp = NULL;
 	// Try to remove the using texture from the memory.
 	// If the reference count is 1.(1 reference count is maintained by the map). Then we remove it from the memory.
@@ -71,7 +71,7 @@ AImage::~AImage(void)
 
 /*
 // Programmer should not use assignment operator to copy any AImage instance.
-// They have to mannually create a new instance, or just using the referenece
+// They have to manually create a new instance, or just using the reference
 AImage& AImage::operator=(const AImage& $image){
 	std::cout << "assignment operator called\n";
 	 _fileName = $image._fileName;
@@ -88,7 +88,7 @@ void AImage::SetTexture(const std::string& $fileName, const Recti& $rect){
 	// Dynamically change texture, we have to try to remove the previous texture it was using.
 	if(_texture_sp != NULL && _texture_sp->fileName() != $fileName){
 		std::string fileName = _texture_sp->fileName();
-		// Null the reference, so we can try to remve th texture
+		// Null the reference, so we can try to remove th texture
 		_texture_sp = NULL;
 		// Try to remove the using texture from the memory.
 		ATextureManager::GetInstance()->Remove(fileName);
@@ -104,7 +104,7 @@ void AImage::SetTexture(const std::string& $fileName){
 	// Dynamically change texture, we have to try to remove the previous texture it was using.
 	if(_texture_sp != NULL && _texture_sp->fileName() != $fileName){
 		std::string fileName = _texture_sp->fileName();
-		// Null the reference, so we can try to remve th texture
+		// Null the reference, so we can try to remove th texture
 		_texture_sp = NULL;
 		// Try to remove the using texture from the memory.
 		ATextureManager::GetInstance()->Remove(fileName);
@@ -133,12 +133,6 @@ void AImage::Draw(const Vec2f& position, float rotation){
 	glTranslatef(_anchor.x, _anchor.y, 0.0f);//anchor translation transform
 	
 	
-
-	// enable  blending mode
-	//glEnable(GL_BLEND);
-	// blend function
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	if(!tintRed){
 		glColor4f(1.0f, 1.0f, 1.0f, alpha);
 	}
@@ -153,8 +147,6 @@ void AImage::Draw(const Vec2f& position, float rotation){
 		glTexCoord2f(_texOffsetX, _texHeight + _texOffsetY);				glVertex3f(0.0f, _rect.height, depth);
 	glEnd();
 
-	// disable alpha blending
-	//glDisable(GL_BLEND);
 	// finsihed drawing disable texture 2d.
 	glDisable(GL_TEXTURE_2D);
 	

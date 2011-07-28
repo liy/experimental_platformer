@@ -29,21 +29,21 @@ void AFrame::Draw(const Vec2f& position, float rotation){
 	_anchor.x = -width()*_anchorRatio.x;
 	_anchor.y = -height()*_anchorRatio.y;
 
+	/*
 	glTranslatef(position.x, position.y, 0.0f);//normal position translation transform
 	glRotatef(rotation, 0.0f, 0.0f, 1.0f);//rotation transform
-	glScalef(scaleX, scaleY, 0.0f);// scale transform
+	glScalef(scaleX, scaleY, 1.0f);// scale transform
 	glTranslatef(_anchor.x, _anchor.y, 0.0f);//anchor translation transform
+	*/
 
 	glColor4f(1.0f, 1.0f, 1.0f, alpha);
 	
 	glBegin(GL_QUADS);
-		glTexCoord2f(_texOffsetX, _texOffsetY);								glVertex3f(0.0f, _rect.height, depth);
-		glTexCoord2f(_texWidth + _texOffsetX, _texOffsetY);					glVertex3f(_rect.width, _rect.height, depth);
-		glTexCoord2f(_texWidth + _texOffsetX, _texHeight + _texOffsetY);	glVertex3f(_rect.width, 0.0f, depth);
-		glTexCoord2f(_texOffsetX, _texHeight + _texOffsetY);				glVertex3f(0.0f, 0.0f, depth);
+	glTexCoord2f(_texOffsetX, _texOffsetY);								glVertex3f(0.0f, 0.0f, depth);
+	glTexCoord2f(_texWidth + _texOffsetX, _texOffsetY);					glVertex3f(_rect.width, 0.0f, depth);
+	glTexCoord2f(_texWidth + _texOffsetX, _texHeight + _texOffsetY);	glVertex3f(_rect.width, _rect.height, depth);
+	glTexCoord2f(_texOffsetX, _texHeight + _texOffsetY);				glVertex3f(0.0f, _rect.height, depth);
 	glEnd();
-
-	glDisable(GL_TEXTURE_2D);
 	
 
 	glPopMatrix();
@@ -115,17 +115,18 @@ void AAnimation::Draw(const Vec2f& position, float rotation){
 		return;
 
 	glPushMatrix();
-	glLoadIdentity();
 
 	// do anchor translation
 	_anchor.x = -width()*_anchorRatio.x;
 	_anchor.y = -height()*_anchorRatio.y;
 
+	
 	glTranslatef(position.x, position.y, 0.0f);//normal position translation transform
 	glRotatef(rotation, 0.0f, 0.0f, 1.0f);//rotation transform
-	glScalef(scaleX, scaleY, 0.0f);// scale transform
 	glTranslatef(_anchor.x, _anchor.y, 0.0f);//anchor translation transform
+	glScalef(scaleX, scaleY, 1.0f);// scale transform
 	//std::cout << "anchor shift: " << _anchor.x << "\n";
+	
 
 	_frames[_frameIndex]->Draw(position, rotation);
 
@@ -189,66 +190,65 @@ AFrame& AAnimation::CurrentFrame(){
 
 void AAnimation::NextFrame(){
 	// frame duration counter reset to 1
-			_frameTimer = 1;
-			//next frame.
-			_frameIndex+=_direction;
-			
-			//frame index exceed the limit
-			if(_frameIndex > _frames.size()-1 || _frameIndex < 0){
-				//keep repeat and pingpong, never stop
-				if(pingpong && repeat){
-					_direction *= -1;
+	_frameTimer = 1;
+	//next frame.
+	_frameIndex+=_direction;
+	
+	//frame index exceed the limit
+	if(_frameIndex > _frames.size()-1 || _frameIndex < 0){
+		//keep repeat and pingpong, never stop
+		if(pingpong && repeat){
+			_direction *= -1;
+			//"direction*2" makes sure the last frame or the first frame do not render twice. See below pingpoing && !repeat case.
+			_frameIndex += _direction*2;
+		}
+		//only pingpong onec
+		else if(pingpong && !repeat){
+			//exceeded the index bound for the first time, still need pingpong once.
+			if(_firstRound){
+				_direction *= -1;
+				_firstRound = false;
 
-					//"direction*2" makes sure the last frame or the first frame do not render twice. See below pingpoing && !repeat case.
-					_frameIndex += _direction*2;
-				}
-				//only pingpong onec
-				else if(pingpong && !repeat){
-					//exceeded the index bound for the first time, still need pingpong once.
-					if(_firstRound){
-						_direction *= -1;
-						_firstRound = false;
-
-						//Reset the current frame to the previous frame immediately.
-						//For example, if animation started using ani_forward, at this point, direction will be -1, currentFrameIndex will be [frames count].
-						//However since frame index [frames count]-1 is already rendered for its delay time period. we need to jump to [frame count]-2,
-						//the new currentFrameIndex = [frame count] + -1*2.
-						//If animation started using ani_backward, at this point, direction will be 1, currentFrameIndex will be -1. Since frame 0 is
-						//already rendered for it delay time period, we need to directly jump to frame 1 which is: currentFrameIndex = -1 + 1*2. Both cases
-						//are correct.
-						_frameIndex += _direction*2;
-					}
-					//exceeded frames index bounds again. stop the animation
-					else {
-						//next round start the animation, means a new round.
-						_firstRound = true;
-						_stopped = true;
-
-						//because at this point the currentFramIndex is out of bounds already.
-						//It can be -1 or [frames count], this further calculation makes sure the frame is not out of bounds.
-						//For example, if animation started using ani_forward, at this point, direction will be -1,
-						//currentFrameIndex will be -1, so the new currentFrameIndex = -1 - -1 which will be 0.
-						//If animation started using ani_backward, at this point, direction will be 1, currentFrameIndex will be [frames count].
-						//So the new currentFrameIndex = [frames count]-1. Both casese are correct.
-						_frameIndex -= _direction;
-					}
-				}
-				//go back to start frame
-				else if(!pingpong && repeat){
-					if (_direction == ANI_FORWARD) {
-						_frameIndex = 0;
-					}
-					else {
-						_frameIndex = _frames.size()-1;
-					}
-				}
-				//stop
-				else {
-					_stopped = true;
-					//stop at last valid frame.
-					_frameIndex -= _direction;
-				}
+				//Reset the current frame to the previous frame immediately.
+				//For example, if animation started using ani_forward, at this point, direction will be -1, currentFrameIndex will be [frames count].
+				//However since frame index [frames count]-1 is already rendered for its delay time period. we need to jump to [frame count]-2,
+				//the new currentFrameIndex = [frame count] + -1*2.
+				//If animation started using ani_backward, at this point, direction will be 1, currentFrameIndex will be -1. Since frame 0 is
+				//already rendered for it delay time period, we need to directly jump to frame 1 which is: currentFrameIndex = -1 + 1*2. Both cases
+				//are correct.
+				_frameIndex += _direction*2;
 			}
+			//exceeded frames index bounds again. stop the animation
+			else {
+				//next round start the animation, means a new round.
+				_firstRound = true;
+				_stopped = true;
+
+				//because at this point the currentFramIndex is out of bounds already.
+				//It can be -1 or [frames count], this further calculation makes sure the frame is not out of bounds.
+				//For example, if animation started using ani_forward, at this point, direction will be -1,
+				//currentFrameIndex will be -1, so the new currentFrameIndex = -1 - -1 which will be 0.
+				//If animation started using ani_backward, at this point, direction will be 1, currentFrameIndex will be [frames count].
+				//So the new currentFrameIndex = [frames count]-1. Both casese are correct.
+				_frameIndex -= _direction;
+			}
+		}
+		//go back to start frame
+		else if(!pingpong && repeat){
+			if (_direction == ANI_FORWARD) {
+				_frameIndex = 0;
+			}
+			else {
+				_frameIndex = _frames.size()-1;
+			}
+		}
+		//stop
+		else {
+			_stopped = true;
+			//stop at last valid frame.
+			_frameIndex -= _direction;
+		}
+	}
 }
 
 AFrame& AAnimation::GetFrame(unsigned int $index){

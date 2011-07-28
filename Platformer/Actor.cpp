@@ -240,18 +240,37 @@ void Actor::GrabWall(bool grabbed){
 
 
 void Actor::Draw(){
-	body_ptr->DrawAABB(1.0f, 0.3f, 0.1f);
-
 	if(image_ptr != NULL)
 		image_ptr->Draw(body_ptr->position, body_ptr->rotation); 
 	if(animation_ptr != NULL)
 		animation_ptr->Draw(body_ptr->position, body_ptr->rotation);
 
+	body_ptr->DrawAABB(1.0f, 0.3f, 0.1f);
 }
 
 void Actor::Move(float xRatio, float yRatio){
 	//body_ptr->velocity.Set(4.0f*xRatio, -4.0f*yRatio);
 	body_ptr->velocity.x = 3.0f * xRatio;
+
+	if(xRatio > 0.0f){
+		if(image_ptr != NULL)
+			image_ptr->scaleX = -1.0f;
+		if(animation_ptr != NULL){
+			animation_ptr->scaleX = -1.0f;
+			animation_ptr->Play();
+		}
+	}
+	else if(xRatio <0.0f){
+		if(image_ptr != NULL)
+			image_ptr->scaleX = 1.0f;
+		if(animation_ptr != NULL){
+			animation_ptr->scaleX = 1.0f;
+			animation_ptr->Play();
+		}
+	}
+	else{
+		animation_ptr->GoToStop(1);
+	}
 }
 
 void Actor::Jump(){

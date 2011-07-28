@@ -4,6 +4,7 @@
 class Actor;
 class Game;
 
+// TODO: refine this class.
 class Camera
 {
 public:

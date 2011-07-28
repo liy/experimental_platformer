@@ -28,7 +28,7 @@ int RenderModule::Init(Game* $game, HDC& $hDC, unsigned int sw, unsigned int sh)
 	_scene = &_game->getCurrentScene();
 
 	// do not render the back of the texture.
-	glPolygonMode(GL_BACK, GL_LINE);
+	//glPolygonMode(GL_BACK, GL_LINE);
 
 	glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_LEQUAL);
@@ -40,6 +40,7 @@ int RenderModule::Init(Game* $game, HDC& $hDC, unsigned int sw, unsigned int sh)
 	//set the background colour
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
+	// by default use orthogonal projection.
 	UseOrthogonal();
 
 	return 0;
@@ -102,7 +103,7 @@ int RenderModule::Render(){
 
 	// make sure the transparent pixels
 	glEnable(GL_DEPTH_TEST);
-	//glDepthFunc(GL_LEQUAL);
+	glDepthFunc(GL_LEQUAL);
 
 	//enable transparency.
 	glEnable(GL_BLEND);
