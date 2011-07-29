@@ -7,6 +7,7 @@
 #include "Actor.h"
 #include "acBody.h"
 #include "acPolygonShape.h"
+#include "AImage.h"
 #include "AAnimation.h"
 #include "Tile.h"
 #include "Camera.h"
@@ -55,7 +56,7 @@ void Scene::Init(Game* $game){
 	_game->getGameInputHandler().AddGamepadListener(this);
 
 
-	// intialize tiles
+	// initialize tiles
 	float tx = 96.0f;
 	float ty = 98.0f;
 
@@ -63,45 +64,38 @@ void Scene::Init(Game* $game){
 
 	tiles[0] = Tile();
 	tiles[0].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
-	tiles[0].image->setAnchor(0.5f, 0.5f);
 	tiles[0].position().Set(0, 0);
 
 	tx += 64.0f;
 
 	tiles[1] = Tile();
 	tiles[1].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
-	tiles[1].image->setAnchor(0.5f, 0.5f);
+	tiles[1].image->anchorRatio.Set(0.5f, 0.5f);
 	tiles[1].position().Set(tx+=32.0f, ty);
 
 	tiles[2] = Tile();
 	tiles[2].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
-	tiles[2].image->setAnchor(0.5f, 0.5f);
 	tiles[2].position().Set(tx+=32.0f, ty);
 
 	tiles[3] = Tile();
 	tiles[3].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
-	tiles[3].image->setAnchor(0.5f, 0.5f);
 	tiles[3].position().Set(tx+=32.0f, ty);
 
 	tiles[4] = Tile();
 	tiles[4].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
-	tiles[4].image->setAnchor(0.5f, 0.5f);
 	tiles[4].position().Set(tx+=32.0f, ty);
 
 	tiles[5] = Tile();
 	tiles[5].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
-	tiles[5].image->setAnchor(0.5f, 0.5f);
 	tiles[5].position().Set(tx, ty-=32.0f);
 
 	tiles[6] = Tile();
 	tiles[6].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
-	tiles[6].image->setAnchor(0.5f, 0.5f);
 	tiles[6].position().Set(tx, ty-=32.0f);
 
 	for(int i=7; i<NUM_TILES; ++i){
 		tiles[i] = Tile();
 		tiles[i].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
-		tiles[i].image->setAnchor(0.5f, 0.5f);
 		tiles[i].position().Set(int((unifRand()*1024.0f)/32.0f)*32.0f, int((unifRand()*768.0f)/32.0f)*32.0f);
 	}
 

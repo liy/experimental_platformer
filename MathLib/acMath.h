@@ -477,7 +477,7 @@ public:
 		return x*v.x + y*v.y + z*v.z;
 	}
 
-	// Cross product, result a new vector penpendicular to the two vectors. 
+	// Cross product, result a new vector perpendicular to the two vectors. 
 	// The result vector's direction can be specified by right-hand rule.
 	//	1. Index finger pointed to "this" vector's direction
 	//	2. Middle finger pointed to the input vector direction.
@@ -569,6 +569,101 @@ inline Vec3<T> acAbs(const Vec3<T>& v){
 }
 
 
+template<class T>
+class Vec4 {
+public:
+	union{
+		// x coordinate
+		T x;
+
+		// red
+		T r;
+	};
+
+	union{
+		// y coordinate
+		T y;
+
+		// green
+		T g;
+	};
+
+	union{
+		// z coordinate
+		T z;
+
+		// blue
+		T b;
+	};
+
+	union{
+		//  w coordinate, for homogeneous coordinate.
+		T w;
+
+		// alpha
+		T a;
+	};
+
+	Vec4(void) {}
+
+	Vec4(T $x, T $y, T $z, T $w): x($x), y($y), z($z), w($w){}
+
+	// copy constructor
+	Vec4(const Vec4<T>& v): x(v.x), y(v.y), z(v.z), w(v.z) {}
+
+	// casting constructor.
+	template<class NT>
+	Vec4(const Vec4<NT>& v): x(static_cast<T>(v.x)), y(static_cast<T>(v.y)), z(static_cast(v.z)), w(static_cast(v.w)) {}
+
+
+	// ==================================== access functions ===================================
+
+	// Directly copy the right hand side vector4 into left and do the casting
+	template<class NT>
+	Vec4<T>& operator= (const Vec4<NT>& v){
+		x = static_cast<T>(v.x);
+		y = static_cast<T>(v.y);
+		z = static_cast<T>(v.z);
+		w = static_cast<T>(v.z);
+
+		return *this;
+	}
+
+	// Normal copy assignment operator
+	Vec4<T>& operator= (const Vec4<T>& v){
+		x = v.x;
+		y = v.y;
+		z = v.z;
+		w = v.w;
+
+		return *this;
+	}
+
+	// Zero the vector
+	void SetZero(){
+		x = y = z = w = 0;
+	}
+
+	// Shortcut setter
+	void Set(T $x, T $y, T $z, T $w){
+		x = $x;
+		y = $y;
+		z = $z;
+		w = $w;
+	}
+
+	// Read the indexed component
+	T operator[] (int i) const{
+		return (&x)[i];
+	}
+
+	// Write to the indexed component
+	T& operator[] (int i){
+		return (&x)[i];
+	}
+};
+
+
 
 
 //####################################################################################
@@ -637,7 +732,7 @@ public:
 
 
 //#######################################################################
-//###################### Transfrom class and functions ##########################
+//###################### Transform class and functions ##########################
 //#######################################################################
 template<class T>
 class Transform2{
@@ -689,6 +784,12 @@ typedef class Vec3<double> Vec3d;
 typedef class Vec3<int> Vec3i;
 typedef class Vec3<short> Vec3s;
 
+typedef class Vec4<float> Vec4f;
+typedef class Vec4<double> Vec4d;
+typedef class Vec4<int> Vec4i;
+typedef class Vec4<short> Vec4s;
+
+
 typedef class Mat2<float> Mat2f;
 typedef class Mat2<double> Mat2d;
 typedef class Mat2<int> Mat2i;
@@ -717,6 +818,13 @@ struct Rect{
 	Rect(): x(0), y(0), width(0), height(0){}
 
 	Rect(T $x, T $y, T $w, T $h): x($x), y($y), width($w), height($h){}
+
+	void Set(T $x, T $y, T $w, T $h){
+		x = $x;
+		y = $y;
+		width = $w;
+		height = $h;
+	}
 
 	T Top(){
 		return y + height;

@@ -1,60 +1,44 @@
 #include "AImage.h"
 #include "ATextureManager.h"
 #include "ATexture.h"
-#include "AQuad.h"
 #include "acMath.h"
 
-AImage::AImage(void): depth(0.0f), scaleX(1.0f), scaleY(1.0f), alpha(1.0f), tintRed(false)
-{
-	_anchor.x = 0.0f;
-	_anchor.y = 0.0f;
-	_anchorRatio.x = 0.5f;
-	_anchorRatio.y = 0.5f;
+AImage::AImage(void){
+	// init tint colour
+	colour.Set(1.0f, 1.0f, 1.0f, 1.0f);
 
-	debugRect = new AQuad();
+	// setup default scale and anchor position
+	scale.Set(1.0f, 1.0f);
+	anchorRatio.Set(0.5f, 0.5f);
 }
 
-AImage::AImage(const std::string& $fileName): depth(0.0f), scaleX(1.0f), scaleY(1.0f), alpha(1.0f), tintRed(false)
-{
+AImage::AImage(const std::string& $fileName){
 	_texture_sp = ATextureManager::GetInstance()->Get($fileName);
 
 	// Set the rect to be the size of the image
 	setRect(0, 0, _texture_sp->contentWidth(), _texture_sp->contentHeight());
 
-	_anchor.x = 0.0f;
-	_anchor.y = 0.0f;
-	_anchorRatio.x = 0.5f;
-	_anchorRatio.y = 0.5f;
-	
-	debugRect = new AQuad();
+	// init tint colour
+	colour.Set(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// setup default scale and anchor position
+	scale.Set(1.0f, 1.0f);
+	anchorRatio.Set(0.5f, 0.5f);
 }
 
-AImage::AImage(const std::string& $fileName, const Recti& $rect): depth(0.0f), scaleX(1.0f), scaleY(1.0f), alpha(1.0f), tintRed(false)
-{
+AImage::AImage(const std::string& $fileName, const Recti& $rect){
 	_texture_sp = ATextureManager::GetInstance()->Get($fileName);
 
+	// assign the texture rectangle.
 	setRect($rect);
 
-	_anchor.x = 0.0f;
-	_anchor.y = 0.0f;
-	_anchorRatio.x = 0.5f;
-	_anchorRatio.y = 0.5f;
-	
-	debugRect = new AQuad();
-}
+	// init tint colour
+	colour.Set(1.0f, 1.0f, 1.0f, 1.0f);
 
-/*
-// Programmer should not use Copy constructor to copy any AImage instance.
-// They have to manually create a new instance, or just using the reference
-AImage::AImage(const AImage& $image) : _fileName($image._fileName)
-{
-	std::cout << "copy constructor called\n";
-	_texture_sp = ATextureManager::GetInstance()->Get($image._fileName);
-
-	// Set the rect to be the size of the image
-	setRect($image._rect); 
+	// setup default scale and anchor position
+	scale.Set(1.0f, 1.0f);
+	anchorRatio.Set(0.5f, 0.5f);
 }
-*/
 
 AImage::~AImage(void)
 {
@@ -69,21 +53,6 @@ AImage::~AImage(void)
 	ATextureManager::GetInstance()->Remove(fileName);
 }
 
-/*
-// Programmer should not use assignment operator to copy any AImage instance.
-// They have to manually create a new instance, or just using the reference
-AImage& AImage::operator=(const AImage& $image){
-	std::cout << "assignment operator called\n";
-	 _fileName = $image._fileName;
-	_texture_sp = ATextureManager::GetInstance()->Get($image._fileName);
-
-	// Set the rect to be the size of the image
-	setRect($image._rect); 
-	return *this;
-}
-*/
-
-
 void AImage::SetTexture(const std::string& $fileName, const Recti& $rect){
 	// Dynamically change texture, we have to try to remove the previous texture it was using.
 	if(_texture_sp != NULL && _texture_sp->fileName() != $fileName){
@@ -95,9 +64,13 @@ void AImage::SetTexture(const std::string& $fileName, const Recti& $rect){
 	}
 	// update to the new texture
 	_texture_sp = ATextureManager::GetInstance()->Get($fileName);
+
+	// update texture coordinate
 	setRect($rect);
-	// update the anchor translation
-	setAnchor(_anchorRatio.x, _anchorRatio.y);
+
+	// setup default scale and anchor position
+	scale.Set(1.0f, 1.0f);
+	anchorRatio.Set(0.5f, 0.5f);
 }
 
 void AImage::SetTexture(const std::string& $fileName){
@@ -111,56 +84,50 @@ void AImage::SetTexture(const std::string& $fileName){
 	}
 	// update to the new texture
 	_texture_sp = ATextureManager::GetInstance()->Get($fileName);
+	// update texture coordinate
 	setRect(0, 0, _texture_sp->contentWidth(), _texture_sp->contentHeight());
-	// update the anchor translation
-	setAnchor(_anchorRatio.x, _anchorRatio.y);
+	
+	// setup default scale and anchor position
+	scale.Set(1.0f, 1.0f);
+	anchorRatio.Set(0.5f, 0.5f);
 }
 
-void AImage::Draw(const Vec2f& position, float rotation){
-	//std::cout << "draw: " << _texture_sp->fileName() << "\n";
+void AImage::Draw(float x, float y, float z, float rotation){
 	glPushMatrix();
 
 	//bind the texture
 	ATextureManager::GetInstance()->Bind(_texture_sp->fileName());
 
-	// do anchor shift.
-	_anchor.x = -width()*_anchorRatio.x;
-	_anchor.y = -height()*_anchorRatio.y;
+	// tint the colour
+	glColor4f(colour.r, colour.g, colour.b, colour.a);
 
-	glTranslatef(position.x, position.y, 0.0f);//normal position translation transform
+	// do the transformation
+	glTranslatef(x, y, z);//normal position translation transform
 	glRotatef(rotation, 0.0f, 0.0f, 1.0f);//rotation transform
-	glScalef(scaleX, scaleY, 0.0f);// scale transform
-	glTranslatef(_anchor.x, _anchor.y, 0.0f);//anchor translation transform
-	
-	
-	if(!tintRed){
-		glColor4f(1.0f, 1.0f, 1.0f, alpha);
-	}
-	else{
-		glColor4f(1.0f, 0.0f, 0.0f, alpha);
-	}
-	
+	glScalef(scale.x, scale.y, 1.0f);// scale transform
+	glTranslatef(-width()*anchorRatio.x, -height()*anchorRatio.y, 0.0f);//anchor translation transform
+
 	glBegin(GL_QUADS);
-		glTexCoord2f(_texOffsetX, _texOffsetY);								glVertex3f(0.0f, 0.0f, depth);
-		glTexCoord2f(_texWidth + _texOffsetX, _texOffsetY);					glVertex3f(_rect.width, 0.0f, depth);
-		glTexCoord2f(_texWidth + _texOffsetX, _texHeight + _texOffsetY);	glVertex3f(_rect.width, _rect.height, depth);
-		glTexCoord2f(_texOffsetX, _texHeight + _texOffsetY);				glVertex3f(0.0f, _rect.height, depth);
+	glTexCoord2f(_texCoord.x, _texCoord.y);											glVertex3f(0.0f, 0.0f, z);
+	glTexCoord2f(_texCoord.x + _texCoord.width, _texCoord.y);						glVertex3f(_rect.width, 0.0f, z);
+	glTexCoord2f(_texCoord.x + _texCoord.width, _texCoord.y + _texCoord.height);	glVertex3f(_rect.width, _rect.height, z);
+	glTexCoord2f(_texCoord.x, _texCoord.y + _texCoord.height);						glVertex3f(0.0f, _rect.height, z);
 	glEnd();
 
-	// finsihed drawing disable texture 2d.
+	// finished drawing disable texture 2d.
 	glDisable(GL_TEXTURE_2D);
-	
 
 	glPopMatrix();
 }
 
 void AImage::setRect(const Recti& $rect){
+	// copy assignment
 	_rect = $rect;
 
-	_texWidth = (float)_rect.width/_texture_sp->width();
-	_texHeight = (float)_rect.height/_texture_sp->height();
-	_texOffsetX = (float)_rect.x/_texture_sp->width();
-	_texOffsetY = (float)_rect.y/_texture_sp->height();
+	_texCoord.width = (float)_rect.width/_texture_sp->width();
+	_texCoord.height = (float)_rect.height/_texture_sp->height();
+	_texCoord.x = (float)_rect.x/_texture_sp->width();
+	_texCoord.y = (float)_rect.y/_texture_sp->height();
 }
 
 void AImage::setRect(int $x, int $y, int $width, int $height){
@@ -169,28 +136,18 @@ void AImage::setRect(int $x, int $y, int $width, int $height){
 	_rect.width = $width;
 	_rect.height = $height;
 
-	_texWidth = (float)_rect.width/_texture_sp->width();
-	_texHeight = (float)_rect.height/_texture_sp->height();
-	_texOffsetX = (float)_rect.x/_texture_sp->width();
-	_texOffsetY = (float)_rect.y/_texture_sp->height();
+	_texCoord.width = (float)_rect.width/_texture_sp->width();
+	_texCoord.height = (float)_rect.height/_texture_sp->height();
+	_texCoord.x = (float)_rect.x/_texture_sp->width();
+	_texCoord.y = (float)_rect.y/_texture_sp->height();
 }
 
 const Recti& AImage::rect() const{
 	return _rect;
 }
 
-void AImage::setAnchor(float $xRatio, float $yRatio){
-	// record the ratio, so if we dynamically change texture, we can update the anchor position
-	// according to the old ratio
-	_anchorRatio.x = $xRatio;
-	_anchorRatio.y = $yRatio;
-	// record the anchor translation, so we do not need to calculate them in draw function.
-	// _anchor.x = -width()*_anchorRatio.x;
-	// _anchor.y = -height()*_anchorRatio.y;
-}
-
-Vec2f& AImage::anchor(){
-	return _anchor;
+Vec2f AImage::anchor() const{
+	return Vec2f(width()*anchorRatio.x, height()*anchorRatio.y);
 }
 
 const std::string& AImage::fileName() const{
@@ -198,22 +155,21 @@ const std::string& AImage::fileName() const{
 }
 
 void AImage::setWidth(float $w){
-	scaleX = $w/(float)_rect.width;
+	scale.x = $w/(float)_rect.width;
 }
 
 void AImage::setHeight(float $h){
-	scaleY = $h/(float)_rect.height;
+	scale.y = $h/(float)_rect.height;
 }
 
 void AImage::setSize(float $w, float $h){
-	setWidth($w);
-	setHeight($h);
+	scale.Set($w/(float)_rect.width, $h/(float)_rect.height);
 }
 
-const float AImage::width(){
-	return (float)(_rect.width)*scaleX;
+const float AImage::width() const{
+	return (float)(_rect.width)*scale.x;
 }
 
-const float AImage::height(){
-	return (float)(_rect.height)*scaleY;
+const float AImage::height() const{
+	return (float)(_rect.height)*scale.y;
 }

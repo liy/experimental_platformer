@@ -1,22 +1,42 @@
 #pragma once
 #include <iostream>
 #include <vector>
-#include "AImage.h"
+#include "AIGraphics.h"
 
-class AFrame : public AImage
+class ATexture;
+
+class AFrame
 {
 public:
-	AFrame(const std::string& $fileName, unsigned int $duration=10);
-	AFrame(const std::string& $fileName, const Recti& $rect, unsigned int $duration=10);
+	AFrame(const std::string& $fileName, unsigned short $duration=10);
+	AFrame(const std::string& $fileName, const Recti& $rect, unsigned short $duration=10);
 	~AFrame(void);
 
-	void Draw(const Vec2f& position, float rotation);
+	// The texture which frame is using.
+	std::tr1::shared_ptr<ATexture> texture_sp;
 
-	unsigned int duration;
-	unsigned int listIndex;
+	// The texture coordinate
+	Rectf texCoord;
+
+	// How many mini seconds this frame is shown
+	unsigned short duration;
+
+	// The frame's index position in the animation list.
+	unsigned int index;
+
+	// Setup texture coordinate
+	void setRect(const Recti& $rect);
+	// Setup texture coordinate
+	void setRect(int $x, int $y, int $width, int $height);
+	// Get the texture coordinate
+	const Recti& rect() const;
+
+protected:
+	// The actual offset position, width and height, related to the texture resolution.
+	Recti _rect;
 };
 
-class AAnimation
+class AAnimation: public AIGraphics
 {
 public:
 	AAnimation(void);
@@ -28,25 +48,25 @@ public:
 
 	bool repeat;
 
-	// direct get and set rotation value is safe.
-	float rotation;
+	void Update(unsigned short delta);
 
-	// directly set and get depth is safe
-	float depth;
+	// Draw the image to a specific position and rotation
+	virtual void Draw(const Vec3f& position, float rotation){
+		Draw(position.x, position.y, position.z, rotation);
+	}
 
-	// TODO: May want to only keep track of width and height for animation instead of scale, since the width and height could be changed during the animation
-	float scaleX;
-	float scaleY;
+	// Draw the image to a specific position and rotation
+	virtual void Draw(const Vec2f& position, float z, float rotation){
+		Draw(position.x, position.y, z, rotation);
+	}
+	// Draw the image to a specific position and rotation
+	void Draw(float x, float y, float z, float rotation);
 
 	void AddFrame(const std::string& $fileName);
 
 	void AddFrame(const std::string& $fileName, const Recti& $rect);
 
-	void AddFrame(const std::string& $fileName, const Recti& $rect, unsigned int $duration);
-
-	void Update();
-
-	void Draw(const Vec2f& position, float rotation);
+	void AddFrame(const std::string& $fileName, const Recti& $rect, unsigned short $duration);
 
 	void Play();
 
@@ -72,15 +92,14 @@ public:
 
 	AFrame& GetFrame(unsigned int $index);
 
-	void setAnchor(float $xRatio, float $yRatio);
-	Vec2f& anchor();
+	Vec2f anchor() const;
 
 	void setWidth(float $w);
 	void setHeight(float $h);
 	void setSize(float $w, float $h);
 
-	const float width();
-	const float height();
+	const float width() const;
+	const float height() const;
 protected:
 	static const int ANI_FORWARD = 1;
 	static const int ANI_BACKWARD = -1;
@@ -96,9 +115,5 @@ protected:
 	bool _stopped;
 
 	int _direction;
-
-	Vec2f _anchor;
-	// anchor ratio internal use only
-	Vec2f _anchorRatio;
 };
 

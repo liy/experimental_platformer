@@ -206,7 +206,7 @@ void Actor::Update(unsigned short deltaTime){
 
 	// update the animation.
 	if(animation_ptr != NULL)
-		animation_ptr->Update();
+		animation_ptr->Update(deltaTime);
 	
 	// update the body's AABB.
 	body_ptr->Synchronize();
@@ -241,9 +241,9 @@ void Actor::GrabWall(bool grabbed){
 
 void Actor::Draw(){
 	if(image_ptr != NULL)
-		image_ptr->Draw(body_ptr->position, body_ptr->rotation); 
+		image_ptr->Draw(body_ptr->position, 0.0f, body_ptr->rotation);
 	if(animation_ptr != NULL)
-		animation_ptr->Draw(body_ptr->position, body_ptr->rotation);
+		animation_ptr->Draw(body_ptr->position, 0.0f, body_ptr->rotation);
 
 	body_ptr->DrawAABB(1.0f, 0.3f, 0.1f);
 }
@@ -254,17 +254,17 @@ void Actor::Move(float xRatio, float yRatio){
 
 	if(xRatio > 0.0f){
 		if(image_ptr != NULL)
-			image_ptr->scaleX = -1.0f;
+			image_ptr->scale.x = -1.0f;
 		if(animation_ptr != NULL){
-			animation_ptr->scaleX = -1.0f;
+			animation_ptr->scale.x = -1.0f;
 			animation_ptr->Play();
 		}
 	}
 	else if(xRatio <0.0f){
 		if(image_ptr != NULL)
-			image_ptr->scaleX = 1.0f;
+			image_ptr->scale.x = 1.0f;
 		if(animation_ptr != NULL){
-			animation_ptr->scaleX = 1.0f;
+			animation_ptr->scale.x = 1.0f;
 			animation_ptr->Play();
 		}
 	}
@@ -304,7 +304,7 @@ const Vec2f& Actor::GetPosition() const{
 
 void Actor::SetPosition(const Vec2f& p){
 	body_ptr->position.Set(p.x, p.y);
-	// FIXME: remove the position directly access, since we need to recomput the AABB here
+	// FIXME: remove the position directly access, since we need to recompute the AABB here
 	 body_ptr->Synchronize();
 
 }

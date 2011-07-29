@@ -6,7 +6,6 @@
 
 class ATexture;
 class ATextureManager;
-class AQuad;
 
 class AImage : public AIGraphics
 {
@@ -15,64 +14,61 @@ public:
 	AImage(const std::string& $fileName);
 	AImage(const std::string& $fileName, const Recti& $rect);
 	virtual ~AImage(void);
-	
-	// Should not be use!!! Too dangerous!! My feeling.
-	// You can always achieve the same thing through reference or create brand new AImage
-	//AImage(const AImage& $image);
 
-	// DIsallowed, Too dangerous!! My feeling. 
-	//AImage& operator=(const AImage& $image);
+	// scale of the image
+	Vec2f scale;
 
+	// tint colour of the image
+	Vec4f colour;
+
+	// Set anchor ratio internal use only
+	Vec2f anchorRatio;
+
+	// update the texture this image is using.
 	void SetTexture(const std::string& $fileName, const Recti& $rect);
+	// update the texture this image is using.
 	void SetTexture(const std::string& $fileName);
-
+	// Get the currently using texture file name.
 	const std::string& fileName() const;
 
-	void Draw(const Vec2f& position, float rotation);
+	// Draw the image to a specific position and rotation
+	virtual void Draw(const Vec3f& position, float rotation){
+		Draw(position.x, position.y, position.z, rotation);
+	}
 
+	// Draw the image to a specific position and rotation
+	virtual void Draw(const Vec2f& position, float z, float rotation){
+		Draw(position.x, position.y, z, rotation);
+	}
+	// Draw the image to a specific position and rotation
+	void Draw(float x, float y, float z, float rotation);
+
+	// Setup texture coordinate
 	void setRect(const Recti& $rect);
+	// Setup texture coordinate
 	void setRect(int $x, int $y, int $width, int $height);
+	// Get the texture coordinate
 	const Recti& rect() const;
 
-	// set anchor position
-	// TODO: Change the anchor to be the exact position related to the image width and height
-	// So in the draw function we do not need to calculate the anchor shift again and agan.
-	// Probably we need an varaible to keep track of the anchor translation, and another for record the anchor ratio passed in.
-	// Therefore, if we change the texture, the anchor position can be auto updated.
-	void setAnchor(float $xRatio, float $yRatio);
-	Vec2f& anchor();
+	// Get the anchor position related to the whole texture
+	Vec2f anchor() const;
 
-	// directly set and get depth is safe
-	float depth;
-
-	float scaleX;
-	float scaleY;
-
-	float alpha;
-
+	// Set the width and height of the image. This actually update the scale value of the image.
 	void setWidth(float $w);
 	void setHeight(float $h);
 	void setSize(float $w, float $h);
 
-	const float width();
-	const float height();
-
-	bool tintRed;
-
-	AQuad* debugRect;
+	// Get the width and height of the image. The width and height is the original size applied scale.
+	const float width() const;
+	const float height() const;
 
 protected:
 	std::tr1::shared_ptr<ATexture> _texture_sp;
 
-	Vec2f _anchor;
-	// anchor ratio internal use only
-	Vec2f _anchorRatio;
-
+	// The actual offset position, width and height, related to the texture resolution.
 	Recti _rect;
 
-	float _texOffsetX;
-	float _texOffsetY;
-	float _texWidth;
-	float _texHeight;
+	// The texture coordinate
+	Rectf _texCoord;
 };
 

@@ -21,9 +21,6 @@
     <ClCompile Include="AImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AQuad.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ATexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,9 +33,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AImage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AQuad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ATexture.h">

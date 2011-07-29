@@ -38,7 +38,7 @@ void Tile::Update(){
 	
 void Tile::Draw(){
 	_body->DrawAABB(0.0f, 0.3f, 0.1f);
-	image->Draw(_body->position, _rotation);
+	image->Draw(_body->position, 0.0f, _rotation);
 }
 
 float Tile::rotation(){

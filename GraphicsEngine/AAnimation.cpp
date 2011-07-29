@@ -3,74 +3,77 @@
 #include "ATexture.h"
 #include "acMath.h"
 
-AFrame::AFrame(const std::string& $fileName, unsigned int $duration): AImage($fileName),
-	duration($duration)
+AFrame::AFrame(const std::string& $fileName, unsigned short $duration): duration($duration)
 {
+	texture_sp = ATextureManager::GetInstance()->Get($fileName);
 
+	// Set the rect to be the size of the image
+	setRect(0, 0, texture_sp->contentWidth(), texture_sp->contentHeight());
 }
-AFrame::AFrame(const std::string& $fileName, const Recti& $rect, unsigned int $duration): AImage($fileName, $rect),
-	duration($duration)
-{
 
+AFrame::AFrame(const std::string& $fileName, const Recti& $rect, unsigned short $duration): duration($duration)
+{
+	texture_sp = ATextureManager::GetInstance()->Get($fileName);
+
+	setRect($rect);
 }
 
 AFrame::~AFrame(void){
-
+	// keep a copy record of the filename, to remove the 
+	std::string fileName = texture_sp->fileName();
+	std::cout << "AFrame["<< fileName <<"] destroy!\n";
+	// Null the reference, so we can try to remove th texture
+	texture_sp = NULL;
+	// Try to remove the using texture from the memory.
+	// If the reference count is 1.(1 reference count is maintained by the map). Then we remove it from the memory.
+	// So programmer will not need to manually  remove texture from the memory
+	ATextureManager::GetInstance()->Remove(fileName);
 }
 
-void AFrame::Draw(const Vec2f& position, float rotation){
-	//std::cout << "draw: " << _texture_sp->fileName() << "\n";
-	glPushMatrix();
+void AFrame::setRect(const Recti& $rect){
+	// copy assignment
+	_rect = $rect;
 
-	//bind the texture
-	ATextureManager::GetInstance()->Bind(_texture_sp->fileName());
+	texCoord.width = (float)_rect.width/texture_sp->width();
+	texCoord.height = (float)_rect.height/texture_sp->height();
+	texCoord.x = (float)_rect.x/texture_sp->width();
+	texCoord.y = (float)_rect.y/texture_sp->height();
+}
 
-	// do anchor translation
-	_anchor.x = -width()*_anchorRatio.x;
-	_anchor.y = -height()*_anchorRatio.y;
+void AFrame::setRect(int $x, int $y, int $width, int $height){
+	_rect.x = $x;
+	_rect.y = $y;
+	_rect.width = $width;
+	_rect.height = $height;
 
-	/*
-	glTranslatef(position.x, position.y, 0.0f);//normal position translation transform
-	glRotatef(rotation, 0.0f, 0.0f, 1.0f);//rotation transform
-	glScalef(scaleX, scaleY, 1.0f);// scale transform
-	glTranslatef(_anchor.x, _anchor.y, 0.0f);//anchor translation transform
-	*/
+	texCoord.width = (float)_rect.width/texture_sp->width();
+	texCoord.height = (float)_rect.height/texture_sp->height();
+	texCoord.x = (float)_rect.x/texture_sp->width();
+	texCoord.y = (float)_rect.y/texture_sp->height();
+}
 
-	glColor4f(1.0f, 1.0f, 1.0f, alpha);
-	
-	glBegin(GL_QUADS);
-	glTexCoord2f(_texOffsetX, _texOffsetY);								glVertex3f(0.0f, 0.0f, depth);
-	glTexCoord2f(_texWidth + _texOffsetX, _texOffsetY);					glVertex3f(_rect.width, 0.0f, depth);
-	glTexCoord2f(_texWidth + _texOffsetX, _texHeight + _texOffsetY);	glVertex3f(_rect.width, _rect.height, depth);
-	glTexCoord2f(_texOffsetX, _texHeight + _texOffsetY);				glVertex3f(0.0f, _rect.height, depth);
-	glEnd();
-	
-
-	glPopMatrix();
+const Recti& AFrame::rect() const{
+	return _rect;
 }
 
 
-AAnimation::AAnimation(void): _frameIndex(0), pingpong(false), repeat(true), _direction(1), _firstRound(true), _stopped(true), rotation(0), scaleX(1.0), scaleY(1.0), _frameTimer(1)
+
+AAnimation::AAnimation(void): _frameIndex(0), pingpong(false), repeat(true), _direction(1), _firstRound(true), _stopped(true), _frameTimer(1)
 {
-	_anchor.x = 0.0f;
-	_anchor.y = 0.0f;
-	_anchorRatio.x = 0.5f;
-	_anchorRatio.y = 0.5f;
+	scale.Set(1.0f, 1.0f);
+	anchorRatio.Set(0.5f, 0.5f);
 }
 
-AAnimation::AAnimation(const std::vector<AFrame*>& $frames): _frameIndex(0), pingpong(false), repeat(true), _firstRound(true), 
-	_stopped(true), _direction(1), rotation(0), scaleX(1.0), scaleY(1.0), _frameTimer(1)
+AAnimation::AAnimation(const std::vector<AFrame*>& $frames): _frameIndex(0), pingpong(false), repeat(true), _direction(1), _firstRound(true), _stopped(true),  _frameTimer(1)
 {
 	int len = $frames.size();
 	for(int i=0; i<len; ++i){
 		_frames.push_back($frames[i]);
-		_frames[i]->listIndex = i;
+		_frames[i]->index = i;
 	}
 
-	_anchor.x = 0.0f;
-	_anchor.y = 0.0f;
-	_anchorRatio.x = 0.5f;
-	_anchorRatio.y = 0.5f;
+	scale.Set(1.0f, 1.0f);
+	anchorRatio.Set(0.5f, 0.5f);
 }
 
 AAnimation::~AAnimation(void)
@@ -80,55 +83,61 @@ AAnimation::~AAnimation(void)
 
 void AAnimation::AddFrame(const std::string& $fileName){
 	AFrame* frame = new AFrame($fileName);
-	frame->listIndex = _frames.size();
+	frame->index = _frames.size();
 	_frames.push_back(frame);
 }
 
 void AAnimation::AddFrame(const std::string& $fileName, const Recti& $rect){
 	AFrame* frame = new AFrame($fileName, $rect);
-	frame->listIndex = _frames.size();
+	frame->index = _frames.size();
 	_frames.push_back(frame);
 }
 
 
-void AAnimation::AddFrame(const std::string& $fileName, const Recti& $rect, unsigned int $duration){
+void AAnimation::AddFrame(const std::string& $fileName, const Recti& $rect, unsigned short $duration){
 	AFrame* frame = new AFrame($fileName, $rect, $duration);
-	frame->listIndex = _frames.size();
+	frame->index = _frames.size();
 	_frames.push_back(frame);
 }
 
-void AAnimation::Update(){
+void AAnimation::Update(unsigned short delta){
 	// jump to next frame
 	if(!_stopped){
 		if(_frameTimer > _frames[_frameIndex]->duration){
 			NextFrame();
-		}//  current frame duration has not passed end
+		}
+		//  current frame duration has not passed end
 		// timer increase, since update is always called first, we do not want the animation missing first frame,
 		// therefore, we have to put the frame timer counter increase here
 		++_frameTimer;
 	}
 }
 
-void AAnimation::Draw(const Vec2f& position, float rotation){
+void AAnimation::Draw(float x, float y, float z, float rotation){
 	// if nothing in the frame list, do not draw
 	if(_frames.size() == 0)
 		return;
 
 	glPushMatrix();
 
-	// do anchor translation
-	_anchor.x = -width()*_anchorRatio.x;
-	_anchor.y = -height()*_anchorRatio.y;
+	AFrame* frame = _frames[_frameIndex];
 
+	ATextureManager::GetInstance()->Bind(frame->texture_sp->fileName());
 	
-	glTranslatef(position.x, position.y, 0.0f);//normal position translation transform
+	glTranslatef(x, y, 0.0f);//normal position translation transform
 	glRotatef(rotation, 0.0f, 0.0f, 1.0f);//rotation transform
-	glTranslatef(_anchor.x, _anchor.y, 0.0f);//anchor translation transform
-	glScalef(scaleX, scaleY, 1.0f);// scale transform
-	//std::cout << "anchor shift: " << _anchor.x << "\n";
-	
+	glTranslatef(-width()*anchorRatio.x, -height()*anchorRatio.y, 0.0f);//anchor translation transform
+	glScalef(scale.x, scale.y, 1.0f);// scale transform
 
-	_frames[_frameIndex]->Draw(position, rotation);
+	// tint the colour
+	glColor4f(colour.r, colour.g, colour.b, colour.a);
+	
+	glBegin(GL_QUADS);
+	glTexCoord2f(frame->texCoord.x, frame->texCoord.y);														glVertex3f(0.0f, 0.0f, z);
+	glTexCoord2f(frame->texCoord.x + frame->texCoord.width, frame->texCoord.y);								glVertex3f(frame->rect().width, 0.0f, z);
+	glTexCoord2f(frame->texCoord.x + frame->texCoord.width, frame->texCoord.y + frame->texCoord.height);	glVertex3f(frame->rect().width, frame->rect().height, z);
+	glTexCoord2f(frame->texCoord.x, frame->texCoord.y + frame->texCoord.height);							glVertex3f(0.0f, frame->rect().height, z);
+	glEnd();
 
 	glDisable(GL_TEXTURE_2D);
 
@@ -202,7 +211,7 @@ void AAnimation::NextFrame(){
 			//"direction*2" makes sure the last frame or the first frame do not render twice. See below pingpoing && !repeat case.
 			_frameIndex += _direction*2;
 		}
-		//only pingpong onec
+		//only pingpong once
 		else if(pingpong && !repeat){
 			//exceeded the index bound for the first time, still need pingpong once.
 			if(_firstRound){
@@ -229,7 +238,7 @@ void AAnimation::NextFrame(){
 				//For example, if animation started using ani_forward, at this point, direction will be -1,
 				//currentFrameIndex will be -1, so the new currentFrameIndex = -1 - -1 which will be 0.
 				//If animation started using ani_backward, at this point, direction will be 1, currentFrameIndex will be [frames count].
-				//So the new currentFrameIndex = [frames count]-1. Both casese are correct.
+				//So the new currentFrameIndex = [frames count]-1. Both cases are correct.
 				_frameIndex -= _direction;
 			}
 		}
@@ -255,26 +264,16 @@ AFrame& AAnimation::GetFrame(unsigned int $index){
 	return *_frames[$index];
 }
 
-void AAnimation::setAnchor(float $xRatio, float $yRatio){
-	// record the ratio, so if we dynamically change texture, we can update the anchor position
-	// according to the old ratio
-	_anchorRatio.x = $xRatio;
-	_anchorRatio.y = $yRatio;
-	// record the anchor translation, so we do not need to calculate them in draw function.
-	// _anchor.x =- width()*_anchorRatio.x;
-	// _anchor.y = -height()*_anchorRatio.y;
-}
-
-Vec2f& AAnimation::anchor(){
-	return _anchor;
+Vec2f AAnimation::anchor() const{
+	return Vec2f(width()*anchorRatio.x, height()*anchorRatio.y);
 }
 
 void AAnimation::setWidth(float $w){
-	scaleX = $w/(float)_frames[_frameIndex]->rect().width;
+	scale.x = $w/(float)_frames[_frameIndex]->rect().width;
 }
 
 void AAnimation::setHeight(float $h){
-	scaleY = $h/(float)_frames[_frameIndex]->rect().height;
+	scale.y = $h/(float)_frames[_frameIndex]->rect().height;
 }
 
 void AAnimation::setSize(float $w, float $h){
@@ -282,10 +281,10 @@ void AAnimation::setSize(float $w, float $h){
 	setHeight($h);
 }
 
-const float AAnimation::width(){
-	return (float)(_frames[_frameIndex]->width())*scaleX;
+const float AAnimation::width() const{
+	return (float)(_frames[_frameIndex]->rect().width)*scale.x;
 }
 
-const float AAnimation::height(){
-	return (float)(_frames[_frameIndex]->height())*scaleY;
+const float AAnimation::height() const{
+	return (float)(_frames[_frameIndex]->rect().height)*scale.y;
 }
