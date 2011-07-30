@@ -4,7 +4,7 @@
 
 class Game;
 class Actor;
-class Tile;
+class PhysicalTile;
 class Camera;
 
 static const int NUM_TILES = 100;
@@ -12,11 +12,10 @@ static const int NUM_TILES = 100;
 class Scene : public IMouseEventListener, public GamepadEventListener
 {
 public:
-
 	Scene(void);
 	~Scene(void);
 
-	Tile* tiles;
+	PhysicalTile* tiles;
 
 	void Init(Game* $game);
 
@@ -43,7 +42,7 @@ public:
 
 protected:
 	// TODO: just for testing pointer and reference, if we want to have a class scoped Game reference, we have to initialize the reference in the constructor parameter list.
-	// Because a reference is invalid with out a referant.
+	// Because a reference is invalid with out a referent.
 	Game* _game;
 	
 	Actor* actor;

@@ -23,16 +23,11 @@ void Camera::Init(float viewportWidth, float viewportHeight, float anchorRatioX,
 
 	position.SetZero();
 
-	SetAnchorRatio(anchorRatioX, anchorRatioY);
-
 	scale = 1.0f;
 
-	lockedTarget = NULL;
-}
+	anchorRatio.Set(anchorRatioX, anchorRatioY);
 
-void Camera::SetAnchorRatio(float ratioX, float ratioY){
-	anchorRatio.Set(ratioX, ratioY);
-	anchorShift.Set(-currentWidth * anchorRatio.x, -currentHeight * anchorRatio.y);
+	lockedTarget = NULL;
 }
 
 // Resize the camera's viewport 
@@ -41,8 +36,6 @@ void Camera::ResizeViewport(float w, float h){
 	currentHeight = h;
 
 	scale = oWidth/currentWidth;
-
-	SetAnchorRatio(anchorRatio.x, anchorRatio.y);
 }
 
 void Camera::ZoomTo(const Rectf& rect){
@@ -51,8 +44,6 @@ void Camera::ZoomTo(const Rectf& rect){
 
 	currentWidth = oWidth*scale;
 	currentHeight = oHeight*scale;
-
-	SetAnchorRatio(anchorRatio.x, anchorRatio.y);
 }
 
 void Camera::TweenTo(const Vec2f& tp){
@@ -74,7 +65,7 @@ void Camera::Move(const Vec2f& dis){
 	position += dis;
 }
 
-void Camera::Update(){
+void Camera::Update(unsigned short delta){
 	if(lockedTarget != NULL){
 		TweenTo(lockedTarget->position());
 	}
@@ -85,7 +76,7 @@ void Camera::Setup(){
 	// scale, related the shifted position.
 	glScalef(scale, scale, 1.0f);
 	// do further shift translation.
-	glTranslatef(-anchorShift.x, -anchorShift.y, 0.0f);
+	glTranslatef(currentWidth * anchorRatio.x, currentHeight * anchorRatio.y, 0.0f);
 	// rotate about the position
 	glRotatef(rotation, 0.0f, 0.0f, 1.0f);
 	// move the camera to specified position, ready for rotation.

@@ -26,7 +26,7 @@ public:
 	void ResizeViewport(float w, float h);
 
 	// update camera, such as, position, rotation...
-	void Update();
+	void Update(unsigned short delta);
 
 	// Setup the camera before we transform any models.
 	void Setup();
@@ -37,9 +37,14 @@ public:
 
 	float rotation;
 
+	Game* game;
+
 	// The ratio will be apply to the viewport width and height, and shift gluLookAt eye position and centre position.
 	// so camera is actually pointed to the (position + shift).
-	void SetAnchorRatio(float ratioX, float ratioY);
+	Vec2f anchorRatio;
+
+	
+	//void SetAnchorRatio(float ratioX, float ratioY);
 
 	Vec2f GetViewportSize() const;
 
@@ -59,12 +64,7 @@ protected:
 
 	float scale;
 
-	Vec2f anchorRatio;
-	Vec2f anchorShift;
-
 	// You can lock the camera to the target so the camera will always follows to it.
 	const Actor* lockedTarget;
-
-	Game* game;
 };
 

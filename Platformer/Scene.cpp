@@ -9,8 +9,9 @@
 #include "acPolygonShape.h"
 #include "AImage.h"
 #include "AAnimation.h"
-#include "Tile.h"
+#include "PhysicalTile.h"
 #include "Camera.h"
+#include "GraphicalTile.h"
 
 Scene::Scene(void)
 {
@@ -22,6 +23,8 @@ Scene::~Scene(void)
 {
 	
 }
+
+GraphicalTile* graphicalTile;
 
 void Scene::Init(Game* $game){
 	 _game = $game;
@@ -60,64 +63,66 @@ void Scene::Init(Game* $game){
 	float tx = 96.0f;
 	float ty = 98.0f;
 
-	tiles = new Tile[NUM_TILES];
+	tiles = new PhysicalTile[NUM_TILES];
 
-	tiles[0] = Tile();
+	tiles[0] = PhysicalTile();
 	tiles[0].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
 	tiles[0].position().Set(0, 0);
 
 	tx += 64.0f;
 
-	tiles[1] = Tile();
+	tiles[1] = PhysicalTile();
 	tiles[1].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
-	tiles[1].image->anchorRatio.Set(0.5f, 0.5f);
 	tiles[1].position().Set(tx+=32.0f, ty);
 
-	tiles[2] = Tile();
+	tiles[2] = PhysicalTile();
 	tiles[2].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
 	tiles[2].position().Set(tx+=32.0f, ty);
 
-	tiles[3] = Tile();
+	tiles[3] = PhysicalTile();
 	tiles[3].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
 	tiles[3].position().Set(tx+=32.0f, ty);
 
-	tiles[4] = Tile();
+	tiles[4] = PhysicalTile();
 	tiles[4].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
 	tiles[4].position().Set(tx+=32.0f, ty);
 
-	tiles[5] = Tile();
+	tiles[5] = PhysicalTile();
 	tiles[5].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
 	tiles[5].position().Set(tx, ty-=32.0f);
 
-	tiles[6] = Tile();
+	tiles[6] = PhysicalTile();
 	tiles[6].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
 	tiles[6].position().Set(tx, ty-=32.0f);
 
 	for(int i=7; i<NUM_TILES; ++i){
-		tiles[i] = Tile();
+		tiles[i] = PhysicalTile();
 		tiles[i].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
 		tiles[i].position().Set(int((unifRand()*2024.0f)/32.0f)*32.0f, int((unifRand()*768.0f)/32.0f)*32.0f);
 	}
 
 	// lock the camera to the actor
-	
 	_game->camera->Follows(*actor);
 
-	
+	graphicalTile = new GraphicalTile(new AAnimation(frames));
+	AAnimation* a = dynamic_cast<AAnimation*>(graphicalTile->graphics());
+	if(a != NULL){
+		a->Play();
+	}
+	graphicalTile->position().Set(300.0f, 100.0f);
 }
 
-void Scene::Update(unsigned short deltaTime){
-	actor->Update(deltaTime);
+void Scene::Update(unsigned short delta){
+	actor->Update(delta);
 
 	for(int i=0; i<NUM_TILES; ++i){
-		tiles[i].Update();
+		tiles[i].Update(delta);
 	}
 
-	//Vec2f p = actor->GetPosition();
-	//Rectf rect = Rectf(p.x, p.y, 32.0f, 32.0f);
-	//camera->ZoomTo(rect);
+	graphicalTile->Update(delta);
 
-	_game->camera->Update();
+	_game->camera->Update(delta);
+
 }
 
 
@@ -138,6 +143,8 @@ void Scene::Render(){
 	glBegin(GL_POINTS);
 	glVertex3f(0.0f, 0.0f, 0.0f);
 	glEnd();
+
+	graphicalTile->Draw();
 }
 
 void Scene::MouseDownHandler(short x, short y){

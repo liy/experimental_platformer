@@ -19,7 +19,7 @@ AFrame::AFrame(const std::string& $fileName, const Recti& $rect, unsigned short 
 }
 
 AFrame::~AFrame(void){
-	free(texCoord);
+	// TODO: how to free the texture coordinate
 
 	// keep a copy record of the filename, to remove the 
 	std::string fileName = texture_sp->fileName();
@@ -37,17 +37,17 @@ void AFrame::setRect(const Recti& $rect){
 	_rect = $rect;
 
 	// calculate bottom left of the image in texture coordinate. 
-	float x = (float)_rect.x/texture_sp->width();
-	float y = (float)_rect.y/texture_sp->height();
+	float u = (float)_rect.x/texture_sp->width();
+	float v = (float)_rect.y/texture_sp->height();
 	// Calculate the the width and height in texture coordinate.
 	float w = (float)_rect.width/texture_sp->width();
 	float h = (float)_rect.height/texture_sp->height();
 
 	// assign the texture coordinate
-	texCoord[0].Set(x, y);
-	texCoord[1].Set(x + w, y);
-	texCoord[2].Set(x + w, y + h);
-	texCoord[3].Set(x, y + h);
+	texCoord[0].Set(u, v);
+	texCoord[1].Set(u + w, v);
+	texCoord[2].Set(u + w, v + h);
+	texCoord[3].Set(u, v + h);
 }
 
 void AFrame::setRect(int $x, int $y, int $width, int $height){
@@ -57,24 +57,22 @@ void AFrame::setRect(int $x, int $y, int $width, int $height){
 	_rect.height = $height;
 
 	// calculate bottom left of the image in texture coordinate. 
-	float x = (float)_rect.x/texture_sp->width();
-	float y = (float)_rect.y/texture_sp->height();
+	float u = (float)_rect.x/texture_sp->width();
+	float v = (float)_rect.y/texture_sp->height();
 	// Calculate the the width and height in texture coordinate.
 	float w = (float)_rect.width/texture_sp->width();
 	float h = (float)_rect.height/texture_sp->height();
 
 	// assign the texture coordinate
-	texCoord[0].Set(x, y);
-	texCoord[1].Set(x + w, y);
-	texCoord[2].Set(x + w, y + h);
-	texCoord[3].Set(x, y + h);
+	texCoord[0].Set(u, v);
+	texCoord[1].Set(u + w, v);
+	texCoord[2].Set(u + w, v + h);
+	texCoord[3].Set(u, v + h);
 }
 
 const Recti& AFrame::rect() const{
 	return _rect;
 }
-
-
 
 AAnimation::AAnimation(void): AIGraphics(), _frameIndex(0), pingpong(false), repeat(true), _direction(1), _firstRound(true), _stopped(true), _frameTimer(1)
 {

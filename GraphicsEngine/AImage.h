@@ -63,6 +63,9 @@ public:
 	const float height() const;
 
 protected:
+	// TODO: make sure copy constructor is doing things correct with the shared pointer.
+	// I assume it will simply do a copy with the pointer, and when the cloned image destructor is called, which will NULL the cloned pointer
+	// And try to remove the texture from the TextureManager. So it should be fine to use machine generated copy constructor.
 	std::tr1::shared_ptr<ATexture> _texture_sp;
 
 	// The actual offset position, width and height, related to the texture resolution.

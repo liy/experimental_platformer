@@ -73,12 +73,14 @@
     <ClInclude Include="GameInputHandler.h" />
     <ClInclude Include="GamepadEventListener.h" />
     <ClInclude Include="game_settings.h" />
+    <ClInclude Include="GraphicalTile.h" />
+    <ClInclude Include="ITile.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="menu_resource.h" />
     <ClInclude Include="IMouseEventListener.h" />
     <ClInclude Include="RenderModule.h" />
     <ClInclude Include="Scene.h" />
-    <ClInclude Include="Tile.h" />
+    <ClInclude Include="PhysicalTile.h" />
     <ClInclude Include="IWinMenuEventListener.h" />
   </ItemGroup>
   <ItemGroup>
@@ -87,10 +89,11 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameInputHandler.cpp" />
     <ClCompile Include="GamepadEventListener.cpp" />
+    <ClCompile Include="GraphicalTile.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="RenderModule.cpp" />
     <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="PhysicalTile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="texture.png" />

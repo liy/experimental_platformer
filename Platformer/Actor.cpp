@@ -4,7 +4,7 @@
 #include "AImage.h"
 #include "AAnimation.h"
 #include "acBody.h"
-#include "Tile.h"
+#include "PhysicalTile.h"
 #include <GL\glut.h>
 #include <GL\GL.h>
 #include "acCollision.h"
@@ -80,15 +80,15 @@ Vec2f gravity(0.0f, -0.24f);
 void Actor::Update(unsigned short deltaTime){
 	body_ptr->velocity += gravity;
 
-	Tile* tiles = scene_ptr->tiles;
+	PhysicalTile* tiles = scene_ptr->tiles;
 
 	////std::cout << "update called\n";
 	float tmin = FLT_MAX;
 	Vec2f normal;
 	bool collide = false;
-	Tile* collidedTile;
+	PhysicalTile* collidedTile;
 	for(int i=0; i<NUM_TILES; ++i){
-		AABB2f mdAABB = tiles[i].GetBody()->aabb - body_ptr->aabb;
+		AABB2f mdAABB = tiles[i].body()->aabb - body_ptr->aabb;
 
 		RayCastInput input;
 		input.maxFraction = 1.0f;
@@ -114,7 +114,7 @@ void Actor::Update(unsigned short deltaTime){
 		body_ptr->position += tmin * body_ptr->velocity;
 
 		// Because of the floating point error, we have to readjust the position of the body.
-		AdjustTOI(tmin, normal, *body_ptr, collidedTile->GetBody());
+		AdjustTOI(tmin, normal, *body_ptr, collidedTile->body());
 
 		// TODO: you can add collision response code here, dispatch event etc.
 
@@ -150,7 +150,7 @@ void Actor::Update(unsigned short deltaTime){
 		}
 
 		// in order to persist the wall grabbing. We should not update the horizontal velocity.
-		// Only when user is not grabbing the walls, eg. grounded and hit the wall, we shall 0 the horizontal velocity.
+		// Only when user is not grabbing the walls, e.g. grounded and hit the wall, we shall 0 the horizontal velocity.
 		// This ensures the wall collision detection is consistent across all updates in the update loops.
 		if(!_wallGrabbed){
 			body_ptr->velocity.x = rv.x;
@@ -165,7 +165,7 @@ void Actor::Update(unsigned short deltaTime){
 		for(int i=0; i<NUM_TILES; ++i){
 			// Using AABB directly to calculate SAT require body's AABB is up to date! Therefore we need to recompute AABB depending on the current body transform.
 			body_ptr->Synchronize();
-			if(AABBSAT(tiles[i].GetBody()->aabb, body_ptr->aabb, penetrationNormal, minTransV)){
+			if(AABBSAT(tiles[i].body()->aabb, body_ptr->aabb, penetrationNormal, minTransV)){
 				//body_ptr->position += sd*penetrationNormal;// + penetrationNormal;
 				//std::cout << "New [" << minTransV.x <<", "<< minTransV.y << "]\n";
 				// Adding 1px to complete separate two object, so future time actor will not hitting the edges of the tile.
