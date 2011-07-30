@@ -40,8 +40,17 @@
     <Filter Include="Header Files\Core">
       <UniqueIdentifier>{b1444030-383f-4b42-8e1a-df4e76d6b3e3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\GameObjects\Tile">
-      <UniqueIdentifier>{57e4083f-098d-4261-92bf-6581b4c611cf}</UniqueIdentifier>
+    <Filter Include="Header Files\GameObjects\Tiles">
+      <UniqueIdentifier>{a8d8ceba-03af-4ce9-b292-19fde3aa7ef7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GameObjects\Tiles">
+      <UniqueIdentifier>{a48aa452-850b-46ed-bf52-da3b933dc606}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GameObjects\Actors">
+      <UniqueIdentifier>{a11d9567-8274-4525-9d98-78052e2e360a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GameObjects\Actors">
+      <UniqueIdentifier>{21106d28-9a46-4213-8db8-c52b7bf5df64}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -59,12 +68,6 @@
     </ClInclude>
     <ClInclude Include="acSettings.h">
       <Filter>Header Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Actor.h">
-      <Filter>Header Files\GameObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="Tile.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IMouseEventListener.h">
       <Filter>Header Files\Input</Filter>
@@ -86,6 +89,12 @@
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.h">
+      <Filter>Header Files\GameObjects\Tiles</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h">
+      <Filter>Header Files\GameObjects\Actors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -111,10 +120,10 @@
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="Tile.cpp">
-      <Filter>Source Files\GameObjects\Tile</Filter>
+      <Filter>Source Files\GameObjects\Tiles</Filter>
     </ClCompile>
     <ClCompile Include="Actor.cpp">
-      <Filter>Source Files\GameObjects</Filter>
+      <Filter>Source Files\GameObjects\Actors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

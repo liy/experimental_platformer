@@ -5,7 +5,10 @@ class AIGraphics
 {
 public:
 	AIGraphics(void){
+		// init tint colour
 		colour.Set(1.0f, 1.0f, 1.0f, 1.0f);
+
+		// setup default scale and anchor position
 		scale.Set(1.0f, 1.0f);
 		anchorRatio.Set(0.5f, 0.5f);
 	};

@@ -68,7 +68,12 @@ protected:
 	// The actual offset position, width and height, related to the texture resolution.
 	Recti _rect;
 
-	// The texture coordinate
-	Rectf _texCoord;
+	// TODO: change the rect into an array of vertices
+	Vec3f _vertices[4];
+
+	// Specifying 4 corners in the texture coordinate, in counter clock wise ordering.
+	// First vertex is the bottom left, second bottom right, third top right, final one is top left.
+	// Note its value is 0.0f ~ 1.0f, texture coordinate.
+	Vec2f _texCoord[4];
 };
 

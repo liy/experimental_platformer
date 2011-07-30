@@ -34,7 +34,7 @@ GLuint ATexture::Create(const std::string& $fileName){
 	_contentHeight = ilGetInteger(IL_IMAGE_HEIGHT);
 	_bpp = ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL);
 
-	// Actual texuture  size padded with extra pixels, ensure width and height are power of two.
+	// Actual texture  size padded with extra pixels, ensure width and height are power of two.
 	_width = nextPowerOfTwo(_contentWidth);
 	_height = nextPowerOfTwo(_contentHeight);
 	ilClearColour(0.0f, 0.0f, 0.0f, 1.0f);
@@ -55,7 +55,7 @@ GLuint ATexture::Create(const std::string& $fileName){
 	// set the canvas size.
 	iluEnlargeCanvas(_width, _height, _bpp);
 
-	// Allocate the memory fo the image data.
+	// Allocate the memory for the image data.
 	_data = new GLubyte[_width*_height*_bpp];
 	// Copy the loaded image data into the texture data depending on how many bytes per pixel
 	if(_bpp == 4){
@@ -72,7 +72,7 @@ GLuint ATexture::Create(const std::string& $fileName){
 	// Delete the devIL image data
 	ilDeleteImage(imageID);
 
-	// Start create OpenGL texutre from here
+	// Start create OpenGL texture from here
 
 	//create a new texture id
 	glGenTextures(1, &_textureID);
@@ -82,6 +82,7 @@ GLuint ATexture::Create(const std::string& $fileName){
 	// Select modulate to mix texture with color for shading
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
+	// TODO: passing in the texture parameters whe creation?
 	// Since this is a very simple 2D pixelated game, using GL_NEAREST will result a better non-fuzzy image on screen
 	// Texture filtering when texture size is big
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

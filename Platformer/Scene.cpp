@@ -96,7 +96,7 @@ void Scene::Init(Game* $game){
 	for(int i=7; i<NUM_TILES; ++i){
 		tiles[i] = Tile();
 		tiles[i].Init("tileset.png", Recti(0, 0, 32, 32), 14.0f, 14.0f);
-		tiles[i].position().Set(int((unifRand()*1024.0f)/32.0f)*32.0f, int((unifRand()*768.0f)/32.0f)*32.0f);
+		tiles[i].position().Set(int((unifRand()*2024.0f)/32.0f)*32.0f, int((unifRand()*768.0f)/32.0f)*32.0f);
 	}
 
 	// lock the camera to the actor
@@ -132,7 +132,6 @@ void Scene::Render(){
 	for(int i=0; i<NUM_TILES; ++i){
 		tiles[i].Draw();
 	}
-
 
 	glColor3f(0.0f, 0.0f, 1.0f);
 	glPointSize(10.0f);

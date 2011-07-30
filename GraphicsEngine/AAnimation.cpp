@@ -19,6 +19,8 @@ AFrame::AFrame(const std::string& $fileName, const Recti& $rect, unsigned short 
 }
 
 AFrame::~AFrame(void){
+	free(texCoord);
+
 	// keep a copy record of the filename, to remove the 
 	std::string fileName = texture_sp->fileName();
 	std::cout << "AFrame["<< fileName <<"] destroy!\n";
@@ -34,10 +36,18 @@ void AFrame::setRect(const Recti& $rect){
 	// copy assignment
 	_rect = $rect;
 
-	texCoord.width = (float)_rect.width/texture_sp->width();
-	texCoord.height = (float)_rect.height/texture_sp->height();
-	texCoord.x = (float)_rect.x/texture_sp->width();
-	texCoord.y = (float)_rect.y/texture_sp->height();
+	// calculate bottom left of the image in texture coordinate. 
+	float x = (float)_rect.x/texture_sp->width();
+	float y = (float)_rect.y/texture_sp->height();
+	// Calculate the the width and height in texture coordinate.
+	float w = (float)_rect.width/texture_sp->width();
+	float h = (float)_rect.height/texture_sp->height();
+
+	// assign the texture coordinate
+	texCoord[0].Set(x, y);
+	texCoord[1].Set(x + w, y);
+	texCoord[2].Set(x + w, y + h);
+	texCoord[3].Set(x, y + h);
 }
 
 void AFrame::setRect(int $x, int $y, int $width, int $height){
@@ -46,10 +56,18 @@ void AFrame::setRect(int $x, int $y, int $width, int $height){
 	_rect.width = $width;
 	_rect.height = $height;
 
-	texCoord.width = (float)_rect.width/texture_sp->width();
-	texCoord.height = (float)_rect.height/texture_sp->height();
-	texCoord.x = (float)_rect.x/texture_sp->width();
-	texCoord.y = (float)_rect.y/texture_sp->height();
+	// calculate bottom left of the image in texture coordinate. 
+	float x = (float)_rect.x/texture_sp->width();
+	float y = (float)_rect.y/texture_sp->height();
+	// Calculate the the width and height in texture coordinate.
+	float w = (float)_rect.width/texture_sp->width();
+	float h = (float)_rect.height/texture_sp->height();
+
+	// assign the texture coordinate
+	texCoord[0].Set(x, y);
+	texCoord[1].Set(x + w, y);
+	texCoord[2].Set(x + w, y + h);
+	texCoord[3].Set(x, y + h);
 }
 
 const Recti& AFrame::rect() const{
@@ -58,13 +76,13 @@ const Recti& AFrame::rect() const{
 
 
 
-AAnimation::AAnimation(void): _frameIndex(0), pingpong(false), repeat(true), _direction(1), _firstRound(true), _stopped(true), _frameTimer(1)
+AAnimation::AAnimation(void): AIGraphics(), _frameIndex(0), pingpong(false), repeat(true), _direction(1), _firstRound(true), _stopped(true), _frameTimer(1)
 {
 	scale.Set(1.0f, 1.0f);
 	anchorRatio.Set(0.5f, 0.5f);
 }
 
-AAnimation::AAnimation(const std::vector<AFrame*>& $frames): _frameIndex(0), pingpong(false), repeat(true), _direction(1), _firstRound(true), _stopped(true),  _frameTimer(1)
+AAnimation::AAnimation(const std::vector<AFrame*>& $frames): AIGraphics(), _frameIndex(0), pingpong(false), repeat(true), _direction(1), _firstRound(true), _stopped(true),  _frameTimer(1)
 {
 	int len = $frames.size();
 	for(int i=0; i<len; ++i){
@@ -118,12 +136,12 @@ void AAnimation::Draw(float x, float y, float z, float rotation){
 	if(_frames.size() == 0)
 		return;
 
-	glPushMatrix();
-
 	AFrame* frame = _frames[_frameIndex];
 
 	ATextureManager::GetInstance()->Bind(frame->texture_sp->fileName());
-	
+
+	glPushMatrix();
+
 	glTranslatef(x, y, 0.0f);//normal position translation transform
 	glRotatef(rotation, 0.0f, 0.0f, 1.0f);//rotation transform
 	glTranslatef(-width()*anchorRatio.x, -height()*anchorRatio.y, 0.0f);//anchor translation transform
@@ -133,10 +151,10 @@ void AAnimation::Draw(float x, float y, float z, float rotation){
 	glColor4f(colour.r, colour.g, colour.b, colour.a);
 	
 	glBegin(GL_QUADS);
-	glTexCoord2f(frame->texCoord.x, frame->texCoord.y);														glVertex3f(0.0f, 0.0f, z);
-	glTexCoord2f(frame->texCoord.x + frame->texCoord.width, frame->texCoord.y);								glVertex3f(frame->rect().width, 0.0f, z);
-	glTexCoord2f(frame->texCoord.x + frame->texCoord.width, frame->texCoord.y + frame->texCoord.height);	glVertex3f(frame->rect().width, frame->rect().height, z);
-	glTexCoord2f(frame->texCoord.x, frame->texCoord.y + frame->texCoord.height);							glVertex3f(0.0f, frame->rect().height, z);
+	glTexCoord2f(frame->texCoord[0].x, frame->texCoord[0].y);				glVertex3f(0.0f, 0.0f, z);
+	glTexCoord2f(frame->texCoord[1].x, frame->texCoord[1].y);				glVertex3f(frame->rect().width, 0.0f, z);
+	glTexCoord2f(frame->texCoord[2].x, frame->texCoord[2].y);				glVertex3f(frame->rect().width, frame->rect().height, z);
+	glTexCoord2f(frame->texCoord[3].x, frame->texCoord[3].y);				glVertex3f(0.0f, frame->rect().height, z);
 	glEnd();
 
 	glDisable(GL_TEXTURE_2D);

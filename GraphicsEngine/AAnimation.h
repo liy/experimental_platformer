@@ -15,8 +15,10 @@ public:
 	// The texture which frame is using.
 	std::tr1::shared_ptr<ATexture> texture_sp;
 
-	// The texture coordinate
-	Rectf texCoord;
+	// Specifying 4 corners in the texture coordinate, in counter clock wise ordering.
+	// First vertex is the bottom left, second bottom right, third top right, final one is top left.
+	// Note its value is 0.0f ~ 1.0f, texture coordinate.
+	Vec2f texCoord[4];
 
 	// How many mini seconds this frame is shown
 	unsigned short duration;

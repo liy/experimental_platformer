@@ -2,7 +2,6 @@
 #include "GamepadEventListener.h"
 
 class Scene;
-class AImage;
 class AAnimation;
 class acBody;
 
@@ -22,13 +21,12 @@ public:
 	Scene* scene_ptr;
 
 	// image pointer, dynamic memory allocation is needed
-	AImage* image_ptr;
-	// animation, dynamic memory allocation is needed
 	AAnimation* animation_ptr;
+
 	// rigid body, dynamic memory allocation is needed
 	acBody* body_ptr;
 
-	const Vec2f& Actor::GetPosition() const;
+	const Vec2f& Actor::position() const;
 	void SetPosition(const Vec2f& p);
 
 	void Update(unsigned short deltaTime);
@@ -45,7 +43,7 @@ protected:
 	bool _floating;
 	bool _wallGrabbed;
 
-	// When actor start falling or jumping, we allow a tiny tolerence until  floating is really set to true. In mini-seconds
+	// When actor start falling or jumping, we allow a tiny tolerance until  floating is really set to true. In mini-seconds
 	static const unsigned short FLOATING_TOLERENCE = 80;
 
 	// indicate the time duration when actor is in floating mode.

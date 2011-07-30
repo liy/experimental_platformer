@@ -24,9 +24,10 @@ public:
 
 	float damping;
 
-	// clone the shape and assigne it to the body
+	// clone the shape and assign it to the body
 	void SetShape(const acShape* shape);
 
+	// Draw the AABB bounding box
 	void DrawAABB(float r, float g, float b);
 
 	// keep AABB, transform synchronize

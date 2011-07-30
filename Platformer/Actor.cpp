@@ -12,16 +12,14 @@
 Actor::Actor(Scene* scene):GamepadEventListener(), _floating(true), _wallGrabbed(false), _floatingTimer(0){
 	scene_ptr = scene;
 
-	image_ptr = NULL;
-	body_ptr = NULL;
 	animation_ptr = NULL;
+	body_ptr = NULL;
 }
 
 Actor::Actor(Scene* scene, acBody* body): _floating(true), _wallGrabbed(false), _floatingTimer(0){
 	scene_ptr = scene;
 	body_ptr = body;
 
-	image_ptr = NULL;
 	animation_ptr = NULL;
 }
 
@@ -29,10 +27,10 @@ Actor::~Actor(void)
 {
 	if(body_ptr != NULL)
 		delete body_ptr;
-	if(image_ptr != NULL)
-		delete image_ptr;
 	if(animation_ptr != NULL)
 		delete animation_ptr;
+	animation_ptr = NULL;
+	body_ptr = NULL;
 }
 
 void AdjustTOI(const float t, const Vec2f& n, acBody& actorBody, const acBody* tileBody){
@@ -112,7 +110,7 @@ void Actor::Update(unsigned short deltaTime){
 
 	if(collide){
 		// TODO: change to relative velocity
-		// forward the poistion to the positon of TOI
+		// forward the position to the position of TOI
 		body_ptr->position += tmin * body_ptr->velocity;
 
 		// Because of the floating point error, we have to readjust the position of the body.
@@ -151,26 +149,26 @@ void Actor::Update(unsigned short deltaTime){
 			Land();
 		}
 
-		// in order to persit the wall grabbing. We should not update the horizontal velocity.
+		// in order to persist the wall grabbing. We should not update the horizontal velocity.
 		// Only when user is not grabbing the walls, eg. grounded and hit the wall, we shall 0 the horizontal velocity.
-		// This ensures the wall collision detection is consitent across all updates in the update loops.
+		// This ensures the wall collision detection is consistent across all updates in the update loops.
 		if(!_wallGrabbed){
 			body_ptr->velocity.x = rv.x;
 		}
 
 
 		// now since above displacement can cause penetration, we have to check if there is any penetration or not.
-		// If there is penetration, use the minimum penetration distance to seperate the object.
-		// Since all we use are AABBs, it make sense simply use SAT to detect the penetration and minimum speration vector.
+		// If there is penetration, use the minimum penetration distance to separate the object.
+		// Since all we use are AABBs, it make sense simply use SAT to detect the penetration and minimum separation vector.
 		Vec2f minTransV;
 		Vec2f penetrationNormal;
 		for(int i=0; i<NUM_TILES; ++i){
-			// Using AABB directly to calculate SAT require body's AABB is up to date! Theirfore we need to recompute AABB depending on the current body transform.
+			// Using AABB directly to calculate SAT require body's AABB is up to date! Therefore we need to recompute AABB depending on the current body transform.
 			body_ptr->Synchronize();
 			if(AABBSAT(tiles[i].GetBody()->aabb, body_ptr->aabb, penetrationNormal, minTransV)){
 				//body_ptr->position += sd*penetrationNormal;// + penetrationNormal;
 				//std::cout << "New [" << minTransV.x <<", "<< minTransV.y << "]\n";
-				// Adding 1px to complete seperate two object, so future time actor will not hitting the edges of the tile.
+				// Adding 1px to complete separate two object, so future time actor will not hitting the edges of the tile.
 				body_ptr->position += minTransV + penetrationNormal;
 			}
 		}
@@ -188,7 +186,7 @@ void Actor::Update(unsigned short deltaTime){
 		// directly translate the position
 		body_ptr->position += body_ptr->velocity;
 		
-		// The collision is consistence while grabbing the wall, so we can saftly ungrab the wall if no collision is found. (When grounded, _wallGrabbed is always false)
+		// The collision is consistence while grabbing the wall, so we can safely ungrab the wall if no collision is found. (When grounded, _wallGrabbed is always false)
 		GrabWall(false);
 
 		// After a short delay, we will set floating mode to true, so actor can not jump anymore.
@@ -205,8 +203,7 @@ void Actor::Update(unsigned short deltaTime){
 	}
 
 	// update the animation.
-	if(animation_ptr != NULL)
-		animation_ptr->Update(deltaTime);
+	animation_ptr->Update(deltaTime);
 	
 	// update the body's AABB.
 	body_ptr->Synchronize();
@@ -240,10 +237,7 @@ void Actor::GrabWall(bool grabbed){
 
 
 void Actor::Draw(){
-	if(image_ptr != NULL)
-		image_ptr->Draw(body_ptr->position, 0.0f, body_ptr->rotation);
-	if(animation_ptr != NULL)
-		animation_ptr->Draw(body_ptr->position, 0.0f, body_ptr->rotation);
+	animation_ptr->Draw(body_ptr->position, 0.0f, body_ptr->rotation);
 
 	body_ptr->DrawAABB(1.0f, 0.3f, 0.1f);
 }
@@ -253,20 +247,13 @@ void Actor::Move(float xRatio, float yRatio){
 	body_ptr->velocity.x = 3.0f * xRatio;
 
 	if(xRatio > 0.0f){
-		if(image_ptr != NULL)
-			image_ptr->scale.x = -1.0f;
-		if(animation_ptr != NULL){
-			animation_ptr->scale.x = -1.0f;
-			animation_ptr->Play();
-		}
+		animation_ptr->scale.x = -1.0f;
+		animation_ptr->Play();
 	}
-	else if(xRatio <0.0f){
-		if(image_ptr != NULL)
-			image_ptr->scale.x = 1.0f;
-		if(animation_ptr != NULL){
-			animation_ptr->scale.x = 1.0f;
-			animation_ptr->Play();
-		}
+	else if(xRatio < 0.0f){
+		animation_ptr->scale.x = 1.0f;
+		animation_ptr->scale.x = 1.0f;
+		animation_ptr->Play();
 	}
 	else{
 		animation_ptr->GoToStop(1);
@@ -274,7 +261,7 @@ void Actor::Move(float xRatio, float yRatio){
 }
 
 void Actor::Jump(){
-	// only when you released the button first, then you can jump agian... do not allow auto button trigger.
+	// only when you released the button first, then you can jump again... do not allow auto button trigger.
 	if(_jumpRelased){
 		GamepadEventListener::Jump();
 
@@ -298,13 +285,12 @@ void Actor::Stop(){
 
 }
 
-const Vec2f& Actor::GetPosition() const{
+const Vec2f& Actor::position() const{
 	return body_ptr->position;
 }
 
 void Actor::SetPosition(const Vec2f& p){
 	body_ptr->position.Set(p.x, p.y);
 	// FIXME: remove the position directly access, since we need to recompute the AABB here
-	 body_ptr->Synchronize();
-
+	body_ptr->Synchronize();
 }
