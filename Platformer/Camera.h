@@ -1,7 +1,7 @@
 #pragma once
 #include "acMath.h"
 
-class Actor;
+class Player;
 class Game;
 
 // TODO: refine this class.
@@ -49,9 +49,9 @@ public:
 	Vec2f GetViewportSize() const;
 
 	// lock camera to a actor.
-	void Follows(const Actor& actor);
+	void Follows(const Player& actor);
 	void Unlock();
-	const Actor* GetLockedTarget();
+	const Player* GetLockedTarget();
 
 	void ZoomTo(const Rectf& rect);
 
@@ -65,6 +65,6 @@ protected:
 	float scale;
 
 	// You can lock the camera to the target so the camera will always follows to it.
-	const Actor* lockedTarget;
+	const Player* lockedTarget;
 };
 

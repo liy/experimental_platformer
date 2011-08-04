@@ -24,6 +24,8 @@ public:
 	// Set anchor ratio internal use only
 	Vec2f anchorRatio;
 
+	bool horizontalFlip;
+
 	// Update the graphic, this probably only apply to the animation. For static image, this function does nothing
 	virtual void Update(unsigned short delta) {};
 

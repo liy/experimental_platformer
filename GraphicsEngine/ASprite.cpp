@@ -1,18 +1,20 @@
-#include "AImage.h"
+#include "ASprite.h"
 #include "ATextureManager.h"
 #include "ATexture.h"
 #include "acMath.h"
 
-AImage::AImage(void){
+ASprite::ASprite(void){
 	// init tint colour
 	colour.Set(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// setup default scale and anchor position
 	scale.Set(1.0f, 1.0f);
 	anchorRatio.Set(0.5f, 0.5f);
+
+	horizontalFlip = false;
 }
 
-AImage::AImage(const std::string& $fileName){
+ASprite::ASprite(const std::string& $fileName){
 	_texture_sp = ATextureManager::GetInstance()->Get($fileName);
 
 	// Set the rect to be the size of the image
@@ -24,20 +26,27 @@ AImage::AImage(const std::string& $fileName){
 	// setup default scale and anchor position
 	scale.Set(1.0f, 1.0f);
 	anchorRatio.Set(0.5f, 0.5f);
+
+	horizontalFlip = false;
 }
 
-AImage::AImage(const std::string& $fileName, const Recti& $rect){
+ASprite::ASprite(const std::string& $fileName, const Recti& $rect){
 	_texture_sp = ATextureManager::GetInstance()->Get($fileName);
 
 	// assign the texture rectangle.
 	setRect($rect);
 
+	// init tint colour
+	colour.Set(1.0f, 1.0f, 1.0f, 1.0f);
+
 	// setup default scale and anchor position
 	scale.Set(1.0f, 1.0f);
 	anchorRatio.Set(0.5f, 0.5f);
+
+	horizontalFlip = false;
 }
 
-AImage::~AImage(void)
+ASprite::~ASprite(void)
 {
 	// FIXME how to free the image texture coordinate????
 
@@ -52,7 +61,7 @@ AImage::~AImage(void)
 	ATextureManager::GetInstance()->Remove(fileName);
 }
 
-void AImage::SetTexture(const std::string& $fileName, const Recti& $rect){
+void ASprite::SetTexture(const std::string& $fileName, const Recti& $rect){
 	// Dynamically change texture, we have to try to remove the previous texture it was using.
 	if(_texture_sp != NULL && _texture_sp->fileName() != $fileName){
 		std::string fileName = _texture_sp->fileName();
@@ -72,7 +81,7 @@ void AImage::SetTexture(const std::string& $fileName, const Recti& $rect){
 	anchorRatio.Set(0.5f, 0.5f);
 }
 
-void AImage::SetTexture(const std::string& $fileName){
+void ASprite::SetTexture(const std::string& $fileName){
 	// Dynamically change texture, we have to try to remove the previous texture it was using.
 	if(_texture_sp != NULL && _texture_sp->fileName() != $fileName){
 		std::string fileName = _texture_sp->fileName();
@@ -91,7 +100,7 @@ void AImage::SetTexture(const std::string& $fileName){
 	anchorRatio.Set(0.5f, 0.5f);
 }
 
-void AImage::Draw(float x, float y, float z, float rotation){
+void ASprite::Draw(float x, float y, float z, float rotation){
 	//bind the texture
 	ATextureManager::GetInstance()->Bind(_texture_sp->fileName());
 
@@ -107,10 +116,18 @@ void AImage::Draw(float x, float y, float z, float rotation){
 	glTranslatef(-width()*anchorRatio.x, -height()*anchorRatio.y, 0.0f);//anchor translation transform
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(_texCoord[0].u, _texCoord[0].v);			glVertex3f(0.0f, 0.0f, z);
-	glTexCoord2f(_texCoord[1].u, _texCoord[1].v);			glVertex3f(_rect.width, 0.0f, z);
-	glTexCoord2f(_texCoord[2].u, _texCoord[2].v);			glVertex3f(_rect.width, _rect.height, z);
-	glTexCoord2f(_texCoord[3].u, _texCoord[3].v);			glVertex3f(0.0f, _rect.height, z);
+	if(!horizontalFlip){
+		glTexCoord2f(_texCoord[0].u, _texCoord[0].v);			glVertex3f(0.0f, 0.0f, z);
+		glTexCoord2f(_texCoord[1].u, _texCoord[1].v);			glVertex3f(_rect.width, 0.0f, z);
+		glTexCoord2f(_texCoord[2].u, _texCoord[2].v);			glVertex3f(_rect.width, _rect.height, z);
+		glTexCoord2f(_texCoord[3].u, _texCoord[3].v);			glVertex3f(0.0f, _rect.height, z);
+	}
+	else{
+		glTexCoord2f(_texCoord[1].u, _texCoord[1].v);			glVertex3f(0.0f, 0.0f, z);
+		glTexCoord2f(_texCoord[0].u, _texCoord[0].v);			glVertex3f(_rect.width, 0.0f, z);
+		glTexCoord2f(_texCoord[3].u, _texCoord[3].v);			glVertex3f(_rect.width, _rect.height, z);
+		glTexCoord2f(_texCoord[2].u, _texCoord[2].v);			glVertex3f(0.0f, _rect.height, z);
+	}
 	glEnd();
 
 	// finished drawing disable texture 2d.
@@ -119,7 +136,7 @@ void AImage::Draw(float x, float y, float z, float rotation){
 	glPopMatrix();
 }
 
-void AImage::setRect(const Recti& $rect){
+void ASprite::setRect(const Recti& $rect){
 	// copy assignment
 	_rect = $rect;
 
@@ -137,7 +154,7 @@ void AImage::setRect(const Recti& $rect){
 	_texCoord[3].Set(u, v + h);
 }
 
-void AImage::setRect(int $x, int $y, int $width, int $height){
+void ASprite::setRect(int $x, int $y, int $width, int $height){
 	_rect.x = $x;
 	_rect.y = $y;
 	_rect.width = $width;
@@ -157,34 +174,34 @@ void AImage::setRect(int $x, int $y, int $width, int $height){
 	_texCoord[3].Set(u, v + h);
 }
 
-const Recti& AImage::rect() const{
+const Recti& ASprite::rect() const{
 	return _rect;
 }
 
-Vec2f AImage::anchor() const{
+Vec2f ASprite::anchor() const{
 	return Vec2f(width()*anchorRatio.x, height()*anchorRatio.y);
 }
 
-const std::string& AImage::fileName() const{
+const std::string& ASprite::fileName() const{
 	return _texture_sp->fileName();
 }
 
-void AImage::setWidth(float $w){
+void ASprite::setWidth(float $w){
 	scale.x = $w/(float)_rect.width;
 }
 
-void AImage::setHeight(float $h){
+void ASprite::setHeight(float $h){
 	scale.y = $h/(float)_rect.height;
 }
 
-void AImage::setSize(float $w, float $h){
+void ASprite::setSize(float $w, float $h){
 	scale.Set($w/(float)_rect.width, $h/(float)_rect.height);
 }
 
-const float AImage::width() const{
+const float ASprite::width() const{
 	return (float)(_rect.width)*scale.x;
 }
 
-const float AImage::height() const{
+const float ASprite::height() const{
 	return (float)(_rect.height)*scale.y;
 }

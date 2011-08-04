@@ -2,7 +2,8 @@
 #include "ITile.h"
 
 class acBody;
-class AImage;
+class ASprite;
+class AAnimation;
 
 class PhysicalTile: public ITile
 {
@@ -10,23 +11,25 @@ public:
 	PhysicalTile(void);
 	~PhysicalTile(void);
 
-	virtual void Init(const std::string& textureName, const Recti& rect, float hw, float hh);
-
 	virtual void Update(unsigned short delta);
 	virtual void Draw();
+
+	virtual void SetSprite(ASprite* img);
+	virtual void SetAnimation(AAnimation* ani);
+
+	virtual void SetBody(acBody* body);
+	virtual void CreateBody(float hw, float hh);
+	virtual acBody* body();
 
 	virtual float rotation() const;
 	virtual void SetRotation(float r);
 
-	virtual Vec2f& position();
+	virtual const Vec2f& position() const;
 	virtual void SetPosition(float x, float y);
 	virtual void SetPosition(const Vec2f& pos);
 
-	virtual acBody* body();
-	virtual void SetBody(acBody* body);
-
 protected:
-	AImage* image;
+	AIGraphics* _graphics_ptr;
 	float _rotation;
 	acBody* _body;
 };

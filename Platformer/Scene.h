@@ -3,7 +3,7 @@
 #include "GamepadEventListener.h"
 
 class Game;
-class Actor;
+class Player;
 class PhysicalTile;
 class Camera;
 
@@ -45,6 +45,6 @@ protected:
 	// Because a reference is invalid with out a referent.
 	Game* _game;
 	
-	Actor* actor;
+	Player* actor;
 };
 

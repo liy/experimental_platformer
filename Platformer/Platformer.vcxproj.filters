@@ -90,9 +90,6 @@
     <ClInclude Include="Camera.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Actor.h">
-      <Filter>Header Files\GameObjects\Actors</Filter>
-    </ClInclude>
     <ClInclude Include="ITile.h">
       <Filter>Header Files\GameObjects\Tiles</Filter>
     </ClInclude>
@@ -101,6 +98,12 @@
     </ClInclude>
     <ClInclude Include="GraphicalTile.h">
       <Filter>Header Files\GameObjects\Tiles</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Header Files\GameObjects\Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h">
+      <Filter>Header Files\GameObjects\Actors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -125,14 +128,14 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Actor.cpp">
-      <Filter>Source Files\GameObjects\Actors</Filter>
-    </ClCompile>
     <ClCompile Include="PhysicalTile.cpp">
       <Filter>Source Files\GameObjects\Tiles</Filter>
     </ClCompile>
     <ClCompile Include="GraphicalTile.cpp">
       <Filter>Source Files\GameObjects\Tiles</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files\GameObjects\Actors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

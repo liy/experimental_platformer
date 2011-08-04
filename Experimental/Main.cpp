@@ -1,6 +1,6 @@
 #pragma once
 #include "ATextureManager.h"
-#include "AImage.h"
+#include "ASprite.h"
 #include <GL\glut.h>
 #include <GL\GL.h>
 #include "acMath.h"
@@ -10,7 +10,7 @@ float red=1.0f, blue=1.0f, green=1.0f;
 float screenWidth;
 float screenHeight;
 
-AImage* image;
+ASprite* image;
 
 void changeSize(int w, int h) {
 	screenWidth = w;
@@ -55,8 +55,10 @@ float easeOut(float s, float d, float D, float t){
 
 int t = 0;
 
+Vec3f vertices[6];
+
 void renderScene(void) {
-	// Clear The Screen And The Depth Buffer, stencial buffer will be set to 0
+	// Clear The Screen And The Depth Buffer, stencil buffer will be set to 0
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	// make sure the transparent pixels
@@ -87,59 +89,24 @@ void renderScene(void) {
 	// reset model view matrix
 	glLoadIdentity();
 	
-	t++;
-	if(t >= 200.0f){
-		t = 200.0f;
-	}
-
-	gluLookAt(QuadraticEase(0.0f, 100.0f, 200, t), QuadraticEase(0.0f, 100.0f, 200, t), 200.0f,
-		QuadraticEase(0.0f, 100.0f, 200, t), QuadraticEase(0.0f, 100.0f, 200, t), 0.0f, 
-		0.0f, 1.0f, 0.0f);
 
 
-	glRotatef(angle, 0.0f, 1.0f, 0.f);
-	glRotatef(angle - 2.0f, 0.0f, 0.0f, 1.0f);
+	//glRotatef(angle, 0.0f, 1.0f, 0.f);
+	//glRotatef(angle - 2.0f, 0.0f, 0.0f, 1.0f);
+	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 
-	glBegin(GL_QUADS);
 
-	glColor3f(1.0f, 0.0f, 0.0f);
-	// FRONT
-	glVertex3f(-50.5f, -50.5f, 50.5f);
-	glVertex3f( 50.5f, -50.5f, 50.5f);
-	glVertex3f( 50.5f, 50.5f, 50.5f);
-	glVertex3f(-50.5f, 50.5f, 50.5f);
-	// BACK
-	glVertex3f(-50.5f, -50.5f, -50.5f);
-	glVertex3f(-50.5f, 50.5f, -50.5f);
-	glVertex3f( 50.5f, 50.5f, -50.5f);
-	glVertex3f( 50.5f, -50.5f, -50.5f);
+	vertices[0] = Vec3f(0.0f, 0.0f, 0.0f);
+	vertices[1] = Vec3f(0.0f, 50.0f, 0.0f);
+	vertices[2] = Vec3f(50.0f, 0.0f, 0.0f);
+	vertices[3] = Vec3f(50.0f, 50.0f, 0.0f);
+	vertices[4] = Vec3f(100.0f, 0.0f, 0.0f);
+	vertices[5] = Vec3f(100.0f, 50.0f, 0.0f);
 
-	glColor3f(0.0f, 1.0f, 0.0f);
-	// LEFT
-	glVertex3f(-50.5f, -50.5f, 50.5f);
-	glVertex3f(-50.5f, 50.5f, 50.5f);
-	glVertex3f(-50.5f, 50.5f, -50.5f);
-	glVertex3f(-50.5f, -50.5f, -50.5f);
-	// RIGHT
-	glVertex3f( 50.5f, -50.5f, -50.5f);
-	glVertex3f( 50.5f, 50.5f, -50.5f);
-	glVertex3f( 50.5f, 50.5f, 50.5f);
-	glVertex3f( 50.5f, -50.5f, 50.5f);
+	glVertexPointer(3, GL_FLOAT, 0, vertices[0]);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
 
-	glColor3f(0.0f, 0.0f, 1.0f);
-	// TOP
-	glVertex3f(-50.5f, 50.5f, 50.5f);
-	glVertex3f( 50.5f, 50.5f, 50.5f);
-	glVertex3f( 50.5f, 50.5f, -50.5f);
-	glVertex3f(-50.5f, 50.5f, -50.5f);
-	// BOTTOM
-	glVertex3f(-50.5f, -50.5f, 50.5f);
-	glVertex3f(-50.5f, -50.5f, -50.5f);
-	glVertex3f( 50.5f, -50.5f, -50.5f);
-	glVertex3f( 50.5f, -50.5f, 50.5f);
-	glEnd();
-
-	angle+=1.0f;
+	//angle+=1.0f;
 
 
 
@@ -225,11 +192,14 @@ void processSpecialKeys(int key, int x, int y) {
 
 void Init(){
 	glPolygonMode(GL_BACK, GL_LINE);
+	
+	//Enable the vertex array functionality:
+	glEnableClientState(GL_VERTEX_ARRAY);
 
 	// You must initialize the TextureManager first before use.
 	ATextureManager::GetInstance()->Init();
 
-	image = new AImage("screen.jpg");
+	image = new ASprite("screen.jpg");
 }
 
 void main(int argc, char **argv) {

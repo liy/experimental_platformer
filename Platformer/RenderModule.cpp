@@ -1,7 +1,7 @@
 #include "RenderModule.h"
 #include "ATexture.h"
 #include "ATextureManager.h"
-#include "AImage.h"
+#include "ASprite.h"
 #include "Game.h"
 #include "Scene.h"
 #include <sstream>
@@ -28,7 +28,7 @@ int RenderModule::Init(Game* $game, HDC& $hDC, unsigned int sw, unsigned int sh)
 	_scene = &_game->getCurrentScene();
 
 	// do not render the back of the texture.
-	//glPolygonMode(GL_BACK, GL_LINE);
+	glPolygonMode(GL_BACK, GL_LINE);
 
 	glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_LEQUAL);
@@ -109,7 +109,7 @@ int RenderModule::Render(){
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	DrawFPS();
+	//DrawFPS();
 
 	// render current scene
 	// reset the matrix

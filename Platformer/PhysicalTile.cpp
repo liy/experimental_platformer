@@ -1,7 +1,8 @@
 #include "PhysicalTile.h"
 #include "acPolygonShape.h"
 #include "acBody.h"
-#include "AImage.h"
+#include "ASprite.h"
+#include "AAnimation.h"
 
 PhysicalTile::PhysicalTile(void):_rotation(0.0f)
 {
@@ -14,14 +15,19 @@ PhysicalTile::~PhysicalTile(void)
 
 }
 
-void PhysicalTile::Init(const std::string& textureName, const Recti& rect, float hw, float hh){
+void PhysicalTile::SetAnimation(AAnimation* ani){
+	_graphics_ptr = ani;
+}
+
+void PhysicalTile::SetSprite(ASprite* img){
+	_graphics_ptr = img;
+}
+
+void PhysicalTile::CreateBody(float hw, float hh){
 	acPolygonShape* boxShape = new acPolygonShape();
 	boxShape->SetAsBox(hw, hh);
 	_body = new acBody();
 	_body->SetShape(boxShape);
-
-	image = new AImage(textureName);
-	image->setRect(rect);
 }
 
 void PhysicalTile::SetBody(acBody* body){
@@ -34,11 +40,13 @@ acBody* PhysicalTile::body(){
 
 void PhysicalTile::Update(unsigned short delta){
 	_body->Synchronize();
+
+	_graphics_ptr->Update(delta);
 }
 	
 void PhysicalTile::Draw(){
 	_body->DrawAABB(0.0f, 0.3f, 0.1f);
-	image->Draw(_body->position, 0.0f, _rotation);
+	_graphics_ptr->Draw(_body->position, 0.0f, _rotation);
 }
 
 float PhysicalTile::rotation() const{
@@ -58,7 +66,7 @@ void PhysicalTile::SetPosition(const Vec2f& pos){
 	_body->position = pos;
 }
 
-Vec2f& PhysicalTile::position(){
+const Vec2f& PhysicalTile::position() const{
 	return _body->position;
 }
 

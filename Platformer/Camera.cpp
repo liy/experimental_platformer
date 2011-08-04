@@ -1,7 +1,7 @@
 #include "Camera.h"
 #include <GL\glut.h>
 #include <GL\GL.h>
-#include "Actor.h"
+#include "Player.h"
 #include "Game.h"
 
 Camera::Camera(Game* gm): game(gm)
@@ -85,7 +85,7 @@ void Camera::Setup(){
 		0.0f, 1.0f, 0.0f);
 }
 
-void Camera::Follows(const Actor& actor){
+void Camera::Follows(const Player& actor){
 	lockedTarget = &actor;
 }
 
@@ -93,7 +93,7 @@ void Camera::Unlock(){
 	lockedTarget = NULL;
 }
 
-const Actor* Camera::GetLockedTarget(){
+const Player* Camera::GetLockedTarget(){
 	return lockedTarget;
 }
 

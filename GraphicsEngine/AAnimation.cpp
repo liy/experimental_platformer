@@ -74,6 +74,10 @@ const Recti& AFrame::rect() const{
 	return _rect;
 }
 
+
+
+
+
 AAnimation::AAnimation(void): AIGraphics(), _frameIndex(0), pingpong(false), repeat(true), _direction(1), _firstRound(true), _stopped(true), _frameTimer(1)
 {
 	scale.Set(1.0f, 1.0f);
@@ -149,10 +153,18 @@ void AAnimation::Draw(float x, float y, float z, float rotation){
 	glColor4f(colour.r, colour.g, colour.b, colour.a);
 	
 	glBegin(GL_QUADS);
-	glTexCoord2f(frame->texCoord[0].x, frame->texCoord[0].y);				glVertex3f(0.0f, 0.0f, z);
-	glTexCoord2f(frame->texCoord[1].x, frame->texCoord[1].y);				glVertex3f(frame->rect().width, 0.0f, z);
-	glTexCoord2f(frame->texCoord[2].x, frame->texCoord[2].y);				glVertex3f(frame->rect().width, frame->rect().height, z);
-	glTexCoord2f(frame->texCoord[3].x, frame->texCoord[3].y);				glVertex3f(0.0f, frame->rect().height, z);
+	if(!horizontalFlip){
+		glTexCoord2f(frame->texCoord[0].x, frame->texCoord[0].y);				glVertex3f(0.0f, 0.0f, z);
+		glTexCoord2f(frame->texCoord[1].x, frame->texCoord[1].y);				glVertex3f(frame->rect().width, 0.0f, z);
+		glTexCoord2f(frame->texCoord[2].x, frame->texCoord[2].y);				glVertex3f(frame->rect().width, frame->rect().height, z);
+		glTexCoord2f(frame->texCoord[3].x, frame->texCoord[3].y);				glVertex3f(0.0f, frame->rect().height, z);
+	}
+	else{
+		glTexCoord2f(frame->texCoord[1].x, frame->texCoord[1].y);				glVertex3f(0.0f, 0.0f, z);
+		glTexCoord2f(frame->texCoord[0].x, frame->texCoord[0].y);				glVertex3f(frame->rect().width, 0.0f, z);
+		glTexCoord2f(frame->texCoord[3].x, frame->texCoord[3].y);				glVertex3f(frame->rect().width, frame->rect().height, z);
+		glTexCoord2f(frame->texCoord[2].x, frame->texCoord[2].y);				glVertex3f(0.0f, frame->rect().height, z);
+	}
 	glEnd();
 
 	glDisable(GL_TEXTURE_2D);

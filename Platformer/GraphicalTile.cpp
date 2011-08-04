@@ -1,46 +1,51 @@
 #include "GraphicalTile.h"
 #include "AIGraphics.h"
 #include "AAnimation.h"
-#include "AImage.h"
+#include "ASprite.h"
 
 GraphicalTile::GraphicalTile(void): _rotation(0.0f)
 {
 	_position.SetZero();
 }
 
-GraphicalTile::GraphicalTile(AImage* img): _rotation(0.0f){
+// TODO: pass a pointer? or pass by reference then call copy constructor?
+GraphicalTile::GraphicalTile(ASprite* img): _rotation(0.0f){
 	// copy the image passed in. Since it can be stored in stack
-	_graphic_ptr = img;
+	_graphics_ptr = img;
 
 	_position.SetZero();
 }
 
+// TODO: pass a pointer? or pass by reference then call copy constructor?
 GraphicalTile::GraphicalTile(AAnimation* ani): _rotation(0.0f){
 	// copy the animation passed in
-	_graphic_ptr = ani;
+	_graphics_ptr = ani;
 
 	_position.SetZero();
 }
 
 GraphicalTile::~GraphicalTile(void)
 {
-	delete _graphic_ptr;
+	delete _graphics_ptr;
+	_graphics_ptr = NULL;
 }
 
+// TODO: pass a pointer? or pass by reference then call copy constructor?
 void GraphicalTile::SetAnimation(const AAnimation& ani){
-	_graphic_ptr = new AAnimation(ani);
+	_graphics_ptr = new AAnimation(ani);
 }
 
-void GraphicalTile::SetImage(const AImage& img){
-	_graphic_ptr = new AImage(img);
+// TODO: pass a pointer? or pass by reference then call copy constructor?
+void GraphicalTile::SetSprite(const ASprite& img){
+	_graphics_ptr = new ASprite(img);
 }
 
 void GraphicalTile::Update(unsigned short delta){
-	_graphic_ptr->Update(delta);
+	_graphics_ptr->Update(delta);
 }
 
 void GraphicalTile::Draw(){
-	_graphic_ptr->Draw(_position, 0.0f, _rotation);
+	_graphics_ptr->Draw(_position, 0.0f, _rotation);
 }
 
 float GraphicalTile::rotation() const{
@@ -51,7 +56,7 @@ void GraphicalTile::SetRotation(float r){
 	_rotation = r;
 }
 
-Vec2f& GraphicalTile::position(){
+const Vec2f& GraphicalTile::position() const{
 	return _position;
 }
 
@@ -64,5 +69,5 @@ void GraphicalTile::SetPosition(const Vec2f& pos){
 }
 
 AIGraphics* GraphicalTile::graphics(){
-	return _graphic_ptr;
+	return _graphics_ptr;
 }

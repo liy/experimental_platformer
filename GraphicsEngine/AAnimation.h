@@ -5,7 +5,7 @@
 
 class ATexture;
 
-class AFrame
+struct AFrame
 {
 public:
 	AFrame(const std::string& $fileName, unsigned short $duration=10);

@@ -1,7 +1,7 @@
-#include "Actor.h"
+#include "Player.h"
 #include "Scene.h"
 #include "game_settings.h"
-#include "AImage.h"
+#include "ASprite.h"
 #include "AAnimation.h"
 #include "acBody.h"
 #include "PhysicalTile.h"
@@ -9,21 +9,23 @@
 #include <GL\GL.h>
 #include "acCollision.h"
 
-Actor::Actor(Scene* scene):GamepadEventListener(), _floating(true), _wallGrabbed(false), _floatingTimer(0){
-	scene_ptr = scene;
+Player::Player(Scene* scene):
+	GamepadEventListener(), 
+	Actor(scene), 
+	_floating(true), _wallGrabbed(false), _floatingTimer(0)
+{
 
-	animation_ptr = NULL;
-	body_ptr = NULL;
 }
 
-Actor::Actor(Scene* scene, acBody* body): _floating(true), _wallGrabbed(false), _floatingTimer(0){
-	scene_ptr = scene;
-	body_ptr = body;
+Player::Player(Scene* scene, AAnimation* ani, acBody* body): 
+	GamepadEventListener(),
+	Actor(scene, ani, body), 
+	_floating(true), _wallGrabbed(false), _floatingTimer(0)
+{
 
-	animation_ptr = NULL;
 }
 
-Actor::~Actor(void)
+Player::~Player(void)
 {
 	if(body_ptr != NULL)
 		delete body_ptr;
@@ -61,23 +63,23 @@ void AdjustTOI(const float t, const Vec2f& n, acBody& actorBody, const acBody* t
 		if(n.x > 0.0f){
 			//actorBody.position.x = tileBody->aabb.upperBound.x + actorBodyExtent.x;
 
-			// adding 1px for complete seperate, so that the jumping or falling will not hit the bottom or top edge of the tile
-			// corresponding SAT seperation will also need 1px as well
+			// adding 1px for complete separate, so that the jumping or falling will not hit the bottom or top edge of the tile
+			// corresponding SAT separation will also need 1px as well
 			actorBody.position.x = tileBody->aabb.upperBound.x + actorBodyExtent.x + n.x;
 		}
 		// hit left of the tile, adjust to tile's left position
 		else{
 			//actorBody.position.x = tileBody->aabb.lowerBound.x - actorBodyExtent.x;
 
-			// adding 1px for complete seperate, so that the jumping or falling will not hit the bottom or top edge of the tile
-			// corresponding SAT seperation will also need 1px as well
+			// adding 1px for complete separate, so that the jumping or falling will not hit the bottom or top edge of the tile
+			// corresponding SAT separation will also need 1px as well
 			actorBody.position.x = tileBody->aabb.lowerBound.x - actorBodyExtent.x + n.x;
 		}
 	}
 }
 
 Vec2f gravity(0.0f, -0.24f);
-void Actor::Update(unsigned short deltaTime){
+void Player::Update(unsigned short deltaTime){
 	body_ptr->velocity += gravity;
 
 	PhysicalTile* tiles = scene_ptr->tiles;
@@ -209,14 +211,14 @@ void Actor::Update(unsigned short deltaTime){
 	body_ptr->Synchronize();
 }
 
-void Actor::Land(){
+void Player::Land(){
 	body_ptr->velocity.y = 0.0f;
 	_floating = false;
 	_wallGrabbed = false;
 	_floatingTimer = 0;
 }
 
-void Actor::GrabWall(bool grabbed){
+void Player::GrabWall(bool grabbed){
 	_wallGrabbed = grabbed;
 
 	// Only if we are grabbing the wall, we set the floating to false.
@@ -235,24 +237,16 @@ void Actor::GrabWall(bool grabbed){
 	}
 }
 
-
-void Actor::Draw(){
-	animation_ptr->Draw(body_ptr->position, 0.0f, body_ptr->rotation);
-
-	body_ptr->DrawAABB(1.0f, 0.3f, 0.1f);
-}
-
-void Actor::Move(float xRatio, float yRatio){
+void Player::Move(float xRatio, float yRatio){
 	//body_ptr->velocity.Set(4.0f*xRatio, -4.0f*yRatio);
 	body_ptr->velocity.x = 3.0f * xRatio;
 
 	if(xRatio > 0.0f){
-		animation_ptr->scale.x = -1.0f;
+		animation_ptr->horizontalFlip = true;
 		animation_ptr->Play();
 	}
 	else if(xRatio < 0.0f){
-		animation_ptr->scale.x = 1.0f;
-		animation_ptr->scale.x = 1.0f;
+		animation_ptr->horizontalFlip = false;
 		animation_ptr->Play();
 	}
 	else{
@@ -260,7 +254,7 @@ void Actor::Move(float xRatio, float yRatio){
 	}
 }
 
-void Actor::Jump(){
+void Player::Jump(){
 	// only when you released the button first, then you can jump again... do not allow auto button trigger.
 	if(_jumpRelased){
 		GamepadEventListener::Jump();
@@ -273,7 +267,7 @@ void Actor::Jump(){
 	}
 }
 
-void Actor::JumpRelease(){
+void Player::JumpRelease(){
 	GamepadEventListener::JumpRelease();
 
 	if(_floating && body_ptr->velocity.y > 0.0f){
@@ -281,16 +275,6 @@ void Actor::JumpRelease(){
 	}
 }
 
-void Actor::Stop(){
+void Player::Stop(){
 
-}
-
-const Vec2f& Actor::position() const{
-	return body_ptr->position;
-}
-
-void Actor::SetPosition(const Vec2f& p){
-	body_ptr->position.Set(p.x, p.y);
-	// FIXME: remove the position directly access, since we need to recompute the AABB here
-	body_ptr->Synchronize();
 }

@@ -13,12 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="DLL">
+      <UniqueIdentifier>{9339488e-29da-442c-9653-7e40431a8956}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AAnimation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ATexture.cpp">
@@ -27,12 +27,12 @@
     <ClCompile Include="ATextureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ASprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AAnimation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ATexture.h">
@@ -44,5 +44,13 @@
     <ClInclude Include="AIGraphics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ASprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\lib\glut-3.7.6-bin\glut32.dll">
+      <Filter>DLL</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -18,7 +18,7 @@ public:
 	virtual float rotation() const =0;
 	virtual void SetRotation(float r) =0;
 
-	virtual Vec2f& position() =0;
+	virtual const Vec2f& position() const =0;
 	virtual void SetPosition(float x, float y) =0;
 	virtual void SetPosition(const Vec2f& pos) =0;
 };

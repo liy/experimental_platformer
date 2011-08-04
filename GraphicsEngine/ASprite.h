@@ -7,13 +7,13 @@
 class ATexture;
 class ATextureManager;
 
-class AImage : public AIGraphics
+class ASprite : public AIGraphics
 {
 public:
-	AImage(void);
-	AImage(const std::string& $fileName);
-	AImage(const std::string& $fileName, const Recti& $rect);
-	virtual ~AImage(void);
+	ASprite(void);
+	ASprite(const std::string& $fileName);
+	ASprite(const std::string& $fileName, const Recti& $rect);
+	virtual ~ASprite(void);
 
 	// scale of the image
 	Vec2f scale;
