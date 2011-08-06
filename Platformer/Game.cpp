@@ -24,6 +24,7 @@ Game::~Game(void)
 
 void Game::Init(HDC hDC, HWND hWnd, int screenWidth, int screenHeight){
 	_hDC = hDC;
+	_hWnd = hWnd;
 
 	// initialize camera
 	camera = new Camera(this);
@@ -60,6 +61,35 @@ LRESULT CALLBACK Game::MsgRouter(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 void Game::Resize(int $w, int $h){
 	_renderer->Resize($w, $h);
+}
+
+
+long _frameCount;
+DWORD _previousTime;
+int _fps;
+void DisplayFPS(HWND hWnd){
+	_frameCount++;
+	//  Get the number of milliseconds since glutInit called
+	//  (or first call to glutGet(GLUT ELAPSED TIME)).
+	DWORD currentTime = GetTickCount();
+	//  Calculate time passed
+	int timeInterval = currentTime - _previousTime;
+	// every half second do a FPS update.
+	if(timeInterval > 500)
+	{
+		//  calculate the number of frames per second
+		_fps = _frameCount / (timeInterval / 1000.0f);
+
+		//  Set time
+		_previousTime = currentTime;
+		//  Reset frame count
+		_frameCount = 0;
+	}
+
+	// conver to string
+	char str[10];
+	sprintf(str, "FPS: %d", _fps);
+	SetWindowText(hWnd, str);
 }
 
 MSG Game::MainGameLoop(){
@@ -103,9 +133,9 @@ MSG Game::MainGameLoop(){
 		{
 			// processing input
 			loops = 0;
-			// If the time for updating is not arrived yet then do the loop will not be executed, or if the max number of frames rendering can skippied is exceeded
+			// If the time for updating is not arrived yet then do the loop will not be executed, or if the max number of frames rendering can skipped is exceeded
 			while(GetTickCount() >= inputTime && loops < MAX_FRAMES_SKIP){
-				// It is just the time for or the time is running behind for input process, we should do the input process again in order to keep up of the time. Unless the max number of frams can be skipped is exceeded.
+				// It is just the time for or the time is running behind for input process, we should do the input process again in order to keep up of the time. Unless the max number of frames can be skipped is exceeded.
 				// process input, include keyboard, mouse and gamepad input...
 				_gameInputHandler->ProcessInput();
 
@@ -136,6 +166,8 @@ MSG Game::MainGameLoop(){
 			// processing rendering
 			// render the whole thing, as much as possible. Do not care about dupldate frames rendering
 			_renderer->Render();
+
+			DisplayFPS(_hWnd);
 
 		} // no message else end.
 	} // while end

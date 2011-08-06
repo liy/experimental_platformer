@@ -35,6 +35,7 @@ public:
 	RenderModule* _renderer;
 
 	HDC _hDC;
+	HWND _hWnd;
 
 	void Init(HDC hDC, HWND hWnd, int screenWidth, int screenHeight);
 

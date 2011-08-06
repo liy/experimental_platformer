@@ -43,13 +43,6 @@ public:
 	void UseOrthogonal();
 
 protected:
-	long _frameCount;
-	DWORD _previousTime;
-	int _fps;
-
-	void DrawFPS();
-	void DrawString(int x, int y, const char *str, ...);
-
 	// screen width
 	unsigned int _screenWidth;
 	// screen height

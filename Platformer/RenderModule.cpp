@@ -6,7 +6,7 @@
 #include "Scene.h"
 #include <sstream>
 
-RenderModule::RenderModule(void): _fps(0)
+RenderModule::RenderModule(void)
 {
 
 }
@@ -46,54 +46,6 @@ int RenderModule::Init(Game* $game, HDC& $hDC, unsigned int sw, unsigned int sh)
 	return 0;
 }
 
-void RenderModule::DrawString(int x, int y, const char *str, ...){
-	char buffer[128];
-
-	va_list arg;
-	va_start(arg, str);
-	vsprintf(buffer, str, arg);
-	va_end(arg);
-
-	glPushMatrix();
-
-	glColor3f(1.0f, 1.0f, 1.0f);
-	glRasterPos3i(x, y, 0);
-	int length = (int)strlen(buffer);
-	for (int i = 0; i < length; ++i){
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, buffer[i]);
-	}
-
-	glPopMatrix();
-}
-
-void RenderModule::DrawFPS(){
-
-	_frameCount++;
-	//  Get the number of milliseconds since glutInit called
-	//  (or first call to glutGet(GLUT ELAPSED TIME)).
-	DWORD currentTime = GetTickCount();
-	//  Calculate time passed
-	int timeInterval = currentTime - _previousTime;
-	// every half second do a FPS update.
-	if(timeInterval > 500)
-	{
-		//  calculate the number of frames per second
-		_fps = _frameCount / (timeInterval / 1000.0f);
-
-		//  Set time
-		_previousTime = currentTime;
-		//  Reset frame count
-		_frameCount = 0;
-	}
-
-	// conver to string
-	std::stringstream ss;
-	ss << _fps;
-
-	// draw the string
-	DrawString(-_screenWidth/2 + 5, _screenHeight/2 - 12 - 5, ss.str().c_str());
-}
-
 int RenderModule::Render(){
 	// reset model view matrix
 	glLoadIdentity();
@@ -108,8 +60,6 @@ int RenderModule::Render(){
 	//enable transparency.
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	//DrawFPS();
 
 	// render current scene
 	// reset the matrix
