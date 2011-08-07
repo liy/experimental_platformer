@@ -78,6 +78,7 @@
     <ClInclude Include="ASprite.h" />
     <ClInclude Include="ATexture.h" />
     <ClInclude Include="ATextureManager.h" />
+    <ClInclude Include="AGeom.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\lib\glut-3.7.6-bin\glut32.dll" />

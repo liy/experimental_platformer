@@ -114,7 +114,13 @@ void ASprite::Draw(float x, float y, float z, float rotation){
 	glTranslatef(x, y, z);//normal position translation transform
 	glRotatef(rotation, 0.0f, 0.0f, 1.0f);//rotation transform
 	glScalef(scale.x, scale.y, 1.0f);// scale transform
+
+	// TODO: multiply the transformation matrix.
+	glMultMatrixf(_transform);
+
 	glTranslatef(-width()*anchorRatio.x, -height()*anchorRatio.y, 0.0f);//anchor translation transform
+
+	
 
 	glBegin(GL_QUADS);
 	if(!horizontalFlip){
@@ -129,6 +135,14 @@ void ASprite::Draw(float x, float y, float z, float rotation){
 		glTexCoord2f(_texCoord[3].u, _texCoord[3].v);			glVertex3f(_rect.width, _rect.height, z);
 		glTexCoord2f(_texCoord[2].u, _texCoord[2].v);			glVertex3f(0.0f, _rect.height, z);
 	}
+	glEnd();
+
+	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+	glBegin(GL_LINE_LOOP);
+	glVertex3f(0.0f, 0.0f, z);
+	glVertex3f(32.0f, 0.0f, z);
+	glVertex3f(32.0f, 32.0f, z);
+	glVertex3f(0.0f, 32.0f, z);
 	glEnd();
 
 	// finished drawing disable texture 2d.

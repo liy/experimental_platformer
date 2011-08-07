@@ -47,6 +47,9 @@
     <ClInclude Include="ASprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AGeom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\lib\glut-3.7.6-bin\glut32.dll">

@@ -819,6 +819,45 @@ public:
 		return *this;
 	}
 
+	// ================== transformation matrix creation =====================
+	static Mat4<T> CreateTranslation(T x, T y, T z, T w=1){
+		Mat4<T> nMat;
+		nMat[12] = x;
+		nMat[13] = y;
+		nMat[14] = z;
+		nMat[15] = w;
+
+		return nMat;
+	}
+
+	static Mat4<T> CreateRotationZ(float radian){
+		Mat4<T> nMat;
+		// a cosine
+		float ac = cos(radian);
+		// b sine
+		float bs = sin(radian);
+		// c -sine
+		float cs = -sin(radian);
+		// d cosine
+		float dc = cos(radian);
+
+		nMat[0] = ac;
+		nMat[1] = bs;
+		nMat[4] = cs;
+		nMat[5] = dc;
+
+		return nMat;
+	}
+
+	static Mat4<T> CreateScale(float x, float y, float z){
+		Mat4<T> nMat;
+		nMat[0] = x;
+		nMat[5] = y;
+		nMat[10] = z;
+
+		return nMat;
+	}
+
 	// ================== transform methods ===========================
 
 	// Set this matrix to identity matrix
@@ -835,11 +874,11 @@ public:
 	 *		| m2  m6  m10	 tz  |
 	 *		| m3  m7  m11	1    | 
 	 */
-	void SetTranslate(const Vec3<T>& v){
-		m[12] = v.x;
-		m[13] = v.y;
-		m[14] = v.z;
-		m[15] = 1;
+	void SetTranslate(T x, T y, T z, T w=1){
+		m[12] = x;
+		m[13] = y;
+		m[14] = z;
+		m[15] = w;
 	}
 
 	/**
@@ -965,7 +1004,7 @@ public:
 	 */
 	Mat4<T> operator* (const Mat4<T>& mat){
 		// The new matrix
-		Mat4<T> nMat;
+		static Mat4<T> nMat;
 		// Since the OpenGL matrix is column major.
 		// We have to scan and assign the matrix element in VERTICAL order.
 
@@ -982,13 +1021,15 @@ public:
 				//	c0*m0  +  c4*m1  +  c8*m2   +  c12*m3
 				for(int k=0; k<4; ++k){
 					// take the current matrix's ROW multiply to the input matrix's COLUMN
-					n += this(k, y) * mat(x, k);
+					n += (*this)(k, y) * mat(x, k);
 				}
 
 				// assign the multiplication result to current matrix element
 				nMat(x, y) = n;
 			}
 		}
+
+		return nMat;
 	}
 
 	/**
@@ -1020,6 +1061,33 @@ public:
 			v.x*m[2] + v.y*m[6] + v.z*m[10] + v.w*m[14],
 			v.x*m[3] + v.y*m[7] + v.z*m[11] + v.w*m[15]
 			);
+	}
+
+	// ========================== transformation of itself =====================================
+
+	Mat4<T>& Translate(T x, T y, T z){
+		// TODO: manually do the translation without matrix multiplication??!?!? faster?!?!
+		Mat4<T> nMat = CreateTranslation(x, y, z);
+
+		std::memcpy(m, ((*this) * nMat).m, sizeof(T)*16);
+
+		return *this;
+	}
+
+	Mat4<T>& RotateZ(float radian){
+		Mat4<T> nMat = CreateRotationZ(radian);
+
+		std::memcpy(m, ((*this) * nMat).m, sizeof(T)*16);
+
+		return *this;
+	}
+
+	Mat4<T>& Scale(float x, float y, float z){
+		Mat4<T> nMat = CreateScale(x, y, z);
+
+		std::memcpy(m, ((*this) * nMat).m, sizeof(T)*16);
+
+		return *this;
 	}
 
 	//================ For OpenGL ======================
@@ -1075,20 +1143,26 @@ public:
 //################################################################
 //###################### Class type shortcut ###########################
 //################################################################
+// define a unsigned byte short cut.
+typedef unsigned char ubyte;
+
 typedef class Vec2<float> Vec2f;
 typedef class Vec2<double> Vec2d;
 typedef class Vec2<int> Vec2i;
 typedef class Vec2<short> Vec2s;
+typedef class Vec2<ubyte> Vec2ub;
 
 typedef class Vec3<float> Vec3f;
 typedef class Vec3<double> Vec3d;
 typedef class Vec3<int> Vec3i;
 typedef class Vec3<short> Vec3s;
+typedef class Vec3<ubyte> Vec3ub;
 
 typedef class Vec4<float> Vec4f;
 typedef class Vec4<double> Vec4d;
 typedef class Vec4<int> Vec4i;
 typedef class Vec4<short> Vec4s;
+typedef class Vec4<ubyte> Vec4ub;
 
 
 typedef class Mat2<float> Mat2f;
@@ -1110,6 +1184,7 @@ typedef class Transform2<int> Transform2i;
 const Vec2f vec2_zero(0.0f, 0.0f);
 const Mat2f mat2_identity(1.0f, 0.0f, 0.0f, 1.0f);
 const Transform2f transform2_identity(vec2_zero, mat2_identity);
+const Mat4f mat4_identity;
 
 
 
