@@ -48,7 +48,7 @@ void Game::Init(HDC hDC, HWND hWnd, int screenWidth, int screenHeight){
 }
 
 MSG Game::Start(){
-	// start the mainloop....
+	// start the main loop....
 	MSG msg = MainGameLoop();
 
 	return msg;
@@ -86,8 +86,8 @@ void DisplayFPS(HWND hWnd){
 		_frameCount = 0;
 	}
 
-	// conver to string
-	char str[10];
+	// convert to string
+	char str[8];
 	sprintf(str, "FPS: %d", _fps);
 	SetWindowText(hWnd, str);
 }
@@ -164,7 +164,7 @@ MSG Game::MainGameLoop(){
 			}
 			
 			// processing rendering
-			// render the whole thing, as much as possible. Do not care about dupldate frames rendering
+			// render the whole thing, as much as possible. Do not care about duplicate frames rendering
 			_renderer->Render();
 
 			DisplayFPS(_hWnd);

@@ -40,8 +40,11 @@ public:
 	virtual void Draw(const Vec2f& position, float z, float rotation){
 		Draw(position.x, position.y, z, rotation);
 	}
+	
 	// Draw the image to a specific position and rotation
 	void Draw(float x, float y, float z, float rotation);
+
+	void Draw(const Mat4f& mat);
 
 	// Setup texture coordinate
 	void setRect(const Recti& $rect);

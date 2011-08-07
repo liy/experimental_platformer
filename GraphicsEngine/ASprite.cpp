@@ -109,6 +109,7 @@ void ASprite::Draw(float x, float y, float z, float rotation){
 	// tint the colour
 	glColor4f(colour.r, colour.g, colour.b, colour.a);
 
+	
 	// do the transformation
 	glTranslatef(x, y, z);//normal position translation transform
 	glRotatef(rotation, 0.0f, 0.0f, 1.0f);//rotation transform
@@ -127,6 +128,42 @@ void ASprite::Draw(float x, float y, float z, float rotation){
 		glTexCoord2f(_texCoord[0].u, _texCoord[0].v);			glVertex3f(_rect.width, 0.0f, z);
 		glTexCoord2f(_texCoord[3].u, _texCoord[3].v);			glVertex3f(_rect.width, _rect.height, z);
 		glTexCoord2f(_texCoord[2].u, _texCoord[2].v);			glVertex3f(0.0f, _rect.height, z);
+	}
+	glEnd();
+
+	// finished drawing disable texture 2d.
+	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
+}
+
+void ASprite::Draw(const Mat4f& mat){
+	//bind the texture
+	ATextureManager::GetInstance()->Bind(_texture_sp->fileName());
+
+	glPushMatrix();
+
+	// tint the colour
+	glColor4f(colour.r, colour.g, colour.b, colour.a);
+
+	// since there's no transformation before this line, we can safely  directly load the input matrix
+	glLoadMatrixf(mat);
+	// The anchor translation transform will be concatenated
+	// inputMatrix * anchorTransMatrix * vertices
+	glTranslatef(-width()*anchorRatio.x, -height()*anchorRatio.y, 0.0f);
+
+	glBegin(GL_QUADS);
+	if(!horizontalFlip){
+		glTexCoord2f(_texCoord[0].u, _texCoord[0].v);			glVertex3f(0.0f, 0.0f, 0.0f);
+		glTexCoord2f(_texCoord[1].u, _texCoord[1].v);			glVertex3f(_rect.width, 0.0f, 0.0f);
+		glTexCoord2f(_texCoord[2].u, _texCoord[2].v);			glVertex3f(_rect.width, _rect.height, 0.0f);
+		glTexCoord2f(_texCoord[3].u, _texCoord[3].v);			glVertex3f(0.0f, _rect.height, 0.0f);
+	}
+	else{
+		glTexCoord2f(_texCoord[1].u, _texCoord[1].v);			glVertex3f(0.0f, 0.0f, 0.0f);
+		glTexCoord2f(_texCoord[0].u, _texCoord[0].v);			glVertex3f(_rect.width, 0.0f, 0.0f);
+		glTexCoord2f(_texCoord[3].u, _texCoord[3].v);			glVertex3f(_rect.width, _rect.height, 0.0f);
+		glTexCoord2f(_texCoord[2].u, _texCoord[2].v);			glVertex3f(0.0f, _rect.height, 0.0f);
 	}
 	glEnd();
 

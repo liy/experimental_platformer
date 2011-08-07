@@ -11,6 +11,7 @@ public:
 		// setup default scale and anchor position
 		scale.Set(1.0f, 1.0f);
 		anchorRatio.Set(0.5f, 0.5f);
+		horizontalFlip = false;
 	};
 
 	virtual ~AIGraphics(void){};
@@ -41,6 +42,9 @@ public:
 
 	// Draw the image to a specific position and rotation
 	virtual void Draw(float x, float y, float z, float rotation) =0;
+
+	// Draw the image using a specific matrix transformation
+	virtual void Draw(const Mat4f& mat) =0;
 
 	// Get the anchor position related to the whole texture
 	virtual Vec2f anchor() const =0;

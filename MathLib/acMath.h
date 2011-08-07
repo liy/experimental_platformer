@@ -55,7 +55,7 @@
 #include <limits>
 #include <sstream>
 
-#define ac_pi 3.1415926;
+#define ac_pi 3.1415926
 
 //################################################################
 //######################## General functions ##########################
@@ -731,6 +731,307 @@ public:
 };
 
 
+/**
+ *	A column major 4x4 matrix. You can pass the matrix directly to OpenGL
+ *		| m0   m4   m8     m12  |
+ *		| m1   m5   m9     m13  |
+ *		| m2   m6   m10   m14  |
+ *		| m3   m7   m11   m15  |          
+ */
+template<class T>
+class Mat4{
+public:
+	/**	
+	 *	| m0   m4   m8     m12  |
+	 *	| m1   m5   m9     m13  |
+	 *	| m2   m6   m10   m14  |
+	 *	| m3   m7   m11   m15  |                 
+	 *
+	 *	v' = M * v
+	 *		===>>>
+	 *	x¡¯	=	 x*m0   +   y*m4   +   z*m8      +   m12
+	 *	y¡¯	=	 x*m1   +   y*m5   +   z*m9      +   m13
+	 *	z¡¯	=	 x*m2   +   y*m6   +   z*m10    +   m14
+	 *	w¡¯	=	 x*m3   +   y*m7   +   z*m11    +   m15
+	 */
+	T m[16];
+
+	/*
+	 * by default, this is a identity matrix 
+	 *
+	 *	| 1  0  0  0  |
+	 *	| 0  1  0  0  |
+	 *	| 0  0  1  0  |
+	 *	| 0  0  0  1  |     
+	 */
+	Mat4(){
+		for(int i=0; i<16; ++i){
+			m[i] = i%5 ? 0 : 1;
+		}
+	}
+
+	// Copy constructor
+	Mat4(const Mat4<T>& mat){
+		std::memcpy(m, mat.m, sizeof(T)*16);
+	}
+
+	// Copy and casting constructor
+	template<class NT>
+	Mat4(const Mat4<NT>& mat){
+		for(int i=0; i<16; ++i){
+			m[i] = static_cast<T>(mat.m[i]);
+		}
+	}
+
+	// pass in an array of T
+	Mat4(const T* arr){
+		std::memcpy(m, arr, sizeof(T)*16);
+	}
+
+	// ==================== access method ============================
+	// Column row setter
+	T& operator() (int columnIndex, int rowIndex){
+		return m[columnIndex*4 + rowIndex];
+	}
+
+	// Column row getter
+	const T& operator() (int columnIndex, int rowIndex) const{
+		return m[columnIndex*4 + rowIndex];
+	}
+
+	/**
+	 *	 Direct array setter, save some typing... might be slower than use public member "m"
+	 */
+	T& operator[] (int index){
+		return m[index];
+	}
+
+	/**
+	 *	Direct array getter, save some typing... might be slower than use public member "m"
+	 */
+	const T& operator[] (int index) const{
+		return m[index];
+	}
+
+	// copy assignment
+	Mat4<T>& operator= (const Mat4<T>& mat){
+		std::memcpy(m, mat.m, sizeof(T)*16);
+		return *this;
+	}
+
+	// ================== transform methods ===========================
+
+	// Set this matrix to identity matrix
+	void SetIdentity(){
+		for(int i=0; i<16; ++i){
+			m[i] = i%5 ? 0 : 1;
+		}
+	}
+
+	/**	
+	 *	Set this matrix to translation matrix.
+	 *		| m0  m4  m8	 tx  |
+	 *		| m1  m5  m9	 ty  |
+	 *		| m2  m6  m10	 tz  |
+	 *		| m3  m7  m11	1    | 
+	 */
+	void SetTranslate(const Vec3<T>& v){
+		m[12] = v.x;
+		m[13] = v.y;
+		m[14] = v.z;
+		m[15] = 1;
+	}
+
+	/**
+	 *	Get the translation of the matrix.
+	 */
+	Vec3<T> GetTranslate(){
+		return Vec3<T>(m[12], m[13], m[14]);
+	}
+
+	/**
+	 *	Set this matrix to scale matrix:
+	 *		| x	0	0	0  |
+	 *		| 0	y	0	0  |
+	 *		| 0	0	z	0  |
+	 *		| 0	0	0	1  |     
+	 *
+	 */
+	void SetScale(float x, float y, float z){
+		m[0] = x;
+		m[5] = y;
+		m[10] = z;
+	}
+
+	/**
+	 *	Set this matrix to Z rotation matrix.	
+	 *
+	 *	The final rotation r' is original rotation add the new rotation
+	 *	r' = or + nr
+	 *
+	 *	Therefore a vector "v" rotated by r' degree, result "v'" will be: 
+	 *		v'.x = v.length * cos( r' )		===>>	v'.x = v.length * cos( or + nr )
+	 *		v'.y = v.length * sin( r' )		===>>	v'.y = v.length * sin( or + nr )
+	 *
+	 *	let: 
+	 *		s = v.length
+	 *	Then we have:
+	 *		v'.x = s * cos(or) * cos(nr)  - s * sin(or) * sin(nr)
+	 *		v'.y = s * sin(or) * cos(nr) + s * cos(or) * sin(nr)
+	 *
+	 *	Cause the original vector v's position is:
+	 *		v.x = s * cos(or)
+	 *		v.y = s * sin(or)
+	 *
+	 *	Combine 4 equations above gives:
+	 *		v'.x = v.x  * cos(nr) - v.y * sin(nr)
+	 *		v'.y = v.y * cos(nr) + v.x * sin(nr)	==>>	 v'.y = v.x * sin(nr) + v.y * cos(nr)
+	 *
+	 *
+	 *	If we have OpenGL style column major matrix, M:
+	 *		| a	c |	
+	 *		| b	d |	
+	 *	and vector, V:
+	 *		| v.x |
+	 *		| v.y |
+	 *
+	 *	V' = M * V will be:
+	 *		| a * v.x + c * v.y |
+	 *		| b * v.x + d * v.y |
+	 *
+	 *
+	 *	Because:
+	 *		v'.x = v.x  * cos(nr) - v.y * sin(nr)
+	 *		v'.y = v.x * sin(nr) + v.y * cos(nr)
+	 *
+	 *	We can say that:
+	 *		a = cos(nr)		c = -sin(nr)
+	 *		b = sin(nr)		d = cos(nr)
+	 *	===>
+	 *		| cos(nr)	-sin(nr) |
+	 *		| sin(nr)	 cos(nr) |
+	 *
+	 *
+	 *	| cos(r)	-sin(r)		0	0  |
+	 *	| sin(r)	cos(r)		0	0  |
+	 *	| 0		0		1	0  |
+	 *	| 0		0		0	1  |
+	 *	
+	 */
+	void SetRotateZ(T radian){
+		// a cosine
+		float ac = cos(radian);
+		// b sine
+		float bs = sin(radian);
+		// c -sine
+		float cs = -sin(radian);
+		// d cosine
+		float dc = cos(radian);
+
+		m[0] = ac;
+		m[1] = bs;
+		m[4] = cs;
+		m[5] = dc;
+	}
+
+	// TODO: do other proper rotation operation.
+
+	//========================= arithmetic ===================
+
+	/**
+	 *	 matrix concatenation,  multiplication
+	 *	
+	 *	currentMatrix * newMatrix
+	 *							
+	 *	| c0   c4   c8     c12  |			| m0   m4   m8     m12  |
+	 *	| c1   c5   c9     c13  |		* 	| m1   m5   m9     m13  |
+	 *	| c2   c6   c10   c14  |			| m2   m6   m10   m14  |
+	 *	| c3   c7   c11   c15  |			| m3   m7   m11   m15  |
+	 *
+	 *			====>>>>
+	 *	
+	 *	n0 = c0 * m0	+	c4 * m1	+	c8 * m2	+	c12 * m3
+	 *	n1 = c1 * m0	+	c5 * m1	+	c9 * m2	+	c13 * m3
+	 *	n2 = c2 * m0	+	c6 * m1	+	c10*m2	+	c14 * m3
+	 *	n3 = c3 * m0	+	c7 * m1	+	c11*m2	+	c15 * m3
+	 *	
+	 *	n4 = c0 * m4	+	c4 * m5	+	c8 * m6	+	c12 * m7
+	 *					..............
+	 *
+	 *	| n0   n4   n8     n12  |
+	 *	| n1   n5   n9     n13  |
+	 *	| n2   n6   n10   n14  |
+	 *	| n3   n7   n11   n15  |
+	 */
+	Mat4<T> operator* (const Mat4<T>& mat){
+		// The new matrix
+		Mat4<T> nMat;
+		// Since the OpenGL matrix is column major.
+		// We have to scan and assign the matrix element in VERTICAL order.
+
+		// Column iteration
+		for(int x=0; x<4; ++x){
+			// Row iteration
+			for(int y=0; y<4; ++y){
+				// Store the two tuples multiplication result.
+				T n=0;
+				
+				// Do the ROW * COLUMN
+				// 
+				// e.g., for row 0, column 0
+				//	c0*m0  +  c4*m1  +  c8*m2   +  c12*m3
+				for(int k=0; k<4; ++k){
+					// take the current matrix's ROW multiply to the input matrix's COLUMN
+					n += this(k, y) * mat(x, k);
+				}
+
+				// assign the multiplication result to current matrix element
+				nMat(x, y) = n;
+			}
+		}
+	}
+
+	/**
+	 * Matrix  multiply a vector3. 
+	 * This means apply transformation to the vector3. Note that w' is ditched.
+	 *	v' = M * v
+	 *		===>>>
+	 *	x¡¯	=	 x*m0   +   y*m4   +   z*m8      +   m12
+	 *	y¡¯	=	 x*m1   +   y*m5   +   z*m9      +   m13
+	 *	z¡¯	=	 x*m2   +   y*m6   +   z*m10    +   m14
+	 *
+	 *	w¡¯	=	 x*m3   +   y*m7   +   z*m11    +   m15
+	 */
+	Vec3<T> operator* (const Vec3<T>& v){
+		return Vec3<T>(
+			v.x*m[0] + v.y*m[4] + v.z*m[8]  + m[12],
+			v.x*m[1] + v.y*m[5] + v.z*m[9]  + m[13],
+			v.x*m[2] + v.y*m[6] + v.z*m[10] + m[14]
+			);
+	}
+
+	/**
+	 *	Transform the Vector4 with this matrix.
+	 */
+	Vec4<T> operator* (const Vec4<T>& v){
+		return Vec4<T>(
+			v.x*m[0] + v.y*m[4] + v.z*m[8]  + v.w*m[12],
+			v.x*m[1] + v.y*m[5] + v.z*m[9]  + v.w*m[13],
+			v.x*m[2] + v.y*m[6] + v.z*m[10] + v.w*m[14],
+			v.x*m[3] + v.y*m[7] + v.z*m[11] + v.w*m[15]
+			);
+	}
+
+	//================ For OpenGL ======================
+	operator T*(){
+		return (T*)m;
+	}
+
+	operator T*() const{
+		return (T*)m;
+	}
+};
+
 //#######################################################################
 //###################### Transform class and functions ##########################
 //#######################################################################
@@ -793,6 +1094,10 @@ typedef class Vec4<short> Vec4s;
 typedef class Mat2<float> Mat2f;
 typedef class Mat2<double> Mat2d;
 typedef class Mat2<int> Mat2i;
+
+typedef class Mat4<float> Mat4f;
+typedef class Mat4<double> Mat4d;
+typedef class Mat4<int> Mat4i;
 
 typedef class Transform2<float> Transform2f;
 typedef class Transform2<double> Transform2d;

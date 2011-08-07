@@ -172,6 +172,47 @@ void AAnimation::Draw(float x, float y, float z, float rotation){
 	glPopMatrix();
 }
 
+void AAnimation::Draw(const Mat4f& mat){
+	// if nothing in the frame list, do not draw
+	if(_frames.size() == 0)
+		return;
+
+	AFrame* frame = _frames[_frameIndex];
+
+	ATextureManager::GetInstance()->Bind(frame->texture_sp->fileName());
+
+	glPushMatrix();
+
+	// tint the colour
+	glColor4f(colour.r, colour.g, colour.b, colour.a);
+
+	// since there's no transformation before this line, we can safely  directly load the input matrix
+	glLoadMatrixf(mat);
+	// The anchor translation transform will be concatenated
+	// inputMatrix * anchorTransMatrix * vertices
+	glTranslatef(-width()*anchorRatio.x, -height()*anchorRatio.y, 0.0f);
+
+	glBegin(GL_QUADS);
+	if(!horizontalFlip){
+		glTexCoord2f(frame->texCoord[0].x, frame->texCoord[0].y);				glVertex3f(0.0f, 0.0f, 0.0f);
+		glTexCoord2f(frame->texCoord[1].x, frame->texCoord[1].y);				glVertex3f(frame->rect().width, 0.0f, 0.0f);
+		glTexCoord2f(frame->texCoord[2].x, frame->texCoord[2].y);				glVertex3f(frame->rect().width, frame->rect().height, 0.0f);
+		glTexCoord2f(frame->texCoord[3].x, frame->texCoord[3].y);				glVertex3f(0.0f, frame->rect().height, 0.0f);
+	}
+	else{
+		glTexCoord2f(frame->texCoord[1].x, frame->texCoord[1].y);				glVertex3f(0.0f, 0.0f, 0.0f);
+		glTexCoord2f(frame->texCoord[0].x, frame->texCoord[0].y);				glVertex3f(frame->rect().width, 0.0f, 0.0f);
+		glTexCoord2f(frame->texCoord[3].x, frame->texCoord[3].y);				glVertex3f(frame->rect().width, frame->rect().height, 0.0f);
+		glTexCoord2f(frame->texCoord[2].x, frame->texCoord[2].y);				glVertex3f(0.0f, frame->rect().height, 0.0f);
+	}
+	glEnd();
+
+	// finished drawing disable texture 2d.
+	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
+}
+
 bool AAnimation::Running(){
 	return !_stopped;
 }

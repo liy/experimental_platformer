@@ -61,8 +61,12 @@ public:
 	virtual void Draw(const Vec2f& position, float z, float rotation){
 		Draw(position.x, position.y, z, rotation);
 	}
+
 	// Draw the image to a specific position and rotation
 	void Draw(float x, float y, float z, float rotation);
+
+	// Draw the image using a specific matrix transformation
+	void Draw(const Mat4f& mat);
 
 	void AddFrame(const std::string& $fileName);
 
