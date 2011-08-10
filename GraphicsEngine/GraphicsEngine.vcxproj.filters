@@ -41,13 +41,13 @@
     <ClInclude Include="ATextureManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AIGraphics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ASprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AGeom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ATextureNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

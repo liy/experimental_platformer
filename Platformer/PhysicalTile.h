@@ -29,7 +29,7 @@ public:
 	virtual void SetPosition(const Vec2f& pos);
 
 protected:
-	AIGraphics* _graphics_ptr;
+	ATextureNode* _graphics_ptr;
 	float _rotation;
 	acBody* _body;
 };

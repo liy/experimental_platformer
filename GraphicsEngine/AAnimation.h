@@ -1,24 +1,12 @@
 #pragma once
 #include <iostream>
 #include <vector>
-#include "AIGraphics.h"
+#include "ATextureManager.h"
+#include "ATextureNode.h"
 
-class ATexture;
-
-struct AFrame
-{
-public:
-	AFrame(const std::string& $fileName, unsigned short $duration=10);
-	AFrame(const std::string& $fileName, const Recti& $rect, unsigned short $duration=10);
-	~AFrame(void);
-
+struct AFrame{
 	// The texture which frame is using.
 	std::tr1::shared_ptr<ATexture> texture_sp;
-
-	// Specifying 4 corners in the texture coordinate, in counter clock wise ordering.
-	// First vertex is the bottom left, second bottom right, third top right, final one is top left.
-	// Note its value is 0.0f ~ 1.0f, texture coordinate.
-	Vec2f texCoord[4];
 
 	// How many mini seconds this frame is shown
 	unsigned short duration;
@@ -26,19 +14,38 @@ public:
 	// The frame's index position in the animation list.
 	unsigned int index;
 
-	// Setup texture coordinate
-	void setRect(const Recti& $rect);
-	// Setup texture coordinate
-	void setRect(int $x, int $y, int $width, int $height);
-	// Get the texture coordinate
-	const Recti& rect() const;
+	/**
+	 *	
+	 */
+	Recti rect;
 
-protected:
-	// The actual offset position, width and height, related to the texture resolution.
-	Recti _rect;
+	AFrame(void){}
+
+	AFrame(const std::string& $fileName, unsigned short $duration=10): duration($duration){
+		texture_sp = ATextureManager::GetInstance()->Get($fileName);
+		rect.Set(0, 0, texture_sp->contentWidth(), texture_sp->contentHeight());
+	}
+
+	AFrame(const std::string& $fileName, const Recti& $rect, unsigned short $duration=10): duration($duration), rect($rect){
+		texture_sp = ATextureManager::GetInstance()->Get($fileName);
+	}
+
+	~AFrame(void){
+		// TODO: how to free the texture coordinate
+
+		// keep a copy record of the filename, to remove the 
+		std::string fileName = texture_sp->fileName();
+		std::cout << "AFrame["<< fileName <<"] destroy!\n";
+		// Null the reference, so we can try to remove th texture
+		texture_sp = NULL;
+		// Try to remove the using texture from the memory.
+		// If the reference count is 1.(1 reference count is maintained by the map). Then we remove it from the memory.
+		// So programmer will not need to manually  remove texture from the memory
+		ATextureManager::GetInstance()->Remove(fileName);
+	}
 };
 
-class AAnimation: public AIGraphics
+class AAnimation: public ATextureNode
 {
 public:
 	AAnimation(void);
@@ -53,20 +60,13 @@ public:
 	void Update(unsigned short delta);
 
 	// Draw the image to a specific position and rotation
-	virtual void Draw(const Vec3f& position, float rotation){
-		Draw(position.x, position.y, position.z, rotation);
-	}
-
-	// Draw the image to a specific position and rotation
-	virtual void Draw(const Vec2f& position, float z, float rotation){
-		Draw(position.x, position.y, z, rotation);
-	}
-
-	// Draw the image to a specific position and rotation
 	void Draw(float x, float y, float z, float rotation);
 
 	// Draw the image using a specific matrix transformation
 	void Draw(const Mat4f& mat);
+
+	// Draw the image to a specific position and rotation
+	void Draw();
 
 	void AddFrame(const std::string& $fileName);
 
@@ -98,14 +98,6 @@ public:
 
 	AFrame& GetFrame(unsigned int $index);
 
-	Vec2f anchor() const;
-
-	void setWidth(float $w);
-	void setHeight(float $h);
-	void setSize(float $w, float $h);
-
-	const float width() const;
-	const float height() const;
 protected:
 	static const int ANI_FORWARD = 1;
 	static const int ANI_BACKWARD = -1;

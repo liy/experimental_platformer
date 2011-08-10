@@ -1,7 +1,7 @@
 #pragma once
 #include "acMath.h"
 
-class AIGraphics;
+class ATextureNode;
 
 // Tiles can be mainly separated into two types
 //	1. Normal graphical tiles, only a visual representation. There is not user interaction or physical collision detection.  e.g., background, houses, flowers, grass, etc.

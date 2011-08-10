@@ -67,7 +67,7 @@ public:
 	};
 
 	virtual void Draw(){
-		animation_ptr->Draw(body_ptr->position, 0.0f, body_ptr->rotation);
+		animation_ptr->Draw(body_ptr->position.x, body_ptr->position.y, 0.0f, body_ptr->rotation);
 		body_ptr->DrawAABB(1.0f, 0.3f, 0.1f);
 	};
 };

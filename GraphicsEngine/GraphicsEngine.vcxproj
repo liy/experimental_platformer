@@ -74,7 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AAnimation.h" />
-    <ClInclude Include="AIGraphics.h" />
+    <ClInclude Include="ATextureNode.h" />
     <ClInclude Include="ASprite.h" />
     <ClInclude Include="ATexture.h" />
     <ClInclude Include="ATextureManager.h" />

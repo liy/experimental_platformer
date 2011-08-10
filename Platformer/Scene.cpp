@@ -26,9 +26,19 @@ Scene::~Scene(void)
 
 GraphicalTile* graphicalTile;
 
+ASprite* sprite;
+
 void Scene::Init(Game* $game){
 	 _game = $game;
 
+	 sprite = new ASprite("texture.png", Recti(0.0f, 0.0f, 53.0f, 31.0f));
+	 sprite->SetPosition(128, 128);
+	 float ratio = 31.0f/53.0f;
+	 sprite->SetHeight(32.0f);
+	 sprite->SetWidth(32.0f/ratio);
+	// sprite->SetScale(2,2);
+	// sprite->SetRotation(ac_pi/4.0f);
+	 /*
 	// create actor's rigid body
 	acBody* body = new acBody();
 	acPolygonShape shape;
@@ -40,7 +50,7 @@ void Scene::Init(Game* $game){
 	int trackX = 0;
 	for(int i=0; i<3; ++i){
 		AFrame* frame = new AFrame("texture.png", 7);
-		frame->setRect(trackX, 0, 17, 31);
+		frame->rect.Set(trackX, 0, 17, 31);
 		trackX+=18;
 		frames.push_back(frame);
 	}
@@ -53,7 +63,6 @@ void Scene::Init(Game* $game){
 	// created a actor
 	actor = new Player(this, ani, body);
 	actor->SetPosition(Vec2f(400.0f, 200.0f));
-	actor->animation_ptr->colour = Vec4f(1.0f, 0.0f, 0.0f, 0.5f);
 
 	_game->getGameInputHandler().AddGamepadListener(actor);
 	_game->getGameInputHandler().AddGamepadListener(this);
@@ -116,9 +125,11 @@ void Scene::Init(Game* $game){
 	graphicalTile = new GraphicalTile(tileAni);
 	tileAni->Play();
 	graphicalTile->SetPosition(300.0f, 100.0f);
+	*/
 }
 
 void Scene::Update(unsigned short delta){
+	/*
 	actor->Update(delta);
 
 	for(int i=0; i<NUM_TILES; ++i){
@@ -128,13 +139,18 @@ void Scene::Update(unsigned short delta){
 	graphicalTile->Update(delta);
 
 	_game->camera->Update(delta);
+	*/
+	static float r = 0.0f;
 
+	r+= 0.1;
+	//sprite->SetRotation(r);
 }
 
 
 // After user input handled(Game class delegate the input to GameInputHandler class), followed by Update method.
 // All the game object rendering should appear here.
 void Scene::Render(){
+	/*
 	_game->camera->Setup();
 
 	//std::cout << "render called\n";
@@ -151,12 +167,24 @@ void Scene::Render(){
 	glEnd();
 
 	graphicalTile->Draw();
+	*/
+	sprite->Draw();
+
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glPointSize(10.0f);
+	glBegin(GL_POINTS);
+	glVertex3f(128, 128.0f, 0.0f);
+	glEnd();
 }
 
 void Scene::MouseDownHandler(short x, short y){
 	std::cout << "Scene left click: [x:" << x <<", y:"<< y <<"]\n";
+	/*
 	Vec2f c = Vec2f(x, y);
 	actor->SetPosition(c);
+	*/
+
+	sprite->SetPosition(x, y);
 }
 
 void Scene::MouseMoveHandler(short x, short y){
@@ -168,6 +196,7 @@ void Scene::Move(float xRatio, float yRatio){
 }
 
 void Scene::UpdateCamera(float xRatio, float yRatio){
+	/*
 	if(yRatio < 0.0f){
 		Vec2f size = _game->camera->GetViewportSize();
 		size -= size*0.01;
@@ -185,7 +214,7 @@ void Scene::UpdateCamera(float xRatio, float yRatio){
 	else if(xRatio > 0.0f){
 		_game->camera->rotation -= 0.4f;
 	}
-
+	*/
 }
 
 void Scene::Jump(){
@@ -199,10 +228,12 @@ void Scene::Stop(){
 }
 
 void Scene::LockOn(){
+	/*
 	if(_game->camera->GetLockedTarget() == NULL){
 		_game->camera->Follows(*actor);
 	}
 	else{
 		_game->camera->Unlock();
 	}
+	*/
 }

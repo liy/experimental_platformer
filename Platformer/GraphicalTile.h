@@ -3,7 +3,7 @@
 
 class ASprite;
 class AAnimation;
-class AIGraphics;
+class ATextureNode;
 
 // No user interaction available. Purely graphical representation
 class GraphicalTile: public ITile
@@ -27,9 +27,9 @@ public:
 	virtual void SetPosition(float x, float y);
 	virtual void SetPosition(const Vec2f& pos);
 
-	virtual AIGraphics* graphics();
+	virtual ATextureNode* graphics();
 protected:
-	AIGraphics* _graphics_ptr;
+	ATextureNode* _graphics_ptr;
 
 	Vec2f _position;
 	float _rotation;

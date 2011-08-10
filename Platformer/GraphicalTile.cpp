@@ -1,5 +1,5 @@
 #include "GraphicalTile.h"
-#include "AIGraphics.h"
+#include "ATextureNode.h"
 #include "AAnimation.h"
 #include "ASprite.h"
 
@@ -45,7 +45,7 @@ void GraphicalTile::Update(unsigned short delta){
 }
 
 void GraphicalTile::Draw(){
-	_graphics_ptr->Draw(_position, 0.0f, _rotation);
+	_graphics_ptr->Draw(_position.x, _position.y, 0.0f, _rotation);
 }
 
 float GraphicalTile::rotation() const{
@@ -68,6 +68,6 @@ void GraphicalTile::SetPosition(const Vec2f& pos){
 	_position = pos;
 }
 
-AIGraphics* GraphicalTile::graphics(){
+ATextureNode* GraphicalTile::graphics(){
 	return _graphics_ptr;
 }

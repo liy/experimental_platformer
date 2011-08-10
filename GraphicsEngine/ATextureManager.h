@@ -31,6 +31,11 @@ public:
 	std::tr1::shared_ptr<ATexture> Get(const std::string& $fleName);
 	void Bind(const std::string& $fileName);
 
+	/**
+	 *	Directly bind the specific texture. Since we already have the id, I assume it is already loaded.
+	 */
+	void Bind(const GLuint& textureID);
+
 	// Remove texture can use the file name's reference.
 	bool Remove(const std::string& $fileName);
 
@@ -41,7 +46,7 @@ protected:
 	ATextureManager(void);
 	~ATextureManager(void);
 
-	GLuint _boundedID;
+	GLuint _textureID;
 
 	Map _texturesMap;
 };

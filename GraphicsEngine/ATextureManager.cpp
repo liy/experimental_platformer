@@ -5,7 +5,7 @@
 
 ATextureManager* ATextureManager::INSTANCE = NULL;
 
-ATextureManager::ATextureManager(void) : _boundedID(0){
+ATextureManager::ATextureManager(void) : _textureID(0){
 
 }
 
@@ -63,10 +63,17 @@ void ATextureManager::Bind(const std::string& $fileName){
 	glEnable(GL_TEXTURE_2D);
 
 	// If the bounded texture is not the requested texture, bind it; or if the bounded id is 0 which means no texture is bounded then bind the texture
-	if(_boundedID != texture_sp->textureID() || _boundedID == 0){
-		_boundedID = texture_sp->textureID();
+	if(_textureID != texture_sp->textureID() || _textureID == 0){
+		_textureID = texture_sp->textureID();
 		// Active the texture, in order to draw it onto the screen.
-		glBindTexture(GL_TEXTURE_2D, _boundedID);
+		glBindTexture(GL_TEXTURE_2D, _textureID);
+	}
+}
+
+void ATextureManager::Bind(const GLuint& textureID){
+	if(_textureID != textureID){
+		_textureID = textureID;
+		glBindTexture(GL_TEXTURE_2D, _textureID);
 	}
 }
 
@@ -75,7 +82,7 @@ bool ATextureManager::Remove(const std::string& $fileName){
 	if(itr != _texturesMap.end()){
 		// "itr->second" is the shared pointer of the ATexture instance.
 		// Since the texture map will always contains a reference  to the texture shared pointer
-		// Therefore if the reference count is less than or equal to 1 (0, reference count should not happen!). We can saftly assume that only TextureManager or no one is holding a reference to the 
+		// Therefore if the reference count is less than or equal to 1 (0, reference count should not happen!). We can safely assume that only TextureManager or no one is holding a reference to the 
 		// texture anymore, so remove it from the map.
 		if(itr->second.use_count() <= 1){
 			//std::cout << "remove texture from TextureManager: " << itr->second->fileName() << "!!!!\n";
@@ -92,5 +99,5 @@ bool ATextureManager::Remove(const std::string& $fileName){
 
 // Return the const reference of the bounded id. Should not be changed
 const GLuint& ATextureManager::boundedID() const{
-	return _boundedID;
+	return _textureID;
 }
