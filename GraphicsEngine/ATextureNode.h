@@ -1,10 +1,10 @@
 #pragma once
-#include <windows.h>
-#include <gl\glu.h>
-#include "AGeom.h"
-#include <map>
 #include "ATextureManager.h"
 #include "ATexture.h"
+#include <windows.h>
+#include "AGeom.h"
+#include <map>
+#include "AShaderManager.h"
 
 /**
  *	Abstract class 
@@ -38,14 +38,7 @@ private:
 		Vec2f anchorTrans = GetAnchor();
 		_transform.Translate(-anchorTrans.x, -anchorTrans.y, 0.0f);
 
-		// initialize the indices array
-		_indices = new GLubyte[6];
-		_indices[0] = 0;
-		_indices[1] = 1;
-		_indices[2] = 3;
-		_indices[3] = 3;
-		_indices[4] = 1;
-		_indices[5] = 2;
+		_shaderManager = AShaderManager::GetInstance();
 	}
 public:
 	ATextureNode(void){
@@ -79,6 +72,9 @@ public:
 		// If the reference count is 1.(1 reference count is maintained by the map). Then we remove it from the memory.
 		// So programmer will not need to manually  remove texture from the memory
 		ATextureManager::GetInstance()->Remove(fileName);
+
+		// clear the index array.
+		delete[] _indices;
 	};
 
 	// update the texture this image is using.
@@ -418,10 +414,18 @@ protected:
 	Vec2f _anchorRatio;
 
 	/**
-	 *	The index array to tell OpenGL how to use the vertices. E.g., we have 0, 1, 2, 3 vertices.
-	 *	If we want to draw 2 triangle to form a quad, we should assign this to _indices array:
-	 *		[0, 1, 2,  2, 1, 3] ?????
+	 *	This indices contains a sequence of indices which describe the vertices drawing order.
+	 *	I think this value should be initialized in the sub class. Or even this variable should be declared in
+	 *	sub classes. but then generic ATextureNode typed object will need to be casted in order to access the 
+	 *	variable.
+	 *
+	 *	We will see...
 	 */
 	GLubyte* _indices;
+
+	/**
+	 *	The shader manager
+	 */
+	AShaderManager* _shaderManager;
 };
 

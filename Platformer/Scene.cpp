@@ -34,8 +34,8 @@ void Scene::Init(Game* $game){
 	 sprite = new ASprite("texture.png", Recti(0.0f, 0.0f, 53.0f, 31.0f));
 	 sprite->SetPosition(128, 128);
 	 float ratio = 31.0f/53.0f;
-	 sprite->SetHeight(32.0f);
-	 sprite->SetWidth(32.0f/ratio);
+	 sprite->SetHeight(64.0f);
+	 sprite->SetWidth(64.0f/ratio);
 	// sprite->SetScale(2,2);
 	// sprite->SetRotation(ac_pi/4.0f);
 	 /*

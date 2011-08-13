@@ -5,6 +5,8 @@
 #include "Game.h"
 #include "Scene.h"
 #include <sstream>
+#include "AShaderManager.h"
+#include "AShader.h"
 
 RenderModule::RenderModule(void)
 {
@@ -42,6 +44,8 @@ int RenderModule::Init(Game* $game, HDC& $hDC, unsigned int sw, unsigned int sh)
 
 	// by default use orthogonal projection.
 	UseOrthogonal();
+
+	InitDefaultShaders();
 
 	return 0;
 }
@@ -105,4 +109,33 @@ void RenderModule::Resize(unsigned int sw, unsigned int sh){
 
 	// setup viewport
 	glViewport(0, 0, _screenWidth, _screenHeight);
+}
+
+void RenderModule::InitDefaultShaders(){
+	AShaderManager* shaderManager = AShaderManager::GetInstance();
+	// create a normal shader program
+	shaderManager->CreateShaderProgram("default");
+
+	// attach the normal vertex shader
+	shaderManager->CreateShader("default.vert", "..\\GraphicsEngine\\default.vert", Vertex);
+	shaderManager->AttachShader("default.vert", "default");
+
+	// attach the normal fragment shader
+	shaderManager->CreateShader("default.frag", "..\\GraphicsEngine\\default.frag", Fragment);
+	shaderManager->AttachShader("default.frag", "default");
+
+	// activate the normal shader program
+	//shaderManager->ActivateProgram("default");
+
+	GLenum ErrorCheckValue = glGetError();
+	if (ErrorCheckValue != GL_NO_ERROR)
+	{
+		fprintf(
+			stderr,
+			"ERROR: Could not create the shaders: %s \n",
+			gluErrorString(ErrorCheckValue)
+			);
+
+		exit(-1);
+	}
 }

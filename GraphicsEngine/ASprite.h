@@ -17,5 +17,10 @@ public:
 
 	// Draw the image to a specific position and rotation
 	void Draw();
+
+	void CreateVBO(void);
+
+private:
+	GLuint _vaoID, _vboID;
 };
 

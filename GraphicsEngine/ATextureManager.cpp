@@ -1,3 +1,4 @@
+#include "gl\glew.h"
 #include "ATextureManager.h"
 #include <memory>
 #include <IL\il.h>
@@ -21,6 +22,12 @@ void ATextureManager::Init(){
 	// All the image loaded will be using top left corner as origin.
 	ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
 	ilEnable(IL_ORIGIN_SET);
+
+	// initialize glew, so we can use OpenGL 3.3 functions
+	GLenum glewInitResult = glewInit();
+	if(glewInitResult != GLEW_OK){
+		std::cout << glewGetErrorString(glewInitResult) <<"\n"; 
+	}
 }
 
 std::tr1::shared_ptr<ATexture> ATextureManager::Get(const std::string& $fileName){

@@ -41,7 +41,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\lib\DevIL-SDK-x86-1.7.8\include;..\MathLib;..\..\lib\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\lib\DevIL-SDK-x86-1.7.8\include;..\MathLib;..\..\lib\freeglut\include;..\..\lib\glew-1.6.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -53,7 +53,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\lib\DevIL-SDK-x86-1.7.8\include;..\MathLib;..\..\lib\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\lib\DevIL-SDK-x86-1.7.8\include;..\MathLib;..\..\lib\freeglut\include;..\..\lib\glew-1.6.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -68,20 +68,28 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AAnimation.cpp" />
+    <ClCompile Include="AShaderManager.cpp" />
     <ClCompile Include="ASprite.cpp" />
     <ClCompile Include="ATexture.cpp" />
     <ClCompile Include="ATextureManager.cpp" />
+    <ClCompile Include="AShader.cpp" />
+    <ClCompile Include="AShaderProgram.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AAnimation.h" />
+    <ClInclude Include="AShaderManager.h" />
     <ClInclude Include="ATextureNode.h" />
     <ClInclude Include="ASprite.h" />
     <ClInclude Include="ATexture.h" />
     <ClInclude Include="ATextureManager.h" />
     <ClInclude Include="AGeom.h" />
+    <ClInclude Include="AShader.h" />
+    <ClInclude Include="AShaderProgram.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\lib\glut-3.7.6-bin\glut32.dll" />
+    <None Include="default.frag" />
+    <None Include="default.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

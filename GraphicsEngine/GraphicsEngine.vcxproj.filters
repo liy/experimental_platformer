@@ -16,6 +16,15 @@
     <Filter Include="DLL">
       <UniqueIdentifier>{9339488e-29da-442c-9653-7e40431a8956}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Shader">
+      <UniqueIdentifier>{b003c5f4-2db4-455d-82ec-fe0994eb5751}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Shader">
+      <UniqueIdentifier>{b574ceb6-9e3b-4fc0-aa06-1d2ff82ac211}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shader_src">
+      <UniqueIdentifier>{ec143c00-a305-473e-a7f0-6c2bf6e85b88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AAnimation.cpp">
@@ -29,6 +38,15 @@
     </ClCompile>
     <ClCompile Include="ASprite.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AShaderManager.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="AShader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="AShaderProgram.cpp">
+      <Filter>Source Files\Shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -50,10 +68,25 @@
     <ClInclude Include="ATextureNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AShaderManager.h">
+      <Filter>Header Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="AShader.h">
+      <Filter>Header Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="AShaderProgram.h">
+      <Filter>Header Files\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\lib\glut-3.7.6-bin\glut32.dll">
       <Filter>DLL</Filter>
+    </None>
+    <None Include="default.frag">
+      <Filter>shader_src</Filter>
+    </None>
+    <None Include="default.vert">
+      <Filter>shader_src</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -87,7 +87,7 @@ void DisplayFPS(HWND hWnd){
 	}
 
 	// convert to string
-	char str[8];
+	char str[10];
 	sprintf(str, "FPS: %d", _fps);
 	SetWindowText(hWnd, str);
 }

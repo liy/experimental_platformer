@@ -7,6 +7,7 @@ class ASprite;
 class TileMap;
 class Game;
 class Scene;
+class AShader;
 
 /**
   * Render setting will be located in this class.
@@ -47,5 +48,10 @@ protected:
 	unsigned int _screenWidth;
 	// screen height
 	unsigned int _screenHeight;
+
+	/**
+	 *	Initialize the default shader
+	 */
+	void InitDefaultShaders();
 };
 
