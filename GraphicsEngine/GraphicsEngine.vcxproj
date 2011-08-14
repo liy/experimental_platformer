@@ -88,8 +88,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\lib\glut-3.7.6-bin\glut32.dll" />
-    <None Include="default.frag" />
-    <None Include="default.vert" />
+    <None Include="..\Shaders\default.frag" />
+    <None Include="..\Shaders\default.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

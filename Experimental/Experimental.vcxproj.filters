@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ShaderFiles">
+      <UniqueIdentifier>{a02f2dab-a170-4ea1-b5a7-8902620d1ee2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -22,6 +25,12 @@
   <ItemGroup>
     <None Include="screen.jpg">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\Shaders\default.frag">
+      <Filter>ShaderFiles</Filter>
+    </None>
+    <None Include="..\Shaders\default.vert">
+      <Filter>ShaderFiles</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -10,16 +10,16 @@ AShader::AShader(ShaderType type)
 	switch (type)
 	{
 		case Fragment:
-			id = glCreateShader(GL_FRAGMENT_SHADER_ARB);
+			id = glCreateShader(GL_FRAGMENT_SHADER);
 			break;
 		case Geometry:
-			id = glCreateShader(GL_GEOMETRY_SHADER_ARB);
+			id = glCreateShader(GL_GEOMETRY_SHADER);
 			break;
 		case Tessellation:
 			id = glCreateShader(GL_TESS_CONTROL_SHADER);
 			break;
 		case Vertex:
-			id = glCreateShader(GL_VERTEX_SHADER_ARB);
+			id = glCreateShader(GL_VERTEX_SHADER);
 			break;
 	}
 }

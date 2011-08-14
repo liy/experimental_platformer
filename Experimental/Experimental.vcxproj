@@ -80,6 +80,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Shaders\default.frag" />
+    <None Include="..\Shaders\default.vert" />
     <None Include="screen.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

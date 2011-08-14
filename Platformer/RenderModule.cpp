@@ -117,11 +117,11 @@ void RenderModule::InitDefaultShaders(){
 	shaderManager->CreateShaderProgram("default");
 
 	// attach the normal vertex shader
-	shaderManager->CreateShader("default.vert", "..\\GraphicsEngine\\default.vert", Vertex);
+	shaderManager->CreateShader("default.vert", "..\\Shaders\\default.vert", Vertex);
 	shaderManager->AttachShader("default.vert", "default");
 
 	// attach the normal fragment shader
-	shaderManager->CreateShader("default.frag", "..\\GraphicsEngine\\default.frag", Fragment);
+	shaderManager->CreateShader("default.frag", "..\\Shaders\\default.frag", Fragment);
 	shaderManager->AttachShader("default.frag", "default");
 
 	// activate the normal shader program

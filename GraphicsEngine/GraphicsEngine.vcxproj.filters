@@ -22,8 +22,8 @@
     <Filter Include="Header Files\Shader">
       <UniqueIdentifier>{b574ceb6-9e3b-4fc0-aa06-1d2ff82ac211}</UniqueIdentifier>
     </Filter>
-    <Filter Include="shader_src">
-      <UniqueIdentifier>{ec143c00-a305-473e-a7f0-6c2bf6e85b88}</UniqueIdentifier>
+    <Filter Include="ShaderFiles">
+      <UniqueIdentifier>{2c6ad9db-67bb-4397-9ce7-8ec5258c6601}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -82,11 +82,11 @@
     <None Include="..\..\lib\glut-3.7.6-bin\glut32.dll">
       <Filter>DLL</Filter>
     </None>
-    <None Include="default.frag">
-      <Filter>shader_src</Filter>
+    <None Include="..\Shaders\default.frag">
+      <Filter>ShaderFiles</Filter>
     </None>
-    <None Include="default.vert">
-      <Filter>shader_src</Filter>
+    <None Include="..\Shaders\default.vert">
+      <Filter>ShaderFiles</Filter>
     </None>
   </ItemGroup>
 </Project>

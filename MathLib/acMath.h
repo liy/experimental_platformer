@@ -1098,6 +1098,84 @@ public:
 	operator T*() const{
 		return (T*)m;
 	}
+
+
+	void SetFrustum(T left, T right, T bottom, T top, T zNear, T zFar){
+		// set to all zero the float point representation's 0 is also 32 zero.
+		memset(m, 0, sizeof(float) * 16);
+
+		if(zNear == 0.0f){
+			zNear = FLT_EPSILON;
+		}
+
+		
+		float invWidth = 1.0f/(right - left);
+		float invHeight = 1.0f/(top - bottom);
+		float invDepth = 1.0f/(zFar - zNear);
+		float doubleNear = 2.0f * zNear;
+
+		m[0] = doubleNear * invWidth;
+		m[5] = doubleNear * invHeight;
+		m[8] = (right + left) * invWidth;
+		m[9] = (top + bottom) * invHeight;
+		m[10] = -(zFar + zNear) * invDepth;
+		m[11] = -1.0f;
+		m[14] = -doubleNear * zFar * invDepth;
+		
+
+		/*
+		m[0] = 2.0f * n / (r - l);
+		m[5] = 2.0f * n / (t-b);
+		m[8] = (r + l)/(r-l);
+		m[9] = (t+b)/(t-b);
+		m[10] = (n+f)/(n-f);
+		m[11] = -1.0f;
+		m[14] = 2.0f*n*f/(n-f);
+		*/
+	}
+
+	/**
+	 *	aspectRatio = w / h
+	 */
+	void SetPerspective(float fovy, float aspectRatio, T zNear, T zFar){
+		// set to all zero the float point representation's 0 is also 32 zero.
+		memset(m, 0, sizeof(float) * 16);
+
+		if(zNear == 0.0f){
+			zNear = FLT_EPSILON;
+		}
+
+		float invDepth = 1.0f/(zNear - zFar);
+		float halfRadian = fovy * ac_pi/360.0f;
+		float f = 1/tan(halfRadian);
+
+		m[0] = f/aspectRatio;
+		m[5] = f;
+		m[10] = (zFar + zNear)*invDepth;
+		m[11] = -1.0f;
+		m[14] = 2.0f*zFar*zNear*invDepth;
+	}
+
+	void SetOrtho(T left, T right, T bottom, T top, T zNear, T zFar){
+		// set to all zero the float point representation's 0 is also 32 zero.
+		memset(m, 0, sizeof(float) * 16);
+
+		if(zNear == 0.0f){
+			zNear = FLT_EPSILON;
+		}
+
+		float invWidth = 1.0f/(right - left);
+		float invHeight = 1.0f/(top - bottom);
+		float invDepth = 1.0f/(zFar - zNear);
+
+		m[0] = 2.0f * invWidth;
+		m[5] = 2.0f * invHeight;
+		m[10] = -2.0f * invDepth;
+		m[12] = -(right + left) * invWidth;
+		m[13] = -(top + bottom) * invHeight;
+		m[14] = -(zFar + zNear) * invDepth;
+		m[15] = 1.0f;
+	}
 };
 
 //#######################################################################
