@@ -3,6 +3,7 @@
 #include "ATextureManager.h"
 #include "ATexture.h"
 #include "acMath.h"
+#include "TransMatrices.h"
 
 ASprite::ASprite(void): ATextureNode(){
 	// initialize the indices array
@@ -11,6 +12,8 @@ ASprite::ASprite(void): ATextureNode(){
 	_indices[1] = 0;
 	_indices[2] = 2;
 	_indices[3] = 1;
+
+	CreateVBO();
 }
 
 ASprite::ASprite(const std::string& $fileName): ATextureNode($fileName){
@@ -20,6 +23,8 @@ ASprite::ASprite(const std::string& $fileName): ATextureNode($fileName){
 	_indices[1] = 0;
 	_indices[2] = 2;
 	_indices[3] = 1;
+
+	CreateVBO();
 }
 
 ASprite::ASprite(const std::string& $fileName, const Recti& $rect): ATextureNode($fileName, $rect){
@@ -29,6 +34,8 @@ ASprite::ASprite(const std::string& $fileName, const Recti& $rect): ATextureNode
 	_indices[1] = 0;
 	_indices[2] = 2;
 	_indices[3] = 1;
+
+	CreateVBO();
 }
 
 ASprite::~ASprite(void)
@@ -126,78 +133,30 @@ void ASprite::Draw(const Mat4f& mat){
 }
 
 void ASprite::Draw(){
-	//Draw(_transform);
+	TransMatrices* matrices = TransMatrices::Instance();
 
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	glBindVertexArray(_vaoID);
 
+	matrices->Push();
+	matrices->modelView = matrices->modelView * _transform;
 
-	glPushMatrix();
-	// apply the transformation after anchor translation.
-	glLoadMatrixf(_transform);
-
-	CreateVBO();
+	GLuint modelViewUnifo = glGetUniformLocation(AShaderManager::GetInstance()->activatedProgramID, "modelView");
+	glUniformMatrix4fv(modelViewUnifo, 1, GL_FALSE, matrices->modelView);
 
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, _indices);
 
-	glPopMatrix();
+	matrices->Pop();
+
+	glBindVertexArray(0);
 }
 
 void ASprite::CreateVBO(void)
 {
-	/*
-	GLfloat Vertices[] = {
-		0.0f, 0.0f, 0.0f, 1.0f,
-		1.0f,  0.0f, 0.0f, 1.0f,
-		0.5f, 1.0f, 0.0f, 1.0f
-	};
-
-	GLfloat Colors[] = {
-		1.0f, 0.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f, 1.0f
-	};
-
-	GLenum ErrorCheckValue = glGetError();
-
-	glGenVertexArrays(1, &VaoId);
-	glBindVertexArray(VaoId);
-
-	glGenBuffers(1, &VboId);
-	glBindBuffer(GL_ARRAY_BUFFER, VboId);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_DYNAMIC_DRAW);
-	// First parameter is the attribute index in the shader file
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(0);
-
-	glGenBuffers(1, &ColorBufferId);
-	glBindBuffer(GL_ARRAY_BUFFER, ColorBufferId);
-	// First parameter is the attribute index in the shader file
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Colors), Colors, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(1);
-	*/
-
-	/*
-	_vertices = new Vertex3f[4];
-	_vertices[0].colour.Set(255, 0, 0, 255);
-	_vertices[0].v.Set(0.0f, 0.0f, 0.0f);
-
-	_vertices[1].colour.Set(0, 255, 0, 255);
-	_vertices[1].v.Set(0.5f, 0.0f, 0.0f);
-
-	_vertices[2].colour.Set(0, 0, 255, 255);
-	_vertices[2].v.Set(0.5f, 0.5f, 0.0f);
-
-	_vertices[3].colour.Set(0, 0, 0, 255);
-	_vertices[3].v.Set(0.0f, 0.5f, 0.0f);
-	*/
-
 	int vertexSize = sizeof(Vertex3f);
 	// since we are using the VBO, the glBufferData already copied the data into graphic card's memory
 	// and the pointer pointed at the started of the memory, so no need to get the _vertice's memory.
 	int startAddr = 0;
 	int bufferSize = vertexSize * sizeof(_indices)/sizeof(GLubyte);
-
 
 	glGenBuffers(1, &_vboID);
 
@@ -209,15 +168,19 @@ void ASprite::CreateVBO(void)
 	glBindBuffer(GL_ARRAY_BUFFER, _vboID);
 	glBufferData(GL_ARRAY_BUFFER, bufferSize, _vertices, GL_DYNAMIC_DRAW);
 
-	// vertex shader attribute, vertex information. Setup vertex coordinate
+	// vertex position information
 	int offset = offsetof(Vertex3f, v);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, vertexSize, (void*)(startAddr+offset));
-	// fragment shader attribute, colour information
+	// vertex colour information
 	offset = offsetof(Vertex3f, colour);
 	glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, vertexSize, (void*)(startAddr+offset));
-	// what is this for? enable the two shaders?
+	// This points the vertex position to vertex shader's  location 0 variable. 
+	// This points the colour to vertex shader's location 1 variable.
+	// TODO: comment needs rephrase
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+
+	glBindVertexArray(0);
 
 	GLenum ErrorCheckValue = glGetError();
 	if (ErrorCheckValue != GL_NO_ERROR)

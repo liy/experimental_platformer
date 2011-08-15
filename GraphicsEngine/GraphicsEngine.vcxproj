@@ -74,6 +74,7 @@
     <ClCompile Include="ATextureManager.cpp" />
     <ClCompile Include="AShader.cpp" />
     <ClCompile Include="AShaderProgram.cpp" />
+    <ClCompile Include="TransMatrices.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AAnimation.h" />
@@ -85,6 +86,7 @@
     <ClInclude Include="AGeom.h" />
     <ClInclude Include="AShader.h" />
     <ClInclude Include="AShaderProgram.h" />
+    <ClInclude Include="TransMatrices.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\lib\glut-3.7.6-bin\glut32.dll" />

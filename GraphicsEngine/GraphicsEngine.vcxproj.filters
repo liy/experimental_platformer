@@ -22,7 +22,7 @@
     <Filter Include="Header Files\Shader">
       <UniqueIdentifier>{b574ceb6-9e3b-4fc0-aa06-1d2ff82ac211}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ShaderFiles">
+    <Filter Include="Shader Files">
       <UniqueIdentifier>{2c6ad9db-67bb-4397-9ce7-8ec5258c6601}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -47,6 +47,9 @@
     </ClCompile>
     <ClCompile Include="AShaderProgram.cpp">
       <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="TransMatrices.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -77,16 +80,19 @@
     <ClInclude Include="AShaderProgram.h">
       <Filter>Header Files\Shader</Filter>
     </ClInclude>
+    <ClInclude Include="TransMatrices.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\lib\glut-3.7.6-bin\glut32.dll">
       <Filter>DLL</Filter>
     </None>
     <None Include="..\Shaders\default.frag">
-      <Filter>ShaderFiles</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="..\Shaders\default.vert">
-      <Filter>ShaderFiles</Filter>
+      <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
 </Project>

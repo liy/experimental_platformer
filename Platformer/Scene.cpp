@@ -28,14 +28,23 @@ GraphicalTile* graphicalTile;
 
 ASprite* sprite;
 
+ASprite* indicator;
+
 void Scene::Init(Game* $game){
 	 _game = $game;
 
-	 sprite = new ASprite("texture.png", Recti(0.0f, 0.0f, 53.0f, 31.0f));
-	 sprite->SetPosition(128, 128);
-	 float ratio = 31.0f/53.0f;
-	 sprite->SetHeight(64.0f);
-	 sprite->SetWidth(64.0f/ratio);
+	 sprite = new ASprite("texture.png", Recti(0, 0, 53, 31));
+	 sprite->SetPosition(100, 100);
+	 //float ratio = 31.0f/53.0f;
+	 //sprite->SetHeight(64.0f);
+	 //sprite->SetWidth(64.0f/ratio);
+	 //sprite->SetScale(2, 2);
+
+
+	 indicator = new ASprite("texture.png", Recti(0, 0, 5, 5));
+	 indicator->SetPosition(200, 200);
+
+
 	// sprite->SetScale(2,2);
 	// sprite->SetRotation(ac_pi/4.0f);
 	 /*
@@ -143,7 +152,8 @@ void Scene::Update(unsigned short delta){
 	static float r = 0.0f;
 
 	r+= 0.1;
-	//sprite->SetRotation(r);
+	sprite->SetRotation(r);
+
 }
 
 
@@ -170,11 +180,7 @@ void Scene::Render(){
 	*/
 	sprite->Draw();
 
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glPointSize(10.0f);
-	glBegin(GL_POINTS);
-	glVertex3f(128, 128.0f, 0.0f);
-	glEnd();
+	indicator->Draw();
 }
 
 void Scene::MouseDownHandler(short x, short y){

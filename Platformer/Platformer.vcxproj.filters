@@ -52,6 +52,9 @@
     <Filter Include="Source Files\GameObjects\Actors">
       <UniqueIdentifier>{21106d28-9a46-4213-8db8-c52b7bf5df64}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files">
+      <UniqueIdentifier>{32ee81a1-dda9-4a81-9f53-5752604e6626}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainWindow.h">
@@ -144,6 +147,12 @@
     </None>
     <None Include="tileset.png">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\Shaders\default.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\Shaders\default.vert">
+      <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

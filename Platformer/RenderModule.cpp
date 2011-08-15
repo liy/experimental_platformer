@@ -1,3 +1,4 @@
+#include "GL\glew.h"
 #include "RenderModule.h"
 #include "ATexture.h"
 #include "ATextureManager.h"
@@ -7,6 +8,7 @@
 #include <sstream>
 #include "AShaderManager.h"
 #include "AShader.h"
+#include "TransMatrices.h"
 
 RenderModule::RenderModule(void)
 {
@@ -42,17 +44,18 @@ int RenderModule::Init(Game* $game, HDC& $hDC, unsigned int sw, unsigned int sh)
 	//set the background colour
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
+	InitDefaultShaders();
+
 	// by default use orthogonal projection.
 	UseOrthogonal();
 
-	InitDefaultShaders();
 
 	return 0;
 }
 
 int RenderModule::Render(){
 	// reset model view matrix
-	glLoadIdentity();
+	//glLoadIdentity();
 
 	// Clear The Screen And The Depth Buffer, stencial buffer will be set to 0
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -67,7 +70,8 @@ int RenderModule::Render(){
 
 	// render current scene
 	// reset the matrix
-	glLoadIdentity();
+	TransMatrices::Instance()->modelView.SetIdentity();
+
 	_scene->Render();
 
 	// By using double buffering, we are drawing everything to a hidden screen that we can not see. When we swap the buffer, the screen we see becomes the hidden screen, 
@@ -79,28 +83,30 @@ int RenderModule::Render(){
 
 void RenderModule::UsePerspective(){
 	// start modify projection matrix
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	// Set the correct ortho project.
-	//glOrtho(-$w/2.0f, $w/2.0f, -$h/2.0f, $h/2.0f, 0.0f, 200.0f);
+	//glMatrixMode(GL_PROJECTION);
+	//glLoadIdentity();
 
-	gluPerspective(60.0f, _screenWidth/_screenHeight, 0.0f, 200.0f);
+	//gluPerspective(60.0f, _screenWidth/_screenHeight, 0.0f, 200.0f);
+	TransMatrices::Instance()->projection.SetPerspective(60.0f, _screenWidth/_screenHeight, 0.01f, 200.0f);
 
 	//start model view transformations
-	glMatrixMode(GL_MODELVIEW);
+	//glMatrixMode(GL_MODELVIEW);
 }
 
 void RenderModule::UseOrthogonal(){
 	// start modify projection matrix
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+	//glMatrixMode(GL_PROJECTION);
+	//glLoadIdentity();
 	// Set the correct ortho project.
-	//glOrtho(-$w/2.0f, $w/2.0f, -$h/2.0f, $h/2.0f, 0.0f, 200.0f);
+	//glOrtho(0.0f, _screenWidth, 0.0f, _screenHeight, 0.0f, 200.0f);
+	TransMatrices::Instance()->projection.SetOrtho(0.0f, _screenWidth, 0.0f, _screenHeight, 0.0f, 200.0f);
 
-	glOrtho(0.0f, _screenWidth, 0.0f, _screenHeight, 0.0f, 200.0f);
+	// get the address of the perspective matrix in the vertex shader
+	GLuint perspectiveMatrixUnif = glGetUniformLocation(AShaderManager::GetInstance()->activatedProgramID, "projection");
+	glUniformMatrix4fv(perspectiveMatrixUnif, 1, GL_FALSE, TransMatrices::Instance()->projection);
 
 	//start model view transformations
-	glMatrixMode(GL_MODELVIEW);
+	//glMatrixMode(GL_MODELVIEW);
 }
 
 void RenderModule::Resize(unsigned int sw, unsigned int sh){
@@ -125,7 +131,7 @@ void RenderModule::InitDefaultShaders(){
 	shaderManager->AttachShader("default.frag", "default");
 
 	// activate the normal shader program
-	//shaderManager->ActivateProgram("default");
+	shaderManager->ActivateProgram("default");
 
 	GLenum ErrorCheckValue = glGetError();
 	if (ErrorCheckValue != GL_NO_ERROR)

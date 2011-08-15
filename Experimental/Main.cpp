@@ -227,17 +227,6 @@ void CreateVBO(void)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Colors), Colors, GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(1);
-
-
-
-
-
-
-
-
-
-
-	
 }
 
 void DestroyVBO(void)
@@ -299,20 +288,20 @@ void CreateShaders(void)
 	*/
 
 
-	Mat4f model_view_matrix;
-	model_view_matrix.SetTranslate(100.0f, 100.0f, 0.0f);
-	GLuint modelViewUnifo = glGetUniformLocation(shaderManager->activatedProgramID, "model_view_matrix");
-	glUniformMatrix4fv(modelViewUnifo, 1, GL_FALSE, model_view_matrix);
+	Mat4f modelView;
+	modelView.SetTranslate(100.0f, 100.0f, 0.0f);
+	GLuint modelViewUnifo = glGetUniformLocation(shaderManager->activatedProgramID, "modelView");
+	glUniformMatrix4fv(modelViewUnifo, 1, GL_FALSE, modelView);
 
 
-	Mat4f projection_matrix;
-	projection_matrix.SetOrtho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 3000.0f);
+	Mat4f projection;
+	projection.SetOrtho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 3000.0f);
 	//perspectiveMat.SetPerspective(60, 1024.0f/768.0f, 0.01f, 3000.0f);
 	//perspectiveMat.SetFrustum(-512.0f, 512.0f, -384.0f, 384.0f, 1.0f, 3000.0f);
 
 	// get the address of the perspective matrix in the vertex shader
-	GLuint perspectiveMatrixUnif = glGetUniformLocation(shaderManager->activatedProgramID, "projection_matrix");
-	glUniformMatrix4fv(perspectiveMatrixUnif, 1, GL_FALSE, projection_matrix);
+	GLuint perspectiveMatrixUnif = glGetUniformLocation(shaderManager->activatedProgramID, "projection");
+	glUniformMatrix4fv(perspectiveMatrixUnif, 1, GL_FALSE, projection);
 }
 
 void DestroyShaders(void)

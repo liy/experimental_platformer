@@ -97,6 +97,8 @@
     <ClCompile Include="PhysicalTile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Shaders\default.frag" />
+    <None Include="..\Shaders\default.vert" />
     <None Include="texture.png" />
     <None Include="tileset.png" />
   </ItemGroup>
