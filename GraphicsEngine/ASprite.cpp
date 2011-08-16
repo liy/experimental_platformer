@@ -133,21 +133,28 @@ void ASprite::Draw(const Mat4f& mat){
 }
 
 void ASprite::Draw(){
+	// save the current model view matrix
 	TransMatrices* matrices = TransMatrices::Instance();
-
-	glBindVertexArray(_vaoID);
-
 	matrices->Push();
+
+	// concatenate the transformation
 	matrices->modelView = matrices->modelView * _transform;
 
+	// set the vertex shader's model view matrix ready for drawing.
 	GLuint modelViewUnifo = glGetUniformLocation(AShaderManager::GetInstance()->activatedProgramID, "modelView");
 	glUniformMatrix4fv(modelViewUnifo, 1, GL_FALSE, matrices->modelView);
 
+	// bind texture
+	ATextureManager::GetInstance()->Bind(_texture_sp->fileName());
+	// bind the vertex states
+	glBindVertexArray(_vaoID);
+	// draw
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, _indices);
-
-	matrices->Pop();
-
+	// unbind the vertex state
 	glBindVertexArray(0);
+
+	// restore original model view matrix.
+	matrices->Pop();
 }
 
 void ASprite::CreateVBO(void)
@@ -160,25 +167,31 @@ void ASprite::CreateVBO(void)
 
 	glGenBuffers(1, &_vboID);
 
-	// Not sure what the vertex array for
+	// The vertex array basically is ued for saving all the states. So later when drawing, 
+	//  instead of bind texture, setup texture coordinate, colour information, etc. we can simply use glBindVertexArray(_vaoID) to set the state and ready for drawing.
 	glGenVertexArrays(1, &_vaoID);
 	glBindVertexArray(_vaoID);
 
 	// create the vbo
 	glBindBuffer(GL_ARRAY_BUFFER, _vboID);
-	glBufferData(GL_ARRAY_BUFFER, bufferSize, _vertices, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, bufferSize, _vertices, GL_STATIC_DRAW);
 
+	// texture
+	int offset = 0;
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, vertexSize, (void*)startAddr);
 	// vertex position information
-	int offset = offsetof(Vertex3f, v);
+	offset = offsetof(Vertex3f, v);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, vertexSize, (void*)(startAddr+offset));
 	// vertex colour information
 	offset = offsetof(Vertex3f, colour);
 	glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, vertexSize, (void*)(startAddr+offset));
 	// This points the vertex position to vertex shader's  location 0 variable. 
 	// This points the colour to vertex shader's location 1 variable.
+	// Points the texture coordinate to location 2 variable
 	// TODO: comment needs rephrase
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
 

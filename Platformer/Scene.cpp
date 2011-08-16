@@ -35,10 +35,10 @@ void Scene::Init(Game* $game){
 
 	 sprite = new ASprite("texture.png", Recti(0, 0, 53, 31));
 	 sprite->SetPosition(100, 100);
-	 //float ratio = 31.0f/53.0f;
-	 //sprite->SetHeight(64.0f);
-	 //sprite->SetWidth(64.0f/ratio);
-	 //sprite->SetScale(2, 2);
+	 float ratio = 31.0f/53.0f;
+	 sprite->SetHeight(64.0f);
+	 sprite->SetWidth(64.0f/ratio);
+	 sprite->SetScale(2, 2);
 
 
 	 indicator = new ASprite("texture.png", Recti(0, 0, 5, 5));
@@ -152,7 +152,7 @@ void Scene::Update(unsigned short delta){
 	static float r = 0.0f;
 
 	r+= 0.1;
-	sprite->SetRotation(r);
+	//sprite->SetRotation(r);
 
 }
 

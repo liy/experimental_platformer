@@ -66,14 +66,21 @@ void ATextureManager::Bind(const std::string& $fileName){
 		throw $e;
 	}
 
+	// TODO: Old fix function to be completed removed
 	// Have to always enable the texture 2d just in case it is not enabled.
-	glEnable(GL_TEXTURE_2D);
+	//glEnable(GL_TEXTURE_2D);
 
 	// If the bounded texture is not the requested texture, bind it; or if the bounded id is 0 which means no texture is bounded then bind the texture
 	if(_textureID != texture_sp->textureID() || _textureID == 0){
 		_textureID = texture_sp->textureID();
+
+		// TODO: Old fix function to be completed removed
 		// Active the texture, in order to draw it onto the screen.
-		glBindTexture(GL_TEXTURE_2D, _textureID);
+		//glBindTexture(GL_TEXTURE_2D, _textureID);
+
+		// OpenGL 3.1 + style of texture binding.
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE0, _textureID);
 	}
 }
 
