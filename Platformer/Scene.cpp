@@ -30,6 +30,8 @@ ASprite* sprite;
 
 ASprite* indicator;
 
+AAnimation* animation;
+
 void Scene::Init(Game* $game){
 	 _game = $game;
 
@@ -43,6 +45,21 @@ void Scene::Init(Game* $game){
 
 	 indicator = new ASprite("texture.png", Recti(0, 0, 5, 5));
 	 indicator->SetPosition(200, 200);
+
+
+	 std::vector<AFrame*> frames;
+	 int trackX = 0;
+	 for(int i=0; i<3; ++i){
+		 AFrame* frame = new AFrame(7);
+		 frame->rect.Set(trackX, 0, 17, 31);
+		 trackX+=18;
+		 frames.push_back(frame);
+	 }
+	 animation = new AAnimation("texture.png", frames);
+	 animation->SetPosition(300, 300);
+	 animation->pingpong = true;
+	 animation->Play();
+	 animation->SetSize(18, 32);
 
 
 	// sprite->SetScale(2,2);
@@ -149,6 +166,9 @@ void Scene::Update(unsigned short delta){
 
 	_game->camera->Update(delta);
 	*/
+
+	animation->Update(delta);
+
 	static float r = 0.0f;
 
 	r+= 0.1;
@@ -181,6 +201,8 @@ void Scene::Render(){
 	sprite->Draw();
 
 	indicator->Draw();
+
+	animation->Draw();
 }
 
 void Scene::MouseDownHandler(short x, short y){

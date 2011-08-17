@@ -43,102 +43,26 @@ ASprite::~ASprite(void)
 	
 }
 
-
-
 // Draw the image to a specific position and rotation
 void ASprite::Draw(float x, float y, float z, float rotation){
-	//bind the texture
-	ATextureManager::GetInstance()->Bind(_texture_sp->fileName());
-
-	glPushMatrix();
-
 	// do the transformation
-	glTranslatef(x, y, z);//normal position translation transform
-	glRotatef(rotation, 0.0f, 0.0f, 1.0f);//rotation transform
-	glScalef(_scale.x, _scale.y, 1.0f);// scale transform
-	glTranslatef(-_rect.width*_anchorRatio.x, -_rect.height*_anchorRatio.y, 0.0f);//anchor translation transform
+	Mat4f matrix;
+	matrix.Translate(x, y, z);//normal position translation transform
+	matrix.RotateZ(rotation);//rotation transform
+	matrix.Scale(_scale.x, _scale.y, 1.0f);// scale transform
+	matrix.Translate(-_rect.width*_anchorRatio.x, -_rect.height*_anchorRatio.y, 0.0f);//anchor translation transform
 
-	//enable to use coordinate array as a source texture
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-	glEnableClientState(GL_VERTEX_ARRAY);
-
-	int vertexSize = sizeof(Vertex3f);
-	int startAddr = (int)_vertices;
-
-	// Setup the texture coordinate
-	int offset = 0;
-	glTexCoordPointer(2, GL_FLOAT, vertexSize, (void*)(startAddr + offset));
-
-	// Setup vertex coordinate
-	offset = offsetof(Vertex3f, v);
-	glVertexPointer(3, GL_FLOAT, vertexSize, (void*)(startAddr + offset));
-
-	// setup colour
-	offset = offsetof(Vertex3f, colour);
-	glColorPointer(4, GL_UNSIGNED_BYTE, vertexSize, (void*)(startAddr + offset));
-
-	// draw the two triangles
-	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, _indices);
-
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-
-	glPopMatrix();
+	Draw(matrix);
 }
 
 // Draw the image using a specific matrix transformation
 void ASprite::Draw(const Mat4f& mat){
-	//bind the texture
-	ATextureManager::GetInstance()->Bind(_texture_sp->fileName());
-
-	glPushMatrix();
-	// apply the transformation after anchor translation.
-	glLoadMatrixf(mat);
-
-	//enable to use coordinate array as a source texture
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-	glEnableClientState(GL_VERTEX_ARRAY);
-
-	int vertexSize = sizeof(Vertex3f);
-	int startAddr = (int)_vertices;
-
-	// Setup the texture coordinate
-	int offset = 0;
-	glTexCoordPointer(2, GL_FLOAT, vertexSize, (void*)(startAddr + offset));
-
-	// Setup vertex coordinate
-	offset = offsetof(Vertex3f, v);
-	glVertexPointer(3, GL_FLOAT, vertexSize, (void*)(startAddr + offset));
-
-	// setup colour
-	offset = offsetof(Vertex3f, colour);
-	glColorPointer(4, GL_UNSIGNED_BYTE, vertexSize, (void*)(startAddr + offset));
-
-	// draw the two triangles
-	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, _indices);
-
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	
-	glPopMatrix();
-
-	int error = glGetError();
-	if(error != GL_NO_ERROR){
-		std::cout << "OpenGL error: " << error << "\n";
-	}
-}
-
-void ASprite::Draw(){
 	// save the current model view matrix
 	TransMatrices* matrices = TransMatrices::Instance();
 	matrices->Push();
 
 	// concatenate the transformation
-	matrices->modelView = matrices->modelView * _transform;
+	matrices->modelView = matrices->modelView * mat;
 
 	// set the vertex shader's model view matrix ready for drawing.
 	GLuint modelViewUnifo = glGetUniformLocation(AShaderManager::GetInstance()->activatedProgramID, "modelView");
@@ -155,6 +79,15 @@ void ASprite::Draw(){
 
 	// restore original model view matrix.
 	matrices->Pop();
+
+	int error = glGetError();
+	if(error != GL_NO_ERROR){
+		std::cout << "OpenGL error: " << error << "\n";
+	}
+}
+
+void ASprite::Draw(){
+	Draw(_transform);
 }
 
 void ASprite::CreateVBO(void)
@@ -185,6 +118,9 @@ void ASprite::CreateVBO(void)
 	// vertex colour information
 	offset = offsetof(Vertex3f, colour);
 	glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, vertexSize, (void*)(startAddr+offset));
+
+	// FIXME: I think I have to bind the indices array as well, using the GL_ELEMENT_ARRAY_BUFFER
+
 	// This points the vertex position to vertex shader's  location 0 variable. 
 	// This points the colour to vertex shader's location 1 variable.
 	// Points the texture coordinate to location 2 variable

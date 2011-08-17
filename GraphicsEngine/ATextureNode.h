@@ -11,8 +11,31 @@
  */
 class ATextureNode
 {
-private:
-	void Init(const Recti& $rect){
+public:
+	ATextureNode(void){
+		Init(Recti(0.0f, 0.0f, 1.0f, 1.0f));
+	}
+
+	ATextureNode(const std::string& $fileName){
+		// initialize the texture
+		_texture_sp = ATextureManager::GetInstance()->Get($fileName);
+
+		// assign the texture rectangle. The vertices position will be initialized as well.
+		Init(Recti(0.0f, 0.0f, _texture_sp->contentWidth(), _texture_sp->contentHeight()));
+	}
+
+	ATextureNode(const std::string& $fileName, const Recti& $rect){
+		// initialize the texture
+		_texture_sp = ATextureManager::GetInstance()->Get($fileName);
+
+		Init($rect);
+	};
+
+protected:
+	/**
+	 *	Init code
+	 */
+	virtual void Init(const Recti& $rect){
 		// initialize the vertices
 		_vertices = new Vertex3f[4];
 		_vertices[0].colour.Set(255, 0, 0, 255);
@@ -40,25 +63,8 @@ private:
 
 		_shaderManager = AShaderManager::GetInstance();
 	}
+
 public:
-	ATextureNode(void){
-		Init(Recti(1.0f, 0.0f, 1.0f, 1.0f));
-	}
-
-	ATextureNode(const std::string& $fileName){
-		// initialize the texture
-		_texture_sp = ATextureManager::GetInstance()->Get($fileName);
-
-		// assign the texture rectangle. The vertices position will be initialized as well.
-		Init(Recti(1.0f, 0.0f, _texture_sp->contentWidth(), _texture_sp->contentHeight()));
-	}
-
-	ATextureNode(const std::string& $fileName, const Recti& $rect){
-		// initialize the texture
-		_texture_sp = ATextureManager::GetInstance()->Get($fileName);
-
-		Init($rect);
-	};
 
 	virtual ~ATextureNode(void){
 		// FIXME how to free the image texture coordinate????
@@ -301,10 +307,10 @@ public:
 		// copy assignment
 		_rect = $rect;
 
-		_vertices[0].v.Set(_rect.x, _rect.y, 0.0f);
-		_vertices[1].v.Set(_rect.x + _rect.width, _rect.y, 0.0f);
-		_vertices[2].v.Set(_rect.x + _rect.width, _rect.y + _rect.height, 0.0f);
-		_vertices[3].v.Set(_rect.x, _rect.y + _rect.height, 0.0f);
+		_vertices[0].v.Set(0.0f, 0.0f, 0.0f);
+		_vertices[1].v.Set(_rect.width, 0.0f, 0.0f);
+		_vertices[2].v.Set(_rect.width, _rect.height, 0.0f);
+		_vertices[3].v.Set(0.0f, _rect.height, 0.0f);
 
 		// calculate bottom left of the image in texture coordinate. 
 		float u = (float)_rect.x/(float)_texture_sp->width();
@@ -326,10 +332,10 @@ public:
 		_rect.width = $width;
 		_rect.height = $height;
 
-		_vertices[0].v.Set(_rect.x, _rect.y, 0.0f);
-		_vertices[1].v.Set(_rect.x + _rect.width, _rect.y, 0.0f);
-		_vertices[2].v.Set(_rect.x + _rect.width, _rect.y + _rect.height, 0.0f);
-		_vertices[3].v.Set(_rect.x, _rect.y + _rect.height, 0.0f);
+		_vertices[0].v.Set(0.0f, 0.0f, 0.0f);
+		_vertices[1].v.Set(_rect.width, 0.0f, 0.0f);
+		_vertices[2].v.Set(_rect.width, _rect.height, 0.0f);
+		_vertices[3].v.Set(0.0f, _rect.height, 0.0f);
 
 		// calculate bottom left of the image in texture coordinate. 
 		float u = (float)_rect.x/_texture_sp->width();

@@ -1,21 +1,19 @@
+#include "gl\glew.h"
 #include "AAnimation.h"
 #include "ATextureManager.h"
 #include "ATexture.h"
 #include "acMath.h"
+#include "TransMatrices.h"
 
-AAnimation::AAnimation(void): ATextureNode(), _frameIndex(0), pingpong(false), repeat(true), _direction(1), _firstRound(true), _stopped(true), _frameTimer(1)
+AAnimation::AAnimation(const std::string& $fileName, const std::vector<AFrame*>& $frames):ATextureNode($fileName), _frameIndex(0), pingpong(false), repeat(true), _direction(1), _firstRound(true), _stopped(true),  _frameTimer(1)
 {
 	_numVertices = 4;
-	_vertices = new Vertex3f[_numVertices];
 
-	_scale.Set(1.0f, 1.0f);
-	_anchorRatio.Set(0.5f, 0.5f);
-}
-
-AAnimation::AAnimation(const std::vector<AFrame*>& $frames): ATextureNode(), _frameIndex(0), pingpong(false), repeat(true), _direction(1), _firstRound(true), _stopped(true),  _frameTimer(1)
-{
-	_numVertices = 4;
-	_vertices = new Vertex3f[_numVertices];
+	_indices = new GLubyte[4];
+	_indices[0] = 3;
+	_indices[1] = 0;
+	_indices[2] = 2;
+	_indices[3] = 1;
 
 	// TODO: no need to loop through, use assignment constructor??
 	int len = $frames.size();
@@ -24,8 +22,9 @@ AAnimation::AAnimation(const std::vector<AFrame*>& $frames): ATextureNode(), _fr
 		_frames[i]->index = i;
 	}
 
-	_scale.Set(1.0f, 1.0f);
-	_anchorRatio.Set(0.5f, 0.5f);
+	SetRect(_frames[_frameIndex]->rect);
+
+	CreateVBO();
 }
 
 AAnimation::~AAnimation(void)
@@ -33,23 +32,80 @@ AAnimation::~AAnimation(void)
 	_frames.clear();
 }
 
-void AAnimation::AddFrame(const std::string& $fileName){
-	AFrame* frame = new AFrame($fileName);
-	frame->index = _frames.size();
-	_frames.push_back(frame);
+void AAnimation::CreateVBO(void)
+{
+	int vertexSize = sizeof(Vertex3f);
+	// since we are using the VBO, the glBufferData already copied the data into graphic card's memory
+	// and the pointer pointed at the started of the memory, so no need to get the _vertice's memory.
+	int startAddr = 0;
+	int bufferSize = vertexSize * sizeof(_indices)/sizeof(GLubyte);
+
+	glGenBuffers(1, &_vboID);
+
+	// The vertex array basically is ued for saving all the states. So later when drawing, 
+	//  instead of bind texture, setup texture coordinate, colour information, etc. we can simply use glBindVertexArray(_vaoID) to set the state and ready for drawing.
+	glGenVertexArrays(1, &_vaoID);
+	glBindVertexArray(_vaoID);
+
+	// create the vbo
+	glBindBuffer(GL_ARRAY_BUFFER, _vboID);
+	glBufferData(GL_ARRAY_BUFFER, bufferSize, _vertices, GL_DYNAMIC_DRAW);
+
+	// texture
+	int offset = 0;
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, vertexSize, (void*)startAddr);
+	// vertex position information
+	offset = offsetof(Vertex3f, v);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, vertexSize, (void*)(startAddr+offset));
+	// vertex colour information
+	offset = offsetof(Vertex3f, colour);
+	glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, vertexSize, (void*)(startAddr+offset));
+
+	// FIXME: I think I have to bind the indices array as well, using the GL_ELEMENT_ARRAY_BUFFER
+
+	// This points the vertex position to vertex shader's  location 0 variable. 
+	// This points the colour to vertex shader's location 1 variable.
+	// Points the texture coordinate to location 2 variable
+	// TODO: comment needs rephrase
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+
+	glBindVertexArray(0);
+
+	GLenum ErrorCheckValue = glGetError();
+	if (ErrorCheckValue != GL_NO_ERROR)
+	{
+		fprintf(
+			stderr,
+			"ERROR: Could not create a VBO: %s \n",
+			gluErrorString(ErrorCheckValue)
+			);
+
+		exit(-1);
+	}
 }
 
-void AAnimation::AddFrame(const std::string& $fileName, const Recti& $rect){
-	AFrame* frame = new AFrame($fileName, $rect);
+void AAnimation::AddFrame(unsigned short $duration, const std::string& $fileName){
+	AFrame* frame = new AFrame($duration, $fileName);
 	frame->index = _frames.size();
 	_frames.push_back(frame);
+
+	// this ensures the rect  is set when the first frame is added.
+	if(_frameIndex == 0 && _frames.size() == 1){
+		SetRect(_frames[_frameIndex]->rect);
+	}
 }
 
-
-void AAnimation::AddFrame(const std::string& $fileName, const Recti& $rect, unsigned short $duration){
-	AFrame* frame = new AFrame($fileName, $rect, $duration);
+void AAnimation::AddFrame(const Recti& $rect, unsigned short $duration, const std::string& $fileName){
+	AFrame* frame = new AFrame($rect, $duration, $fileName);
 	frame->index = _frames.size();
 	_frames.push_back(frame);
+
+	// this ensures the rect  is set when the first frame is added.
+	if(_frameIndex == 0 && _frames.size() == 1){
+		SetRect(_frames[_frameIndex]->rect);
+	}
 }
 
 void AAnimation::Update(unsigned short delta){
@@ -57,6 +113,10 @@ void AAnimation::Update(unsigned short delta){
 	if(!_stopped){
 		if(_frameTimer > _frames[_frameIndex]->duration){
 			NextFrame();
+			// update the _texture_sp
+			if(_frames[_frameIndex]->texture_sp != NULL){
+				_texture_sp = _frames[_frameIndex]->texture_sp;
+			}
 		}
 		//  current frame duration has not passed end
 		// timer increase, since update is always called first, we do not want the animation missing first frame,
@@ -73,75 +133,62 @@ void AAnimation::Draw(float x, float y, float z, float rotation){
 	AFrame* frame = _frames[_frameIndex];
 	_rect = frame->rect;
 
-	ATextureManager::GetInstance()->Bind(frame->texture_sp->fileName());
+	// do the transformation
+	Mat4f matrix;
+	matrix.Translate(x, y, z);//normal position translation transform
+	matrix.RotateZ(rotation);//rotation transform
+	matrix.Scale(_scale.x, _scale.y, 1.0f);// scale transform
+	matrix.Translate(-_rect.width*_anchorRatio.x, -_rect.height*_anchorRatio.y, 0.0f);//anchor translation transform
 
-	glPushMatrix();
-
-	// since there's no transformation before this line, we can safely  directly load the input matrix
-	glLoadMatrixf(_transform);
-	// The anchor translation transform will be concatenated
-	// inputMatrix * anchorTransMatrix * vertices
-	glTranslatef(-GetWidth()*_anchorRatio.x, -GetHeight()*_anchorRatio.y, 0.0f);
-
-	// TODO: draw
-
-	//enable to use coordinate array as a source texture
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-
-	int vertexSize = sizeof(Vertex3f);
-	int startAddr = (int)&_vertices[0];
-
-	// Setup the vertex pointer first
-	// offset of the vertex vector position.
-	// Since the Vertex3f extends Vec3f, the first offset for vertex pointer array will be 0
-	int offset = 0;
-	glVertexPointer(3, GL_FLAT, vertexSize, (void*)(startAddr + offset));
-
-	// Setup the texture coordinate
-	offset = offsetof(Vertex3f, uv);
-	glTexCoordPointer(2, GL_FLOAT, vertexSize, (void*)(startAddr + offset));
-
-	// setup colour
-	offset = offsetof(Vertex3f, colour);
-	glColorPointer(4, GL_UNSIGNED_BYTE, vertexSize, (void*)(startAddr + offset));
-
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, _indices);
-
-	glPopMatrix();
+	Draw(matrix);
 }
 
 void AAnimation::Draw(){
-
-}
-
-void AAnimation::Draw(const Mat4f& mat){
-
-}
-
-/*
-void AAnimation::Draw(const Mat4f& mat){
 	// if nothing in the frame list, do not draw
 	if(_frames.size() == 0)
 		return;
 
 	AFrame* frame = _frames[_frameIndex];
+	SetRect(frame->rect);
 
-	ATextureManager::GetInstance()->Bind(frame->texture_sp->fileName());
+	int vertexSize = sizeof(Vertex3f);
+	int bufferSize = vertexSize * sizeof(_indices)/sizeof(GLubyte);
+	
+	// update
+	glBufferSubData(GL_ARRAY_BUFFER, 0, bufferSize, _vertices);
 
-	glPushMatrix();
-
-	// since there's no transformation before this line, we can safely  directly load the input matrix
-	glLoadMatrixf(mat);
-	// The anchor translation transform will be concatenated
-	// inputMatrix * anchorTransMatrix * vertices
-	glTranslatef(-width()*_anchorRatio.x, -height()*_anchorRatio.y, 0.0f);
-
-	// TODO: draw
-
-	glPopMatrix();
+	Draw(_transform);
 }
-*/
+
+void AAnimation::Draw(const Mat4f& mat){
+	// save the current model view matrix
+	TransMatrices* matrices = TransMatrices::Instance();
+	matrices->Push();
+
+	// concatenate the transformation
+	matrices->modelView = matrices->modelView * mat;
+
+	// set the vertex shader's model view matrix ready for drawing.
+	GLuint modelViewUnifo = glGetUniformLocation(AShaderManager::GetInstance()->activatedProgramID, "modelView");
+	glUniformMatrix4fv(modelViewUnifo, 1, GL_FALSE, matrices->modelView);
+
+	// bind texture
+	ATextureManager::GetInstance()->Bind(_texture_sp->fileName());
+	// bind the vertex states
+	glBindVertexArray(_vaoID);
+	// draw
+	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, _indices);
+	// unbind the vertex state
+	glBindVertexArray(0);
+
+	// restore original model view matrix.
+	matrices->Pop();
+
+	int error = glGetError();
+	if(error != GL_NO_ERROR){
+		std::cout << "OpenGL error: " << error << "\n";
+	}
+}
 
 bool AAnimation::Running(){
 	return !_stopped;
@@ -262,4 +309,3 @@ void AAnimation::NextFrame(){
 AFrame& AAnimation::GetFrame(unsigned int $index){
 	return *_frames[$index];
 }
-
