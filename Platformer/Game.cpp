@@ -28,7 +28,7 @@ void Game::Init(HDC hDC, HWND hWnd, int screenWidth, int screenHeight){
 
 	// initialize camera
 	camera = new Camera(this);
-	camera->Init(screenWidth, screenHeight, 0.5, 0.3);
+	camera->Init(screenWidth, screenHeight, 0.5, 0.5);
 
 	// You must initialize the TextureManager first before use.
 	ATextureManager::GetInstance()->Init();

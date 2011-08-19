@@ -80,13 +80,14 @@ void ATextureManager::Bind(const std::string& $fileName){
 
 		// OpenGL 3.1 + style of texture binding.
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE0, _textureID);
+		glBindTexture(GL_TEXTURE_2D, _textureID);
 	}
 }
 
 void ATextureManager::Bind(const GLuint& textureID){
 	if(_textureID != textureID){
 		_textureID = textureID;
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, _textureID);
 	}
 }

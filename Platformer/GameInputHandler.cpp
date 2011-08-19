@@ -6,6 +6,7 @@
 #include "GamepadEventListener.h"
 #include "menu_resource.h"
 #include "Scene.h"
+#include "TransMatrices.h"
 
 GameInputHandler::GameInputHandler(void)
 {
@@ -65,8 +66,9 @@ void GetOGLPos(short x, short y, GLdouble& glx, GLdouble& gly){
 	GLfloat winX, winY, winZ;
 	GLdouble posZ;
 
-	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-	glGetDoublev(GL_PROJECTION_MATRIX, projection);
+	// covert to double
+	std::copy(TransMatrices::Instance()->modelView.m, TransMatrices::Instance()->modelView.m+16, modelview);
+	std::copy(TransMatrices::Instance()->projection.m, TransMatrices::Instance()->projection.m+16, projection);
 	glGetIntegerv(GL_VIEWPORT, viewportRect);
 
 	winX = (float)x;
@@ -81,6 +83,7 @@ LRESULT CALLBACK GameInputHandler::MsgHandler(HWND hWnd, UINT uMsg, WPARAM wPara
 	{
 		case WM_LBUTTONDOWN:
 		{
+			// TODO: Needs a more robust convertor.
 			GLdouble x, y;
 			GetOGLPos((short)LOWORD(lParam), (short)HIWORD(lParam), x, y);
 

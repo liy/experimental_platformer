@@ -35,35 +35,20 @@ AAnimation* animation;
 void Scene::Init(Game* $game){
 	 _game = $game;
 
-	 sprite = new ASprite("texture.png", Recti(0, 0, 53, 31));
-	 sprite->SetPosition(100, 100);
-	 float ratio = 31.0f/53.0f;
-	 sprite->SetHeight(64.0f);
-	 sprite->SetWidth(64.0f/ratio);
-	 sprite->SetScale(2, 2);
-
-
-	 indicator = new ASprite("texture.png", Recti(0, 0, 5, 5));
-	 indicator->SetPosition(200, 200);
-
-
 	 std::vector<AFrame*> frames;
 	 int trackX = 0;
 	 for(int i=0; i<3; ++i){
-		 AFrame* frame = new AFrame(7);
-		 frame->rect.Set(trackX, 0, 17, 31);
+		 AFrame* frame = new AFrame(Recti(trackX, 0, 17, 31), 7);
 		 trackX+=18;
 		 frames.push_back(frame);
 	 }
 	 animation = new AAnimation("texture.png", frames);
-	 animation->SetPosition(300, 300);
 	 animation->pingpong = true;
 	 animation->Play();
-	 animation->SetSize(18, 32);
 
+	 sprite = new ASprite("texture.png");
+	 sprite->SetPosition(100, 100);
 
-	// sprite->SetScale(2,2);
-	// sprite->SetRotation(ac_pi/4.0f);
 	 /*
 	// create actor's rigid body
 	acBody* body = new acBody();
@@ -75,12 +60,11 @@ void Scene::Init(Game* $game){
 	std::vector<AFrame*> frames;
 	int trackX = 0;
 	for(int i=0; i<3; ++i){
-		AFrame* frame = new AFrame("texture.png", 7);
-		frame->rect.Set(trackX, 0, 17, 31);
+		AFrame* frame = new AFrame(Recti(trackX, 0, 17, 31), 7);
 		trackX+=18;
 		frames.push_back(frame);
 	}
-	AAnimation* ani = new AAnimation(frames);
+	AAnimation* ani = new AAnimation("texture.png", frames);
 	ani->pingpong = true;
 	ani->Play();
 
@@ -98,6 +82,7 @@ void Scene::Init(Game* $game){
 	float tx = 96.0f;
 	float ty = 98.0f;
 
+	
 	tiles = new PhysicalTile[NUM_TILES];
 
 	tiles[0] = PhysicalTile();
@@ -143,18 +128,24 @@ void Scene::Init(Game* $game){
 		tiles[i].SetSprite(new ASprite("tileset.png", Recti(0, 0, 32, 32)));
 		tiles[i].SetPosition(int((unifRand()*2024.0f)/32.0f)*32.0f, int((unifRand()*768.0f)/32.0f)*32.0f);
 	}
+	*/
 
 	// lock the camera to the actor
+	 /*
 	_game->camera->Follows(*actor);
 
-	AAnimation* tileAni = new AAnimation(frames);
+
+	AAnimation* tileAni = new AAnimation("texture.png", frames);
 	graphicalTile = new GraphicalTile(tileAni);
 	tileAni->Play();
-	graphicalTile->SetPosition(300.0f, 100.0f);
+	graphicalTile->SetPosition(300.0f, 150.0f);
 	*/
 }
 
 void Scene::Update(unsigned short delta){
+	animation->Update(delta);
+	_game->camera->Update(delta);
+
 	/*
 	actor->Update(delta);
 
@@ -166,20 +157,18 @@ void Scene::Update(unsigned short delta){
 
 	_game->camera->Update(delta);
 	*/
-
-	animation->Update(delta);
-
-	static float r = 0.0f;
-
-	r+= 0.1;
-	//sprite->SetRotation(r);
-
 }
 
 
 // After user input handled(Game class delegate the input to GameInputHandler class), followed by Update method.
 // All the game object rendering should appear here.
 void Scene::Render(){
+	_game->camera->Setup();
+
+	animation->Draw();
+
+	sprite->Draw();
+
 	/*
 	_game->camera->Setup();
 
@@ -190,19 +179,8 @@ void Scene::Render(){
 		tiles[i].Draw();
 	}
 
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glPointSize(10.0f);
-	glBegin(GL_POINTS);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	glEnd();
-
 	graphicalTile->Draw();
 	*/
-	sprite->Draw();
-
-	indicator->Draw();
-
-	animation->Draw();
 }
 
 void Scene::MouseDownHandler(short x, short y){
@@ -212,7 +190,7 @@ void Scene::MouseDownHandler(short x, short y){
 	actor->SetPosition(c);
 	*/
 
-	sprite->SetPosition(x, y);
+	//animation->SetPosition(x, y);
 }
 
 void Scene::MouseMoveHandler(short x, short y){

@@ -80,9 +80,14 @@ void ASprite::Draw(const Mat4f& mat){
 	// restore original model view matrix.
 	matrices->Pop();
 
-	int error = glGetError();
-	if(error != GL_NO_ERROR){
-		std::cout << "OpenGL error: " << error << "\n";
+	GLenum ErrorCheckValue = glGetError();
+	if (ErrorCheckValue != GL_NO_ERROR)
+	{
+		fprintf(
+			stderr,
+			"OpenGL error: %s \n",
+			gluErrorString(ErrorCheckValue)
+			);
 	}
 }
 
@@ -92,6 +97,7 @@ void ASprite::Draw(){
 
 void ASprite::CreateVBO(void)
 {
+
 	int vertexSize = sizeof(Vertex3f);
 	// since we are using the VBO, the glBufferData already copied the data into graphic card's memory
 	// and the pointer pointed at the started of the memory, so no need to get the _vertice's memory.
@@ -104,6 +110,8 @@ void ASprite::CreateVBO(void)
 	//  instead of bind texture, setup texture coordinate, colour information, etc. we can simply use glBindVertexArray(_vaoID) to set the state and ready for drawing.
 	glGenVertexArrays(1, &_vaoID);
 	glBindVertexArray(_vaoID);
+
+	//ATextureManager::GetInstance()->Bind(_texture_sp->fileName());
 
 	// create the vbo
 	glBindBuffer(GL_ARRAY_BUFFER, _vboID);
@@ -140,6 +148,6 @@ void ASprite::CreateVBO(void)
 			gluErrorString(ErrorCheckValue)
 			);
 
-		exit(-1);
+		//exit(-1);
 	}
 }

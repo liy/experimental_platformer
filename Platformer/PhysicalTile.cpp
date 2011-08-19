@@ -45,7 +45,7 @@ void PhysicalTile::Update(unsigned short delta){
 }
 	
 void PhysicalTile::Draw(){
-	_body->DrawAABB(0.0f, 0.3f, 0.1f);
+	//_body->DrawAABB(0.0f, 0.3f, 0.1f);
 	_graphics_ptr->Draw(_body->position.x, _body->position.y, 0.0f, _rotation);
 }
 

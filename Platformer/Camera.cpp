@@ -3,6 +3,7 @@
 #include <GL\GL.h>
 #include "Player.h"
 #include "Game.h"
+#include "TransMatrices.h"
 
 Camera::Camera(Game* gm): game(gm)
 {
@@ -67,11 +68,12 @@ void Camera::Move(const Vec2f& dis){
 
 void Camera::Update(unsigned short delta){
 	if(lockedTarget != NULL){
-		TweenTo(lockedTarget->position());
+		//TweenTo(lockedTarget->position());
 	}
 }
 
 void Camera::Setup(){
+	/*
 	// glulookat with rotation. Needs to separate the shift translation.
 	// scale, related the shifted position.
 	glScalef(scale, scale, 1.0f);
@@ -81,6 +83,14 @@ void Camera::Setup(){
 	glRotatef(rotation, 0.0f, 0.0f, 1.0f);
 	// move the camera to specified position, ready for rotation.
 	gluLookAt(position.x, position.y, 1.0f,
+		position.x, position.y, 0.0f,
+		0.0f, 1.0f, 0.0f);
+		*/
+
+	TransMatrices::Instance()->modelView.Scale(scale, scale, 1.0f);
+	TransMatrices::Instance()->modelView.Translate(currentWidth * anchorRatio.x, currentHeight * anchorRatio.y, 0.0f);
+	TransMatrices::Instance()->modelView.RotateZ(rotation);
+	TransMatrices::Instance()->modelView.LookAt(position.x, position.y, 1.0f,
 		position.x, position.y, 0.0f,
 		0.0f, 1.0f, 0.0f);
 }

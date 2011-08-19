@@ -7,7 +7,7 @@ class Player;
 class PhysicalTile;
 class Camera;
 
-static const int NUM_TILES = 100;
+static const int NUM_TILES = 0;
 
 class Scene : public IMouseEventListener, public GamepadEventListener
 {

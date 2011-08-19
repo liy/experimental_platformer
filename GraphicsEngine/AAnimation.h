@@ -21,19 +21,19 @@ struct AFrame{
 	unsigned int index;
 
 	/**
+	 *	Each frame has its own anchor shift, so we can place them freely.
+	 */
+	Vec2f anchorRatio;
+
+	/**
 	 *	The  rectangle for generate texture coordinate.
 	 */
 	Recti rect;
 
-	AFrame(unsigned short $duration=10, const std::string& $fileName=""): duration($duration){
-		if($fileName != ""){
-			texture_sp = ATextureManager::GetInstance()->Get($fileName);
-			rect.Set(0, 0, texture_sp->contentWidth(), texture_sp->contentHeight());
-		}
-		else{
-			texture_sp = NULL;
-			rect.Set(0, 0, 0, 0);
-		}
+	AFrame(const std::string& $fileName, unsigned short $duration=10): duration($duration){
+		texture_sp = ATextureManager::GetInstance()->Get($fileName);
+		rect.Set(0, 0, texture_sp->contentWidth(), texture_sp->contentHeight());
+		anchorRatio.Set(0.5f, 0.5f);
 	}
 
 	AFrame(const Recti& $rect, unsigned short $duration=10, const std::string& $fileName=""): duration($duration), rect($rect){
@@ -43,6 +43,11 @@ struct AFrame{
 		else{
 			texture_sp = NULL;
 		}
+		anchorRatio.Set(0.5f, 0.5f);
+	}
+
+	Vec2f GetAnchor() const{
+		return Vec2f(rect.width*anchorRatio.x, rect.height*anchorRatio.y);
 	}
 
 	~AFrame(void){
@@ -83,9 +88,15 @@ public:
 
 	bool repeat;
 
-	void AddFrame(unsigned short $duration=10, const std::string& $fileName="");
+	/**
+	 *	If you do not provide clip rectangle, you must provide a texture, otherwise the rectangle cannot be correctly set. The clip rectangle will be the size of the texture
+	 */
+	void AddFrame(const std::string& $fileName, unsigned short $duration=10, const Vec2f& anchroRatio=Vec2f(0.5f, 0.5f));
 
-	void AddFrame(const Recti& $rect, unsigned short $duration=10, const std::string& $fileName="");
+	/**
+	 *	Frame's texture is optional, if you do not provide one. The default texture will be using AAnimation's texture. If you do provide one, it will override the AAnimation's texture.
+	 */
+	void AddFrame(const Recti& $rect, unsigned short $duration=10, const Vec2f& anchroRatio=Vec2f(0.5f, 0.5f), const std::string& $fileName="");
 
 	void Update(unsigned short delta);
 

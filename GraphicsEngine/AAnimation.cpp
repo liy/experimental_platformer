@@ -86,8 +86,9 @@ void AAnimation::CreateVBO(void)
 	}
 }
 
-void AAnimation::AddFrame(unsigned short $duration, const std::string& $fileName){
-	AFrame* frame = new AFrame($duration, $fileName);
+void AAnimation::AddFrame(const std::string& $fileName, unsigned short $duration, const Vec2f& anchorRatio){
+	AFrame* frame = new AFrame($fileName, $duration);
+	frame->anchorRatio = anchorRatio;
 	frame->index = _frames.size();
 	_frames.push_back(frame);
 
@@ -97,8 +98,9 @@ void AAnimation::AddFrame(unsigned short $duration, const std::string& $fileName
 	}
 }
 
-void AAnimation::AddFrame(const Recti& $rect, unsigned short $duration, const std::string& $fileName){
+void AAnimation::AddFrame(const Recti& $rect, unsigned short $duration, const Vec2f& anchorRatio, const std::string& $fileName){
 	AFrame* frame = new AFrame($rect, $duration, $fileName);
+	frame->anchorRatio = anchorRatio;
 	frame->index = _frames.size();
 	_frames.push_back(frame);
 
@@ -131,7 +133,7 @@ void AAnimation::Draw(float x, float y, float z, float rotation){
 		return;
 
 	AFrame* frame = _frames[_frameIndex];
-	_rect = frame->rect;
+	SetRect(frame->rect);
 
 	// do the transformation
 	Mat4f matrix;
@@ -139,6 +141,14 @@ void AAnimation::Draw(float x, float y, float z, float rotation){
 	matrix.RotateZ(rotation);//rotation transform
 	matrix.Scale(_scale.x, _scale.y, 1.0f);// scale transform
 	matrix.Translate(-_rect.width*_anchorRatio.x, -_rect.height*_anchorRatio.y, 0.0f);//anchor translation transform
+
+	int vertexSize = sizeof(Vertex3f);
+	int bufferSize = vertexSize * sizeof(_indices)/sizeof(GLubyte);
+
+	// update
+	glBufferSubData(GL_ARRAY_BUFFER, 0, bufferSize, _vertices);
+
+	std::cout << "rect: " << _frames[_frameIndex]->rect.x << "\n";
 
 	Draw(matrix);
 }
@@ -150,6 +160,7 @@ void AAnimation::Draw(){
 
 	AFrame* frame = _frames[_frameIndex];
 	SetRect(frame->rect);
+
 
 	int vertexSize = sizeof(Vertex3f);
 	int bufferSize = vertexSize * sizeof(_indices)/sizeof(GLubyte);
