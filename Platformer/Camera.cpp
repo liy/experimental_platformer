@@ -68,7 +68,7 @@ void Camera::Move(const Vec2f& dis){
 
 void Camera::Update(unsigned short delta){
 	if(lockedTarget != NULL){
-		//TweenTo(lockedTarget->position());
+		TweenTo(lockedTarget->position());
 	}
 }
 

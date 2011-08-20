@@ -38,10 +38,10 @@ protected:
 	virtual void Init(const Recti& $rect){
 		// initialize the vertices
 		_vertices = new Vertex3f[4];
-		_vertices[0].colour.Set(255, 0, 0, 255);
-		_vertices[1].colour.Set(255, 0, 0, 255);
-		_vertices[2].colour.Set(255, 0, 0, 255);
-		_vertices[3].colour.Set(255, 0, 0, 255);
+		_vertices[0].colour.Set(255, 255, 255, 255);
+		_vertices[1].colour.Set(255, 255, 255, 255);
+		_vertices[2].colour.Set(255, 255, 255, 255);
+		_vertices[3].colour.Set(255, 255, 255, 255);
 
 		// assign the texture rectangle. The vertices position will be initialized as well.
 		SetRect($rect);

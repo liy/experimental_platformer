@@ -21,6 +21,6 @@ public:
 	void CreateVBO(void);
 
 private:
-	GLuint _vaoID, _vboID;
+	GLuint _vaoID, _vboID, _iboID;
 };
 

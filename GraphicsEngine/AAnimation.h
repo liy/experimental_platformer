@@ -136,7 +136,7 @@ public:
 	void CreateVBO(void);
 
 private:
-	GLuint _vaoID, _vboID;
+	GLuint _vaoID, _vboID, _iboID;
 
 protected:
 	static const int ANI_FORWARD = 1;
