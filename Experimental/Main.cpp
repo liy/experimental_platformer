@@ -26,6 +26,8 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <acMath.h>
+#include "pugixml.hpp"
+
 #define WINDOW_TITLE_PREFIX "Chapter 2"
 
 int CurrentWidth = 800,
@@ -51,8 +53,28 @@ void DestroyVBO(void);
 void CreateShaders(void);
 void DestroyShaders(void);
 
+//using namespace rapidxml;
+
+void TestXML(const std::string& fn){
+	pugi::xml_document doc;
+
+	pugi::xml_parse_result result = doc.load_file(fn.c_str());
+
+	// add node with some name
+	pugi::xml_node node = doc.append_child("new_node");
+	// add description node with text child
+	pugi::xml_node descr = node.append_child("description");
+	descr.append_child(pugi::node_pcdata).set_value("Simple node");
+
+	// save document to file
+	doc.save(std::cout);
+}
+
 int main(int argc, char* argv[])
 {
+	TestXML("data.xml");
+
+
 	Initialize(argc, argv);
 
 	glutMainLoop();

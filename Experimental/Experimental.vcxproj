@@ -41,7 +41,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\PhysicsEngine;..\MathLib;..\GraphicsEngine;..\..\lib\freeglut\include;..\..\lib\glew-1.6.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\PhysicsEngine;..\MathLib;..\GraphicsEngine;..\..\lib\freeglut\include;..\..\lib\glew-1.6.0\include;..\..\lib\rapidxml-1.13;..\Pugixml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -55,7 +55,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\PhysicsEngine;..\MathLib;..\GraphicsEngine;..\..\lib\freeglut\include;..\..\lib\glew-1.6.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\PhysicsEngine;..\MathLib;..\GraphicsEngine;..\..\lib\freeglut\include;..\..\lib\glew-1.6.0\include;..\..\lib\rapidxml-1.13;..\Pugixml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -77,6 +77,9 @@
     </ProjectReference>
     <ProjectReference Include="..\PhysicsEngine\PhysicsEngine.vcxproj">
       <Project>{7bd022bb-a440-45ba-b0ed-aeacab29d802}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Pugixml\Pugixml.vcxproj">
+      <Project>{082260f9-4fca-446b-8652-e5b5eec19fce}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
