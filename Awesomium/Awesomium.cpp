@@ -17,11 +17,15 @@
 #include <GLUT/GLUT.h>
 #endif
 
+#include <iostream>
+
 // Various macro definitions
 #define WIDTH	1024
 #define HEIGHT	768
 #define URL	"http://www.google.com"
-#define UPDATE_DELAY_MS	25
+#define INDEX_FILE "index.html"
+#define DIR "E:/jquery-ui-1.8.16.custom/"
+#define UPDATE_DELAY_MS	5
 
 void cleanup();
 void display();
@@ -31,6 +35,8 @@ void mousePressed(int button, int state, int x, int y);
 void keyPressed(unsigned char key, int x, int y);
 void specialKeyPressed(int key, int x, int y);
 void injectSpecialKey(int keyCode);
+
+void webLoadingComplete(awe_webview* caller);
 
 static awe_webview* webView = 0;
 
@@ -53,17 +59,31 @@ int main(int argc, char *argv[])
 	// Create our WebCore singleton with the default options
 	awe_webcore_initialize_default();
 	
+	awe_string* base_dir = awe_string_create_from_ascii(DIR, strlen(DIR));
+	awe_webcore_set_base_directory(base_dir);
+
 	// Create a new WebView instance with a certain width and height, using the 
 	// WebCore we just created
 	webView = awe_webcore_create_webview(WIDTH, HEIGHT, false);
+
+	awe_webview_set_transparent(webView, true);
 	
 	// Load a certain URL into our WebView instance
-	awe_string* url_str = awe_string_create_from_ascii(URL, strlen(URL));
-	awe_webview_load_url(webView, url_str, awe_string_empty(), awe_string_empty(), awe_string_empty());
+	//awe_string* url_str = awe_string_create_from_ascii(URL, strlen(URL));
+	//awe_webview_load_url(webView, url_str, awe_string_empty(), awe_string_empty(), awe_string_empty());
+
+	
+	awe_string* file_str = awe_string_create_from_ascii(INDEX_FILE, strlen(INDEX_FILE));
+	awe_webview_load_file(webView, file_str, awe_string_empty());
+
 	// destroy string
-	awe_string_destroy(url_str);
+	//awe_string_destroy(url_str);
+	awe_string_destroy(base_dir);
+	awe_string_destroy(file_str);
 
 	awe_webview_focus(webView);
+
+	awe_webview_set_callback_finish_loading(webView, webLoadingComplete);
 
 	glutDisplayFunc(display);
 	glutTimerFunc(UPDATE_DELAY_MS, update, 0);
@@ -78,6 +98,17 @@ int main(int argc, char *argv[])
 	glutMainLoop();
 	
 	return 0;
+}
+
+void webLoadingComplete(awe_webview* caller){
+
+	awe_string* urlStr = awe_webview_get_url(caller);
+
+	int str_size = awe_string_to_utf8(urlStr, NULL, 0) + 1;
+	char* url = new char[str_size];
+	awe_string_to_utf8(urlStr, url, str_size);
+
+	std::cout << url << "\n";
 }
 
 void cleanup()
@@ -219,41 +250,28 @@ void specialKeyPressed(int key, int x, int y)
 
 void injectSpecialKey(int keyCode)
 {
-	wchar16 key = keyCode;
-
 	// Key Down
 	awe_webkeyboardevent e;
 	e.is_system_key = false;
 	e.modifiers = 0;
 
-	e.text[0] = key;
+	e.text[0] = keyCode;
 	e.text[1] = 0;
 	e.text[2] = 0;
 	e.text[3] = 0;
-	e.unmodified_text[0] = key;
+	e.unmodified_text[0] = keyCode;
 	e.unmodified_text[1] = 0;
 	e.unmodified_text[2] = 0;
 	e.unmodified_text[3] = 0;
-	e.virtual_key_code = key;
-	e.native_key_code = key;
+	e.virtual_key_code = keyCode;
+	e.native_key_code = keyCode;
 	e.type = AWE_WKT_KEYDOWN;
 	awe_webview_inject_keyboard_event(webView, e);
 
 	// Key Up
-	e.is_system_key = false;
-	e.modifiers = 0;
-
-	e.text[0] = key;
-	e.text[1] = 0;
-	e.text[2] = 0;
-	e.text[3] = 0;
-	e.unmodified_text[0] = key;
-	e.unmodified_text[1] = 0;
-	e.unmodified_text[2] = 0;
-	e.unmodified_text[3] = 0;
-	e.virtual_key_code = key;
-	e.native_key_code = key;
 	e.type = AWE_WKT_KEYUP;
 	awe_webview_inject_keyboard_event(webView, e);
+
+	// update immediately
 	awe_webcore_update();
 }
