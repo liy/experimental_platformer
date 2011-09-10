@@ -111,6 +111,7 @@ void display()
 
 	if(renderBuffer != NULL)
 	{
+
 		// Draw pixels directly to screen from our image buffer
 		glDrawPixels(WIDTH, HEIGHT, GL_BGRA, GL_UNSIGNED_BYTE, awe_renderbuffer_get_buffer(renderBuffer));
 	}
