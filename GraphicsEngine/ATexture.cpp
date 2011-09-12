@@ -82,7 +82,7 @@ GLuint ATexture::Create(const std::string& $fileName){
 	// Select modulate to mix texture with color for shading
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	// TODO: passing in the texture parameters whe creation?
+	// TODO: passing in the texture parameters who creation?
 	// Since this is a very simple 2D pixelated game, using GL_NEAREST will result a better non-fuzzy image on screen
 	// Texture filtering when texture size is big
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
