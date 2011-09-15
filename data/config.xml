@@ -1,0 +1,8 @@
+<config>
+	<game>
+		<fullscreen>false<fullscreen>
+		<resolution>800*600</resolution>
+	</game>
+	<editor>
+	</editor>
+</config>

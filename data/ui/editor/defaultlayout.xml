@@ -1,0 +1,23 @@
+<layouts>
+	<layout name="auto">
+		<view id="tool_box" x="0" y="64" width="64" height="300">
+			<visible>true</visible>
+			<locked>true</locked>
+		</view>
+		
+		<view id="main_menu" x="64" y="0" width="800" height="128">
+			<visible>true</visible>
+			<locked>true</locked>
+		</view>
+		
+		<view id="side_bar" x="950" y="64" width="128" height="800">
+			<visible>true</visible>
+			<locked>true</locked>
+		</view>
+		
+		<view id="dock" x="64" y="680" width="800" height="96">
+			<visible>true</visible>
+			<locked>true</locked>
+		</view>
+	</layout>
+</layouts>

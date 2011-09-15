@@ -6,6 +6,9 @@
 
 // Various included headers
 #include <Awesomium/awesomium_capi.h>
+#include "UIViewManager.h"
+#include "UIView.h"
+
 #if defined(__WIN32__) || defined(_WIN32)
 #include <windows.h>
 #include <gl/gl.h>
@@ -38,52 +41,46 @@ void injectSpecialKey(int keyCode);
 
 void webLoadingComplete(awe_webview* caller);
 
-static awe_webview* webView = 0;
+
+UIViewManager* manager = UIViewManager::GetInstance();
+UIView* uiview;
 
 // Our main program
 int main(int argc, char *argv[])
 {
+	// initialize the UIViewManager
+	UIViewManager::GetInstance()->Init();
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(WIDTH, HEIGHT);
 	glutCreateWindow("AwesomiumGL Sample");
 
-	// Initialize OpenGL
+	// viewport
 	glViewport(0, 0, WIDTH, HEIGHT);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+
+
+	// Set the correct ortho project.
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluOrtho2D(0, WIDTH, 0, HEIGHT);
+	glOrtho(0.0f, WIDTH, 0.0f, HEIGHT, 0.0f, 200.0f);
 
-	// Create our WebCore singleton with the default options
-	awe_webcore_initialize_default();
-	
-	awe_string* base_dir = awe_string_create_from_ascii(DIR, strlen(DIR));
-	awe_webcore_set_base_directory(base_dir);
+	// switch to model view matrix
+	glMatrixMode(GL_MODELVIEW);
 
-	// Create a new WebView instance with a certain width and height, using the 
-	// WebCore we just created
-	webView = awe_webcore_create_webview(WIDTH, HEIGHT, false);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	awe_webview_set_transparent(webView, true);
-	
-	// Load a certain URL into our WebView instance
-	//awe_string* url_str = awe_string_create_from_ascii(URL, strlen(URL));
-	//awe_webview_load_url(webView, url_str, awe_string_empty(), awe_string_empty(), awe_string_empty());
+	//set the background colour
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
-	
-	awe_string* file_str = awe_string_create_from_ascii(INDEX_FILE, strlen(INDEX_FILE));
-	awe_webview_load_file(webView, file_str, awe_string_empty());
+	uiview = new UIView(WIDTH, HEIGHT);
+	uiview->LoadURL("http://www.google.com");
 
-	// destroy string
-	//awe_string_destroy(url_str);
-	awe_string_destroy(base_dir);
-	awe_string_destroy(file_str);
 
-	awe_webview_focus(webView);
+	awe_webview_focus(uiview->GetWebview());
 
-	awe_webview_set_callback_finish_loading(webView, webLoadingComplete);
+
 
 	glutDisplayFunc(display);
 	glutTimerFunc(UPDATE_DELAY_MS, update, 0);
@@ -114,7 +111,7 @@ void webLoadingComplete(awe_webview* caller){
 void cleanup()
 {
 	// Destroy our WebView instance
-	awe_webview_destroy(webView);
+	//awe_webview_destroy(webView);
 
 	// Destroy our WebCore instance
 	// NOTE: Since we don't have access to the main loop of
@@ -125,45 +122,44 @@ void cleanup()
 	// guaranteed which may cause a crash to occur.
 	//
 	// The Solution: Don't use GLUT or atexit :-)
-	awe_webcore_shutdown();
+	//awe_webcore_shutdown();
+
+	delete manager;
 }
 
 void display()
 {
-	
-
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	// Flip image vertically
-	glRasterPos2i(0, HEIGHT); 
-	glPixelZoom(1.0f,-1.0f); 
-
-	const awe_renderbuffer* renderBuffer = awe_webview_render(webView);
-
-	if(renderBuffer != NULL)
-	{
-
-		// Draw pixels directly to screen from our image buffer
-		glDrawPixels(WIDTH, HEIGHT, GL_BGRA, GL_UNSIGNED_BYTE, awe_renderbuffer_get_buffer(renderBuffer));
-	}
+	manager->UpdateViewBuffer();
+	manager->Draw();
 
 	glutSwapBuffers();
+
+	GLenum ErrorCheckValue = glGetError();
+	if (ErrorCheckValue != GL_NO_ERROR)
+	{
+		std::cout << " error";
+	}
 }
 
 void update(int val)
 {
 	awe_webcore_update();
 
+	
+
 	// Call our display func when the WebView needs rendering
-	if(awe_webview_is_dirty(webView))
+	if(awe_webview_is_dirty(uiview->GetWebview())){
 		glutPostRedisplay();
+	}
 
 	glutTimerFunc(UPDATE_DELAY_MS, update, 0);
 }
 
 void mouseMoved(int x, int y)
 {
-	awe_webview_inject_mouse_move(webView, x, y);
+	awe_webview_inject_mouse_move(uiview->GetWebview(), x, y);
 }
 
 void mousePressed(int button, int state, int x, int y)
@@ -171,9 +167,9 @@ void mousePressed(int button, int state, int x, int y)
 	if(button == GLUT_LEFT_BUTTON)
 	{
 		if(state == GLUT_DOWN)
-			awe_webview_inject_mouse_down(webView, AWE_MB_LEFT);
+			awe_webview_inject_mouse_down(uiview->GetWebview(), AWE_MB_LEFT);
 		else
-			awe_webview_inject_mouse_up(webView, AWE_MB_LEFT);
+			awe_webview_inject_mouse_up(uiview->GetWebview(), AWE_MB_LEFT);
 	}
 }
 
@@ -214,7 +210,7 @@ void keyPressed(unsigned char key, int x, int y)
 	e.unmodified_text[3] = 0;
 	e.virtual_key_code = 0;
 	e.native_key_code = 0;
-	awe_webview_inject_keyboard_event(webView, e);
+	awe_webview_inject_keyboard_event(uiview->GetWebview(), e);
 }
 
 void specialKeyPressed(int key, int x, int y)
@@ -266,11 +262,11 @@ void injectSpecialKey(int keyCode)
 	e.virtual_key_code = keyCode;
 	e.native_key_code = keyCode;
 	e.type = AWE_WKT_KEYDOWN;
-	awe_webview_inject_keyboard_event(webView, e);
+	awe_webview_inject_keyboard_event(uiview->GetWebview(), e);
 
 	// Key Up
 	e.type = AWE_WKT_KEYUP;
-	awe_webview_inject_keyboard_event(webView, e);
+	awe_webview_inject_keyboard_event(uiview->GetWebview(), e);
 
 	// update immediately
 	awe_webcore_update();

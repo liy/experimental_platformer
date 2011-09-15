@@ -12,6 +12,9 @@
 #include "PhysicalTile.h"
 #include "Camera.h"
 #include "GraphicalTile.h"
+#include "UIViewManager.h"
+#include "UIView.h"
+
 
 Scene::Scene(void)
 {
@@ -118,6 +121,9 @@ void Scene::Init(Game* $game){
 	graphicalTile = new GraphicalTile(tileAni);
 	tileAni->Play();
 	graphicalTile->SetPosition(300.0f, 100.0f);
+
+	UIViewManager::GetInstance()->Init();
+	UIView* uiview = new UIView(1024, 768);
 }
 
 void Scene::Update(unsigned short delta){

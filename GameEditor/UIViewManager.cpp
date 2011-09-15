@@ -1,12 +1,12 @@
 #include "UIViewManager.h"
-
 #include "UIView.h"
+#include <Awesomium/awesomium_capi.h>
 
 UIViewManager* UIViewManager::INSTANCE = NULL;
 
 UIViewManager::UIViewManager(void)
 {
-	awe_webcore_initialize_default();
+	
 }
 
 
@@ -23,15 +23,16 @@ UIViewManager::~UIViewManager(void)
 	awe_webcore_shutdown();
 }
 
-UIView* UIViewManager::Create( unsigned int w, unsigned int h )
+void UIViewManager::Init()
 {
-	awe_webview* wv = awe_webcore_create_webview(w, h, false);
-	UIView* uiView = new UIView();
-	uiView->Init(wv, w, h);
+	awe_webcore_initialize(true, true, true, awe_string_empty(), awe_string_empty(), awe_string_empty(), AWE_LL_NORMAL, false, awe_string_empty(), true, awe_string_empty(), awe_string_empty(),
+		awe_string_empty(), awe_string_empty(), awe_string_empty(), awe_string_empty(), true, 0, false, false, awe_string_empty());
+	
+}
 
-	_uiViewsMap[wv] = uiView;
-
-	return uiView;
+void UIViewManager::AddUIView(UIView* uiview)
+{
+	_uiViewsMap[uiview->GetWebview()] = uiview;
 }
 
 UIView* UIViewManager::GetUIView( awe_webview* wv )
@@ -39,7 +40,7 @@ UIView* UIViewManager::GetUIView( awe_webview* wv )
 	return _uiViewsMap[wv];
 }
 
-void UIViewManager::Update()
+void UIViewManager::UpdateViewBuffer()
 {
 	Map::iterator i;
 	for(i = _uiViewsMap.begin(); i != _uiViewsMap.end(); ++i){

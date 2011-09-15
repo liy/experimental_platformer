@@ -1,0 +1,7 @@
+<property>
+	<directory>
+		<ui>./data/ui/</ui>
+		<map>./data/map/</map>
+		<font>./data/font/</font>
+	</directory>
+</property>

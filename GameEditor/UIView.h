@@ -1,10 +1,10 @@
 #pragma once
 
 #include <string>
-#include <Awesomium/awesomium_capi.h>
 
 typedef unsigned int GLuint;
 typedef unsigned char GLubyte;
+typedef struct _awe_webview awe_webview;
 
 class UIView
 {
@@ -15,9 +15,19 @@ class UIView
 
 public:
 	/**
-	 *	
+	 * Before you can create UIView instance, you must first initialize the UIViewManager first!
 	 */
-	virtual void Init(awe_webview* wv, unsigned int w, unsigned int h);
+	UIView(unsigned int w, unsigned int h);
+
+	/**
+	 * 
+	 */
+	virtual ~UIView(void);
+
+	/**
+	 * 
+	 */
+	virtual void LoadURL(const std::string& url);
 
 	/**
 	 *	
@@ -51,21 +61,42 @@ public:
 	GLubyte* buffer;
 
 protected:
-	UIView(void);
-	virtual ~UIView(void);
 
 	/**
 	 * 
 	 */
 	virtual void UpdateBuffer();
 
+
+
 	/**
 	 * 
 	 */
 	virtual void Draw();
 
+	/**
+	 * 
+	 */
 	GLuint _textureID;
+
+	/**
+	 * 
+	 */
 	awe_webview* _webview;
-	unsigned int _bpp, _width, _height;
+
+	/**
+	 * 
+	 */
+	unsigned int _bpp;
+
+	/**
+	 * 
+	 */
+	unsigned int _width;
+
+	/**
+	 * 
+	 */
+	unsigned int _height;
 };
 
