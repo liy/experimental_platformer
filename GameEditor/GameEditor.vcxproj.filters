@@ -15,20 +15,17 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GameEditor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UIViewManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UIView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AweString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GameEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Awesomium.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,6 +33,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UIView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AweString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

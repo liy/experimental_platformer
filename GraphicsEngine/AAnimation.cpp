@@ -1,9 +1,9 @@
 #include "gl\glew.h"
 #include "AAnimation.h"
-#include "ATextureManager.h"
 #include "ATexture.h"
 #include "acMath.h"
 #include "TransMatrices.h"
+#include "ATextureBinder.h"
 
 AAnimation::AAnimation(const std::string& $fileName, const std::vector<AFrame*>& $frames):ATextureNode($fileName), _frameIndex(0), pingpong(false), repeat(true), _direction(1), _firstRound(true), _stopped(true),  _frameTimer(1)
 {
@@ -169,7 +169,7 @@ void AAnimation::Draw(const Mat4f& mat){
 	glBindVertexArray(_vaoID);
 
 	// bind texture
-	ATextureManager::GetInstance()->Bind(_texture_sp->fileName());
+	ATextureBinder::GetInstance()->Bind(_texture_sp->textureID());
 
 	// Seems like if we want to update the vbo, only bind vertex array object will not. We need to explicit bind the VBO, then call glBufferSubData to update the VBO
 	int vertexSize = sizeof(Vertex3f);

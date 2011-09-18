@@ -1,78 +1,82 @@
 #include "ATexture.h"
 #include <iostream>
-#include <IL\il.h>
-#include <IL\ilu.h>
 #include "acMath.h"
+#include <windows.h>
+#include <GL\GL.h>
 
-ATexture::ATexture(const std::string& $fileName): _textureID(0), _contentWidth(0), _contentHeight(0), _data(NULL)
+ATexture::ATexture(void): _textureID(0), _contentWidth(0), _contentHeight(0), _width(0), _height(0), _bpp(0)
 {
-	Create($fileName);
+
+}
+
+ATexture::ATexture( unsigned int contentWidth, unsigned int contentHeight, GLenum inputFormat, unsigned char bpp/*=4*/ )
+{
+	Create(contentWidth, contentHeight, inputFormat, bpp);
+}
+
+ATexture::ATexture( GLubyte* buffer, unsigned int contentWidth, unsigned int contentHeight, unsigned int width, unsigned int height, GLenum pixelDataFormat, unsigned char bpp/*=4*/ )
+{
+	Create(buffer, contentWidth, contentHeight, width, height, pixelDataFormat, bpp);
 }
 
 ATexture::~ATexture(void)
 {
-	std::cout << "*** ATexture[" << _fileName << ", " << _textureID <<"] destroy ***\n";
+	std::cout << "*** ATexture[" << _textureID <<"] destroyed ***\n";
 	glDeleteTextures(1, &_textureID);
 }
 
+GLuint ATexture::Create( unsigned int contentWidth, unsigned int contentHeight, GLenum pixelDataFormat, unsigned char bpp/*=4*/ )
+{
+	_bpp = bpp;
 
-GLuint ATexture::Create(const std::string& $fileName){
-	// std::string's "assignment operator" is called, basically create a copy of the file name string.
-	_fileName = $fileName;
+	_width = _contentWidth = contentWidth;
+	_height = _contentHeight = contentHeight;
 
-	ILuint imageID = ilGenImage();
-	ilBindImage(imageID);
+	if(!isPowerOfTwo(_contentWidth))
+		_width = nextPowerOfTwo(_contentWidth);
+	if(!isPowerOfTwo(_contentHeight))
+		_height = nextPowerOfTwo(_contentHeight);
 
-	if(!ilLoadImage(_fileName.c_str())){
-		std::string error = "Fail to load file: "+$fileName;
-		throw std::exception(error.c_str());
-		return NULL;
-	}
+	// create a data buffer for drawing the web view
+	GLubyte* buffer = new GLubyte[_width * _height * _bpp];
 
-	// The content in
-	_contentWidth = ilGetInteger(IL_IMAGE_WIDTH);
-	_contentHeight = ilGetInteger(IL_IMAGE_HEIGHT);
-	_bpp = ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL);
+	glGenTextures(1, &_textureID);
+	glBindTexture(GL_TEXTURE_2D, _textureID);
 
-	// Actual texture  size padded with extra pixels, ensure width and height are power of two.
-	_width = nextPowerOfTwo(_contentWidth);
-	_height = nextPowerOfTwo(_contentHeight);
-	ilClearColour(0.0f, 0.0f, 0.0f, 1.0f);
+	// Select modulate to make tint effect when supply color information
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	// Setup the scale up scale down interpolation method.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// Setup the wrapping method.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-	// TODO: there is still some confusion here.......
-	// flip texture problem is mentioned here: http://www.gamedev.net/topic/308200-devil-textures-upside-down/
-
-	// Together with the ilOriginFunc in the ATextureManager init function, and following iLuFlipImage(). 
-	// They ensures the image data will be correctly loaded and place on top left corner. And the data will be always stored from top left corner.
-	iluImageParameter(ILU_PLACEMENT, ILU_UPPER_LEFT);
-	// bitmap image seems like storing data upside down, its origin is on the lower left.
-	// jpg, png data seems like using upper left as the origin.
-	if (ilGetInteger(IL_IMAGE_ORIGIN) == IL_ORIGIN_UPPER_LEFT){
-		// This is for fixing the loaded image upside down in OpenGL...
-		iluFlipImage();
-	}
-
-	// set the canvas size.
-	iluEnlargeCanvas(_width, _height, _bpp);
-
-	// Allocate the memory for the image data.
-	_data = new GLubyte[_width*_height*_bpp];
-	// Copy the loaded image data into the texture data depending on how many bytes per pixel
 	if(_bpp == 4){
-		ilCopyPixels(0, 0, 0, _width, _height, 1, IL_RGBA, GL_UNSIGNED_BYTE, _data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, pixelDataFormat, GL_UNSIGNED_BYTE, buffer);
 	}
 	else if(_bpp == 3){
-		ilCopyPixels(0, 0, 0, _width, _height, 1, IL_RGB, GL_UNSIGNED_BYTE, _data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, pixelDataFormat, GL_UNSIGNED_BYTE, buffer);
 	}
 	else{
-		std::string error = "Loading process, byte per pixel error, _bpp: "+_bpp;
-		throw std::exception(error.c_str());	
+		std::string error = "Texture creation error, byte per pixel error, _bpp: "+_bpp;
+		throw std::exception(error.c_str());
 	}
 
-	// Delete the devIL image data
-	ilDeleteImage(imageID);
+	delete[] buffer;
+	buffer = NULL;
 
-	// Start create OpenGL texture from here
+	return _textureID;
+}
+
+GLuint ATexture::Create( GLubyte* buffer, unsigned int contentWidth, unsigned int contentHeight, unsigned int width, unsigned int height, GLenum pixelDataFormat, unsigned char bpp/*=4*/ )
+{
+	// update texture information
+	_width = width;
+	_height = height;
+	_contentWidth = contentWidth;
+	_contentHeight = contentHeight;
+	_bpp = bpp;
 
 	//create a new texture id
 	glGenTextures(1, &_textureID);
@@ -91,29 +95,35 @@ GLuint ATexture::Create(const std::string& $fileName){
 
 	//create the texture data in opengl
 	if(_bpp == 4){
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, pixelDataFormat, GL_UNSIGNED_BYTE, buffer);
 	}
 	else if(_bpp == 3){
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, _data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, pixelDataFormat, GL_UNSIGNED_BYTE, buffer);
 	}
 	else{
-		std::string error = "Binding process, byte per pixel error, _bpp: "+_bpp;
+		std::string error = "Texture loading error, byte per pixel error, _bpp: "+_bpp;
 		throw std::exception(error.c_str());
 	}
 
-	// delete data after loading and creation of OpenGL image data
-	delete[] _data;
-	_data = NULL;
-
 	return _textureID;
+}
+
+void ATexture::UpdateBuffer( GLubyte* data )
+{
+	if(_bpp == 4){
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, _width, _height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}
+	else if(_bpp == 3){
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, _width, _height, GL_RGB, GL_UNSIGNED_BYTE, data);
+	}
+	else{
+		std::string error = "Texture creation error, byte per pixel error, _bpp: "+_bpp;
+		throw std::exception(error.c_str());
+	}
 }
 
 const GLuint ATexture::textureID() const{
 	return _textureID;
-}
-
-const std::string& ATexture::fileName() const{
-	return _fileName;
 }
 
 const unsigned int ATexture::contentWidth() const{

@@ -68,24 +68,29 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AAnimation.cpp" />
+    <ClCompile Include="ATextureBinder.cpp" />
+    <ClCompile Include="ATextureLoader.cpp" />
     <ClCompile Include="AShaderManager.cpp" />
     <ClCompile Include="ASprite.cpp" />
     <ClCompile Include="ATexture.cpp" />
-    <ClCompile Include="ATextureManager.cpp" />
+    <ClCompile Include="ATextureCache.cpp" />
     <ClCompile Include="AShader.cpp" />
     <ClCompile Include="AShaderProgram.cpp" />
     <ClCompile Include="TransMatrices.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AAnimation.h" />
+    <ClInclude Include="ATextureBinder.h" />
+    <ClInclude Include="ATextureLoader.h" />
     <ClInclude Include="AShaderManager.h" />
     <ClInclude Include="ATextureNode.h" />
     <ClInclude Include="ASprite.h" />
     <ClInclude Include="ATexture.h" />
-    <ClInclude Include="ATextureManager.h" />
+    <ClInclude Include="ATextureCache.h" />
     <ClInclude Include="AGeom.h" />
     <ClInclude Include="AShader.h" />
     <ClInclude Include="AShaderProgram.h" />
+    <ClInclude Include="graphics_engine.h" />
     <ClInclude Include="TransMatrices.h" />
   </ItemGroup>
   <ItemGroup>

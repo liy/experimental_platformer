@@ -1,7 +1,6 @@
 #include "GL\glew.h"
 #include "RenderModule.h"
 #include "ATexture.h"
-#include "ATextureManager.h"
 #include "ASprite.h"
 #include "Game.h"
 #include "Scene.h"
@@ -9,6 +8,7 @@
 #include "AShaderManager.h"
 #include "AShader.h"
 #include "TransMatrices.h"
+#include "GameEditor.h"
 
 RenderModule::RenderModule(void)
 {
@@ -73,6 +73,8 @@ int RenderModule::Render(){
 	TransMatrices::Instance()->modelView.SetIdentity();
 
 	_scene->Render();
+
+	_game->editor->Draw();
 
 	// By using double buffering, we are drawing everything to a hidden screen that we can not see. When we swap the buffer, the screen we see becomes the hidden screen, 
 	// and the screen that was hidden becomes visible. This way we don't see our scene being drawn out. It just instantly appears. 

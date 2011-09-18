@@ -1,10 +1,15 @@
 #pragma once
 
+#include "AGeom.h"
 #include <string>
+#include <windows.h>
+#include <map>
 
 typedef unsigned int GLuint;
 typedef unsigned char GLubyte;
 typedef struct _awe_webview awe_webview;
+
+class ATexture;
 
 class UIView
 {
@@ -52,22 +57,23 @@ public:
 	/**
 	 * 
 	 */
-	GLuint GetTextureID();
+	const GLuint UIView::GetTextureID() const;
 
-	// TODO: to be removed. Change it into local variable.
 	/**
 	 * 
 	 */
-	GLubyte* buffer;
+	virtual void SetRect(int $x, int $y, int $width, int $height);
 
 protected:
+	/**
+	 * 
+	 */
+	virtual void CreateVBO();
 
 	/**
 	 * 
 	 */
 	virtual void UpdateBuffer();
-
-
 
 	/**
 	 * 
@@ -77,26 +83,29 @@ protected:
 	/**
 	 * 
 	 */
-	GLuint _textureID;
-
-	/**
-	 * 
-	 */
 	awe_webview* _webview;
 
 	/**
 	 * 
 	 */
-	unsigned int _bpp;
+	Vertex3f* _vertices;
 
 	/**
 	 * 
 	 */
-	unsigned int _width;
+	GLubyte* _indices;
+
+	//
+	GLuint _vaoID, _vboID, _iboID;
 
 	/**
 	 * 
 	 */
-	unsigned int _height;
+	ATexture* _texture;
+
+	/**
+	 * 
+	 */
+	Recti _rect;
 };
 

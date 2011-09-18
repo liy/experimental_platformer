@@ -33,9 +33,6 @@
     <ClCompile Include="ATexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ATextureManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ASprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -51,15 +48,21 @@
     <ClCompile Include="TransMatrices.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ATextureCache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ATextureLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ATextureBinder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AAnimation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ATexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ATextureManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ASprite.h">
@@ -81,6 +84,18 @@
       <Filter>Header Files\Shader</Filter>
     </ClInclude>
     <ClInclude Include="TransMatrices.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ATextureCache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ATextureLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ATextureBinder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics_engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

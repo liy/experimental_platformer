@@ -83,13 +83,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GameEditor.h" />
+    <ClInclude Include="AweString.h" />
     <ClInclude Include="UIView.h" />
     <ClInclude Include="UIViewManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Awesomium.cpp" />
-    <ClCompile Include="GameEditor.cpp" />
+    <ClCompile Include="AweString.cpp" />
     <ClCompile Include="UIView.cpp" />
     <ClCompile Include="UIViewManager.cpp" />
   </ItemGroup>

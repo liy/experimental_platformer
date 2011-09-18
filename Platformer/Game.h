@@ -4,6 +4,7 @@
 #include <gl\glu.h>								// Header File For The GLu32 Library
 #include <vector>
 
+class GameEditor;
 class GameInputHandler;
 class Scene;
 class RenderModule;
@@ -12,7 +13,9 @@ class Camera;
 class Game
 {
 public:
-	// Every second, how many times of input processsing will happen
+	GameEditor* editor;
+
+	// Every second, how many times of input processing will happen
 	static const int INPUT_PER_SEC = 30;
 	// Each input can only afforded time, in mini seconds.
 	static const int MS_PER_INPUT = 1000/INPUT_PER_SEC;
@@ -22,7 +25,7 @@ public:
 	// The time each update can only cost, in mini seconds.
 	static const int MS_PER_UPDATE = 1000/UPDATE_PER_SEC;
 
-	// only 5 render call can ommited, if the update or input process is running to slow. After 5 times, the input or update loop will break in order to give renderer a chance to render the screen.
+	// only 5 render call can omitted, if the update or input process is running to slow. After 5 times, the input or update loop will break in order to give renderer a chance to render the screen.
 	static const int MAX_FRAMES_SKIP = 5;
 
 	Game(void);

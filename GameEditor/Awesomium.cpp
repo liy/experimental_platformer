@@ -21,11 +21,12 @@
 #endif
 
 #include <iostream>
+#include "AweString.h"
 
 // Various macro definitions
 #define WIDTH	1024
 #define HEIGHT	768
-#define URL	"http://www.google.com"
+#define URL	 "E:/GameDev/Platformer/data/ui/editor/generic.html" //"http://www.google.com"
 #define INDEX_FILE "index.html"
 #define DIR "E:/jquery-ui-1.8.16.custom/"
 #define UPDATE_DELAY_MS	5
@@ -44,6 +45,17 @@ void webLoadingComplete(awe_webview* caller);
 
 UIViewManager* manager = UIViewManager::GetInstance();
 UIView* uiview;
+
+void jsCallback(awe_webview* caller, const awe_string* objectName, const awe_string* callbackName, const awe_jsarray* arguments){
+	if(AweString::std_str(objectName) == "jsObject" && AweString::std_str(callbackName) == "trace"){
+		const awe_jsvalue* value = awe_jsarray_get_element(arguments, 0);
+		const awe_string* trace_string = awe_jsvalue_to_string(value);
+
+		std::cout << "javascript trigger c++ function: " << AweString::std_str(trace_string) << std::endl;
+	}
+
+	AweString objName("test");
+}
 
 // Our main program
 int main(int argc, char *argv[])
@@ -75,11 +87,21 @@ int main(int argc, char *argv[])
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
 	uiview = new UIView(WIDTH, HEIGHT);
-	uiview->LoadURL("http://www.google.com");
+	awe_webview* webview = uiview->GetWebview();
+	uiview->LoadURL(URL);
 
 
 	awe_webview_focus(uiview->GetWebview());
 
+	AweString objName("jsObject");
+	awe_webview_create_object(webview, objName.awe_str());
+	
+
+	//awe_string* funcName = awe_string_create_from_ascii("trace", strlen("trace"));
+	AweString funcName("trace");
+	awe_webview_set_object_callback(webview, objName.awe_str(), funcName.awe_str());
+
+	awe_webview_set_callback_js_callback(webview, jsCallback);
 
 
 	glutDisplayFunc(display);
@@ -101,11 +123,7 @@ void webLoadingComplete(awe_webview* caller){
 
 	awe_string* urlStr = awe_webview_get_url(caller);
 
-	int str_size = awe_string_to_utf8(urlStr, NULL, 0) + 1;
-	char* url = new char[str_size];
-	awe_string_to_utf8(urlStr, url, str_size);
-
-	std::cout << url << "\n";
+	std::cout << AweString::std_str(urlStr) << "\n";
 }
 
 void cleanup()

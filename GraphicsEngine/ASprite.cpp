@@ -1,9 +1,9 @@
 #include "gl\glew.h"
 #include "ASprite.h"
-#include "ATextureManager.h"
 #include "ATexture.h"
 #include "acMath.h"
 #include "TransMatrices.h"
+#include "ATextureBinder.h"
 
 ASprite::ASprite(void): ATextureNode(){
 	// initialize the indices array
@@ -71,7 +71,7 @@ void ASprite::Draw(const Mat4f& mat){
 	// bind the vertex states
 	glBindVertexArray(_vaoID);
 	// bind texture
-	ATextureManager::GetInstance()->Bind(_texture_sp->fileName());
+	ATextureBinder::GetInstance()->Bind(_texture_sp->textureID());
 	// draw
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
 	// unbind the vertex state

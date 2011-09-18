@@ -1,0 +1,26 @@
+body {
+	/* "Microsoft YaHei" */
+	font-family:  Arial, Sans-serif, Times, "Helvetica Neue";
+	/* remove any margin around the whole body*/
+
+	font-size: 12px;
+	/*background: #555555;*/
+}
+
+a:link, a:visited, a:hover {
+	/* no text decoration*/
+	text-decoration: none;
+	color: #FFFFFF;
+}
+
+.bubble {
+	-webkit-border-radius:5px;
+	
+	text-shadow:0 1px 0 rgba(255,255,255,0.2);
+	-webkit-text-fill-color:rgba(0,0,0,0.75);
+	text-overflow: ellipsis;
+	
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, to(rgba(43, 128, 0, 0.75)), from(rgba(169, 255, 127, 0.75)));
+	
+	padding: 5px;
+}

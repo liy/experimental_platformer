@@ -1,10 +1,9 @@
 #pragma once
-#include "ATextureManager.h"
-#include "ATexture.h"
-#include <windows.h>
 #include "AGeom.h"
-#include <map>
 #include "AShaderManager.h"
+#include "ATextureLoader.h"
+#include "ATextureCache.h"
+#include "ATexture.h"
 
 /**
  *	Abstract class 
@@ -16,9 +15,10 @@ public:
 		Init(Recti(0.0f, 0.0f, 1.0f, 1.0f));
 	}
 
-	ATextureNode(const std::string& $fileName){
+	ATextureNode(const std::string& $fileName): _fileName($fileName){
 		// initialize the texture
-		_texture_sp = ATextureManager::GetInstance()->Get($fileName);
+		ATextureLoader loader;
+		_texture_sp = loader.LoadFile(_fileName);
 
 		// assign the texture rectangle. The vertices position will be initialized as well.
 		Init(Recti(0.0f, 0.0f, _texture_sp->contentWidth(), _texture_sp->contentHeight()));
@@ -26,7 +26,8 @@ public:
 
 	ATextureNode(const std::string& $fileName, const Recti& $rect){
 		// initialize the texture
-		_texture_sp = ATextureManager::GetInstance()->Get($fileName);
+		ATextureLoader loader;
+		_texture_sp = loader.LoadFile($fileName);
 
 		Init($rect);
 	};
@@ -70,56 +71,21 @@ public:
 		// FIXME how to free the image texture coordinate????
 
 		// keep a copy record of the filename, to remove the 
-		std::string fileName = _texture_sp->fileName();
-		std::cout << "AImage["<< fileName <<"] destroy!\n";
+		std::cout << "AImage["<< _fileName <<"] destroy!\n";
 		// Null the reference, so we can try to remove th texture
 		_texture_sp = NULL;
 		// Try to remove the using texture from the memory.
 		// If the reference count is 1.(1 reference count is maintained by the map). Then we remove it from the memory.
 		// So programmer will not need to manually  remove texture from the memory
-		ATextureManager::GetInstance()->Remove(fileName);
+		ATextureCache::GetInstance()->TryRemove(_fileName);
 
 		// clear the index array.
 		delete[] _indices;
 	};
 
-	// update the texture this image is using.
-	void SetTexture(const std::string& $fileName, const Recti& $rect){
-		// Dynamically change texture, we have to try to remove the previous texture it was using.
-		if(_texture_sp != NULL && _texture_sp->fileName() != $fileName){
-			std::string fileName = _texture_sp->fileName();
-			// Null the reference, so we can try to remove th texture
-			_texture_sp = NULL;
-			// Try to remove the using texture from the memory.
-			ATextureManager::GetInstance()->Remove(fileName);
-		}
-
-		// update to the new texture
-		_texture_sp = ATextureManager::GetInstance()->Get($fileName);
-		// update texture coordinate
-		SetRect($rect);
-	}
-
-	// update the texture this image is using.
-	void SetTexture(const std::string& $fileName){
-		// Dynamically change texture, we have to try to remove the previous texture it was using.
-		if(_texture_sp != NULL && _texture_sp->fileName() != $fileName){
-			std::string fileName = _texture_sp->fileName();
-			// Null the reference, so we can try to remove th texture
-			_texture_sp = NULL;
-			// Try to remove the using texture from the memory.
-			ATextureManager::GetInstance()->Remove(fileName);
-		}
-
-		// update to the new texture
-		_texture_sp = ATextureManager::GetInstance()->Get($fileName);
-		// update texture coordinate
-		SetRect(0, 0, _texture_sp->contentWidth(), _texture_sp->contentHeight());
-	}
-
 	// Get the currently using texture file name.
 	virtual const std::string& fileName() const{
-		return _texture_sp->fileName();
+		return _fileName;
 	}
 
 	// Update the graphic, this probably only apply to the animation. For static image, this function does nothing
@@ -433,5 +399,10 @@ protected:
 	 *	The shader manager
 	 */
 	AShaderManager* _shaderManager;
+
+	/**
+	 * 
+	 */
+	std::string _fileName;
 };
 

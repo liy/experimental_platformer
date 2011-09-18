@@ -1,11 +1,15 @@
 #include <iostream>
-
+#include "game_settings.h"
+#include "graphics_engine.h"
 #include "Game.h"
 #include "GameInputHandler.h"
-#include "ATextureManager.h"
+#include "ATextureCache.h"
 #include "Scene.h"
 #include "RenderModule.h"
 #include "Camera.h"
+#include "GameEditor.h"
+
+
 
 Game::Game(void): quit(false)
 {
@@ -20,18 +24,25 @@ Game::~Game(void)
 
 	delete _renderer;
 	_renderer = NULL;
+
+
+	delete editor;
+
 }
 
 void Game::Init(HDC hDC, HWND hWnd, int screenWidth, int screenHeight){
 	_hDC = hDC;
 	_hWnd = hWnd;
 
+	// initialize the graphics engine
+	InitGraphicsEngine();
+
 	// initialize camera
 	camera = new Camera(this);
 	camera->Init(screenWidth, screenHeight, 0.5, 0.5);
 
 	// You must initialize the TextureManager first before use.
-	ATextureManager::GetInstance()->Init();
+	ATextureCache::GetInstance()->Init();
 
 	// create input handler
 	_gameInputHandler = new GameInputHandler();
@@ -45,6 +56,9 @@ void Game::Init(HDC hDC, HWND hWnd, int screenWidth, int screenHeight){
 	// create renderer, by default using orthogonal projection
 	_renderer = new RenderModule();
 	_renderer->Init(this, _hDC, screenWidth, screenHeight);
+
+
+	editor = new GameEditor(this);
 }
 
 MSG Game::Start(){
@@ -55,7 +69,10 @@ MSG Game::Start(){
 }
 
 // simply route the window message to the InputHandler instance.
-LRESULT CALLBACK Game::MsgRouter(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
+LRESULT CALLBACK Game::MsgRouter(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	editor->MsgHandler(hWnd, uMsg, wParam, lParam);
+
 	return _gameInputHandler->MsgHandler(hWnd, uMsg, wParam, lParam);
 }
 
@@ -158,6 +175,8 @@ MSG Game::MainGameLoop(){
 				//std::cout << "deltaTime: " << deltaTime <<"\n";
 				// then update game state and animation, etc.
 				_currentScene->Update(deltaTime);
+
+				editor->Update();
 
 				updateTime += MS_PER_UPDATE;
 				++loops;

@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Utils">
-      <UniqueIdentifier>{3eebc614-1dff-44b8-813b-8c45ef3911b4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\GameObjects">
       <UniqueIdentifier>{c5e7c6ea-00fb-4fe8-b597-bd55ae7575b9}</UniqueIdentifier>
     </Filter>
@@ -55,6 +52,12 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{32ee81a1-dda9-4a81-9f53-5752604e6626}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GameEditor">
+      <UniqueIdentifier>{fe030eff-e189-4ab1-b3d8-f826b683dfdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GameEditor">
+      <UniqueIdentifier>{8e1de9e0-98b8-41e1-babb-e4b32d7b594d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainWindow.h">
@@ -68,9 +71,6 @@
     </ClInclude>
     <ClInclude Include="game_settings.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="acSettings.h">
-      <Filter>Header Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="IMouseEventListener.h">
       <Filter>Header Files\Input</Filter>
@@ -108,6 +108,9 @@
     <ClInclude Include="Actor.h">
       <Filter>Header Files\GameObjects\Actors</Filter>
     </ClInclude>
+    <ClInclude Include="GameEditor.h">
+      <Filter>Header Files\GameEditor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainWindow.cpp">
@@ -139,6 +142,9 @@
     </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Source Files\GameObjects\Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="GameEditor.cpp">
+      <Filter>Source Files\GameEditor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

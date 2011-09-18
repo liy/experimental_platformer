@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
-#include "ATextureManager.h"
+#include "ATextureLoader.h"
 #include "ATextureNode.h"
 
 struct AFrame{
@@ -30,15 +30,19 @@ struct AFrame{
 	 */
 	Recti rect;
 
-	AFrame(const std::string& $fileName, unsigned short $duration=10): duration($duration){
-		texture_sp = ATextureManager::GetInstance()->Get($fileName);
+	std::string _fileName;
+
+	AFrame(const std::string& $fileName, unsigned short $duration=10): duration($duration), _fileName($fileName){
+		ATextureLoader loader;
+		texture_sp = loader.LoadFile(_fileName);
 		rect.Set(0, 0, texture_sp->contentWidth(), texture_sp->contentHeight());
 		anchorRatio.Set(0.5f, 0.5f);
 	}
 
-	AFrame(const Recti& $rect, unsigned short $duration=10, const std::string& $fileName=""): duration($duration), rect($rect){
+	AFrame(const Recti& $rect, unsigned short $duration=10, const std::string& $fileName=""): duration($duration), rect($rect), _fileName($fileName){
 		if($fileName != ""){
-			texture_sp = ATextureManager::GetInstance()->Get($fileName);
+			ATextureLoader loader;
+			texture_sp = loader.LoadFile(_fileName);
 		}
 		else{
 			texture_sp = NULL;
@@ -55,14 +59,13 @@ struct AFrame{
 
 		// keep a copy record of the filename, to remove the 
 		if(texture_sp != NULL){
-			std::string fileName = texture_sp->fileName();
-			std::cout << "AFrame["<< fileName <<"] destroy!\n";
+			std::cout << "AFrame["<< _fileName <<"] destroy!\n";
 			// Null the reference, so we can try to remove th texture
 			texture_sp = NULL;
 			// Try to remove the using texture from the memory.
 			// If the reference count is 1.(1 reference count is maintained by the map). Then we remove it from the memory.
 			// So programmer will not need to manually  remove texture from the memory
-			ATextureManager::GetInstance()->Remove(fileName);
+			ATextureCache::GetInstance()->TryRemove(_fileName);
 		}
 	}
 };

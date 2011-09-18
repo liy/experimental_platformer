@@ -2,6 +2,8 @@
 #include "UIView.h"
 #include <Awesomium/awesomium_capi.h>
 
+typedef std::pair<awe_webview*, UIView*> ViewPair;
+
 UIViewManager* UIViewManager::INSTANCE = NULL;
 
 UIViewManager::UIViewManager(void)
@@ -25,9 +27,9 @@ UIViewManager::~UIViewManager(void)
 
 void UIViewManager::Init()
 {
-	awe_webcore_initialize(true, true, true, awe_string_empty(), awe_string_empty(), awe_string_empty(), AWE_LL_NORMAL, false, awe_string_empty(), true, awe_string_empty(), awe_string_empty(),
-		awe_string_empty(), awe_string_empty(), awe_string_empty(), awe_string_empty(), true, 0, false, false, awe_string_empty());
-	
+	awe_webcore_initialize(true, true, true, awe_string_empty(), awe_string_empty(), awe_string_empty(), AWE_LL_NORMAL, false, 
+		awe_string_empty(), true, awe_string_empty(), awe_string_empty(), awe_string_empty(), awe_string_empty(), 
+		awe_string_empty(), awe_string_empty(), true, 0, false, true, awe_string_empty());
 }
 
 void UIViewManager::AddUIView(UIView* uiview)
