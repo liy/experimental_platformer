@@ -4,6 +4,7 @@
 #include <memory>
 
 class ATexture;
+typedef unsigned char GLubyte;
 
 class ATextureLoader
 {

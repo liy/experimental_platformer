@@ -4,13 +4,20 @@
 #include <string>
 #include <windows.h>
 #include <map>
+#include <vector>
 
 typedef unsigned int GLuint;
 typedef unsigned char GLubyte;
 typedef struct _awe_webview awe_webview;
 
 class ATexture;
+class UIViewListener;
 
+/**
+ * @class	UIView
+ *
+ * @brief	This is a wrapper class for awe_webview in Awesomium.
+ */
 class UIView
 {
 	/**
@@ -64,6 +71,33 @@ public:
 	 */
 	virtual void SetRect(int $x, int $y, int $width, int $height);
 
+	/**
+	 * @fn	virtual void UIView::AddListener(const UIViewListener* listener);
+	 *
+	 * @brief	Adds a listener. 
+	 *
+	 * @param	listener	The listener.
+	 */
+	virtual void AddListener(UIViewListener* listener);
+
+	/**
+	 * @fn	virtual void UIView::RemoveListener(const UIViewListener* listener);
+	 *
+	 * @brief	Removes the listener described by listener.
+	 *
+	 * @param	listener	The listener.
+	 */
+	virtual void RemoveListener(UIViewListener* listener);
+
+	/**
+	 * @fn	virtual std::vector<UIViewListener*> UIView::GetListeners();
+	 *
+	 * @brief	Gets the listeners.
+	 *
+	 * @return	null if it fails, else the listeners.
+	 */
+	virtual std::vector<UIViewListener*> GetListeners();
+
 protected:
 	/**
 	 * 
@@ -107,5 +141,8 @@ protected:
 	 * 
 	 */
 	Recti _rect;
+
+
+	std::vector<UIViewListener*> _listeners;
 };
 

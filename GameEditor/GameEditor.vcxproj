@@ -85,6 +85,7 @@
   <ItemGroup>
     <ClInclude Include="AweString.h" />
     <ClInclude Include="UIView.h" />
+    <ClInclude Include="UIViewListener.h" />
     <ClInclude Include="UIViewManager.h" />
   </ItemGroup>
   <ItemGroup>

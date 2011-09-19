@@ -1,4 +1,5 @@
 #include "UIView.h"
+#include <typeinfo>
 #include "gl\glew.h"
 #include "UIViewManager.h"
 #include <iostream>
@@ -8,18 +9,6 @@
 #include "ATexture.h"
 #include "ATextureBinder.h"
 
-void BeginNavigationCallback(awe_webview* caller, const awe_string* url, const awe_string* frame_name){
-	// update url
-	int str_size = awe_string_to_utf8(url, NULL, 0) + 1;
-	char* urlChar = new char[str_size];
-	awe_string_to_utf8(url, urlChar, str_size);
-	std::cout << std::string(urlChar) << "\n";
-}
-
-void LoadCompleteCallback(awe_webview* caller){
-	std::cout << "loading complete" << "\n";
-}
-
 UIView::UIView(unsigned int w, unsigned int h)
 {
 	_texture = new ATexture(w, h, GL_BGRA_EXT, 4);
@@ -27,9 +16,13 @@ UIView::UIView(unsigned int w, unsigned int h)
 	// keep a reference of the webview so later we can retrieve it directly from this UIView instance.
 	_webview = awe_webcore_create_webview(w, h, false);
 
-	// add some callback function
-	awe_webview_set_callback_begin_navigation(_webview, BeginNavigationCallback);
-	awe_webview_set_callback_finish_loading(_webview, LoadCompleteCallback);
+	// add some callback function, the manager will take care of finding correct corresponding UIView and notify its listeners.
+	awe_webview_set_callback_js_callback(_webview, UIViewManager::OnCallback);
+	awe_webview_set_callback_begin_loading(_webview, UIViewManager::OnBeginLoading);
+	awe_webview_set_callback_begin_navigation(_webview, UIViewManager::OnBeginNavigation);
+	awe_webview_set_callback_finish_loading(_webview, UIViewManager::OnFinishLoading);
+	awe_webview_set_callback_change_cursor(_webview, UIViewManager::OnChangeCursor);
+	awe_webview_set_callback_open_external_link(_webview, UIViewManager::OnOpenExternalLink);
 
 	// Add this UIView to the manager.
 	UIViewManager::GetInstance()->AddUIView(this);
@@ -53,8 +46,19 @@ UIView::UIView(unsigned int w, unsigned int h)
 
 UIView::~UIView(void)
 {
+	// Remove the this UIView instance from the map.
+	UIViewManager::GetInstance()->RemoveUIView(this);
+
+	// TODO: check if the texture is stored in the cache?? At the moment, the dynamic generated texture will not be stored in the cache. Probably in the future, it will be.
+
+	// Release the texture memory in the graphics card. 
+	const GLuint id = _texture->GetTextureID();
+	glDeleteTextures(1, &id);
+
+	// Destroy the texture object.
 	delete _texture;
 
+	// Destroy the webview.
 	awe_webview_destroy(_webview);
 }
 
@@ -66,7 +70,7 @@ void UIView::UpdateBuffer()
 
 		// TODO: can be optimized? just update part of the data?
 		// update the texture data with the newest render buffer data
-		ATextureBinder::GetInstance()->Bind(_texture->textureID());
+		ATextureBinder::GetInstance()->Bind(_texture->GetTextureID());
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, _texture->contentWidth(), _texture->contentHeight(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, awe_renderbuffer_get_buffer(renderBuffer));
 	}
 }
@@ -87,7 +91,7 @@ void UIView::Draw()
 	// bind the vertex states
 	glBindVertexArray(_vaoID);
 	// bind texture
-	ATextureBinder::GetInstance()->Bind(_texture->textureID());
+	ATextureBinder::GetInstance()->Bind(_texture->GetTextureID());
 	// draw
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
 	// unbind the vertex state
@@ -131,7 +135,7 @@ const unsigned int UIView::GetHeight() const
 
 const GLuint UIView::GetTextureID() const
 {
-	return _texture->textureID();
+	return _texture->GetTextureID();
 }
 
 void UIView::Resize( unsigned int w, unsigned int h )
@@ -142,7 +146,7 @@ void UIView::Resize( unsigned int w, unsigned int h )
 
 		_texture = new ATexture(w, h, GL_BGRA_EXT, 4);
 
-		// resize then update the vertice information
+		// resize then update the vertices information
 		SetRect(0, 0, w, h);
 	}
 }
@@ -153,7 +157,7 @@ void UIView::CreateVBO(void)
 	int bufferSize = vertexSize * sizeof(_indices)/sizeof(GLubyte);
 
 	// initialization for VAO
-	// The vertex array basically is ued for saving all the states. So later when drawing, 
+	// The vertex array basically is used for saving all the states. So later when drawing, 
 	//  instead of bind texture, setup texture coordinate, colour information, etc. we can simply use glBindVertexArray(_vaoID) to set the state and ready for drawing.
 	glGenVertexArrays(1, &_vaoID);
 	glBindVertexArray(_vaoID);
@@ -191,8 +195,6 @@ void UIView::CreateVBO(void)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iboID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(_indices), _indices, GL_STATIC_DRAW);
 
-
-
 	// unbind the vao
 	glBindVertexArray(0);
 
@@ -201,7 +203,8 @@ void UIView::CreateVBO(void)
 	{
 		fprintf(
 			stderr,
-			"ERROR: Could not create a VBO: %s \n",
+			"ERROR: %s could not create a VBO: %s \n",
+			typeid(this).name(),
 			gluErrorString(ErrorCheckValue)
 			);
 
@@ -232,4 +235,25 @@ void UIView::SetRect(int $x, int $y, int $width, int $height){
 	_vertices[2].uv.Set(u + w, v);
 	_vertices[1].uv.Set(u + w, v + h);
 	_vertices[0].uv.Set(u, v + h);
+}
+
+std::vector<UIViewListener*> UIView::GetListeners()
+{
+	return _listeners;
+}
+
+void UIView::AddListener( UIViewListener* listener )
+{
+	_listeners.push_back(listener);
+}
+
+void UIView::RemoveListener( UIViewListener* listener )
+{
+	for(int i=0; i<_listeners.size(); ++i){
+		// FIXME: Are you sure this will work??
+		if(_listeners[i] == listener){
+			_listeners.erase(_listeners.begin()+i);
+			break;
+		}
+	}
 }

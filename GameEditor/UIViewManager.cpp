@@ -1,8 +1,9 @@
 #include "UIViewManager.h"
 #include "UIView.h"
+#include <iostream>
 #include <Awesomium/awesomium_capi.h>
-
-typedef std::pair<awe_webview*, UIView*> ViewPair;
+#include "AweString.h"
+#include "UIViewListener.h"
 
 UIViewManager* UIViewManager::INSTANCE = NULL;
 
@@ -37,6 +38,15 @@ void UIViewManager::AddUIView(UIView* uiview)
 	_uiViewsMap[uiview->GetWebview()] = uiview;
 }
 
+void UIViewManager::RemoveUIView( UIView* uiview )
+{
+	Map::iterator itr = _uiViewsMap.find(uiview->GetWebview());
+	if(itr != _uiViewsMap.end()){
+		_uiViewsMap.erase(itr);
+	}
+}
+
+
 UIView* UIViewManager::GetUIView( awe_webview* wv )
 {
 	return _uiViewsMap[wv];
@@ -55,5 +65,65 @@ void UIViewManager::Draw()
 	Map::iterator i;
 	for(i = _uiViewsMap.begin(); i != _uiViewsMap.end(); ++i){
 		i->second->Draw();
+	}
+}
+
+void UIViewManager::OnCallback( awe_webview* caller, const awe_string* object_name, const awe_string* callback_name, const awe_jsarray* arguments )
+{
+	UIView* uiview = UIViewManager::GetInstance()->GetUIView(caller);
+	std::vector<UIViewListener*> listeners = uiview->GetListeners();
+	int len = listeners.size();
+	for(int i=0; i<len; ++i){
+		listeners[i]->OnCallback(uiview, AweString::std_str(object_name), AweString::std_str(callback_name), arguments);
+	}
+}
+
+void UIViewManager::OnBeginLoading( awe_webview* caller, const awe_string* url, const awe_string* frame_name, int status_code, const awe_string* mime_type )
+{
+	UIView* uiview = UIViewManager::GetInstance()->GetUIView(caller);
+	std::vector<UIViewListener*> listeners = uiview->GetListeners();
+	int len = listeners.size();
+	for(int i=0; i<len; ++i){
+		listeners[i]->OnBeginLoading(uiview, AweString::std_str(url), AweString::std_str(frame_name), status_code, AweString::std_str(mime_type));
+	}
+}
+
+void UIViewManager::OnBeginNavigation( awe_webview* caller, const awe_string* url, const awe_string* frame_name )
+{
+	UIView* uiview = UIViewManager::GetInstance()->GetUIView(caller);
+	std::vector<UIViewListener*> listeners = uiview->GetListeners();
+	int len = listeners.size();
+	for(int i=0; i<len; ++i){
+		listeners[i]->OnBeginNavigation(uiview, AweString::std_str(url), AweString::std_str(frame_name));
+	}
+}
+
+void UIViewManager::OnFinishLoading(awe_webview* caller)
+{
+	UIView* uiview = UIViewManager::GetInstance()->GetUIView(caller);
+	std::vector<UIViewListener*> listeners = uiview->GetListeners();
+	int len = listeners.size();
+	for(int i=0; i<len; ++i){
+		listeners[i]->OnFinishLoading(uiview);
+	}
+}
+
+void UIViewManager::OnChangeCursor( awe_webview* caller, awe_cursor_type cursor )
+{
+	UIView* uiview = UIViewManager::GetInstance()->GetUIView(caller);
+	std::vector<UIViewListener*> listeners = uiview->GetListeners();
+	int len = listeners.size();
+	for(int i=0; i<len; ++i){
+		listeners[i]->OnChangeCursor(uiview, cursor);
+	}
+}
+
+void UIViewManager::OnOpenExternalLink( awe_webview* caller, const awe_string* url, const awe_string* source )
+{
+	UIView* uiview = UIViewManager::GetInstance()->GetUIView(caller);
+	std::vector<UIViewListener*> listeners = uiview->GetListeners();
+	int len = listeners.size();
+	for(int i=0; i<len; ++i){
+		listeners[i]->OnOpenExternalLink(uiview, AweString::std_str(url), AweString::std_str(source));
 	}
 }

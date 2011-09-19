@@ -73,6 +73,7 @@ public:
 		// keep a copy record of the filename, to remove the 
 		std::cout << "AImage["<< _fileName <<"] destroy!\n";
 		// Null the reference, so we can try to remove th texture
+		delete &_texture_sp;
 		_texture_sp = NULL;
 		// Try to remove the using texture from the memory.
 		// If the reference count is 1.(1 reference count is maintained by the map). Then we remove it from the memory.

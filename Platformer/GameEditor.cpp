@@ -12,7 +12,8 @@ GameEditor::GameEditor(Game* game)
 
 	_uiview = new UIView(1024, 768);
 	awe_webview_focus(_uiview->GetWebview());
-	_uiview->LoadURL("http://www.google.co.uk");
+	//_uiview->LoadURL("http://www.google.co.uk");
+	_uiview->LoadURL("E:/GameDev/Platformer/Platformer/Debug/data/ui/editor/generic.html");
 
 	awe_webview_set_transparent(_uiview->GetWebview(), true);
 }

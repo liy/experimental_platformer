@@ -71,7 +71,7 @@ void ASprite::Draw(const Mat4f& mat){
 	// bind the vertex states
 	glBindVertexArray(_vaoID);
 	// bind texture
-	ATextureBinder::GetInstance()->Bind(_texture_sp->textureID());
+	ATextureBinder::GetInstance()->Bind(_texture_sp->GetTextureID());
 	// draw
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
 	// unbind the vertex state

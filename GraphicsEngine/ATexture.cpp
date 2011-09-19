@@ -122,7 +122,7 @@ void ATexture::UpdateBuffer( GLubyte* data )
 	}
 }
 
-const GLuint ATexture::textureID() const{
+const GLuint ATexture::GetTextureID() const{
 	return _textureID;
 }
 

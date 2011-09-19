@@ -47,6 +47,7 @@ void GameInputHandler::RemoveMouseEventListener(IMouseEventListener* listener){
 		// FIXME: Are you sure this will work??
 		if(_mouseEventListeners[i] == listener){
 			_mouseEventListeners.erase(_mouseEventListeners.begin()+i);
+			break;
 		}
 	}
 }

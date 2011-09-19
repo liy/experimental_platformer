@@ -49,7 +49,7 @@ public:
 	void UpdateBuffer(GLubyte* buffer);
 
 	// When bound the texture using OpenGL, an ID is generated for this texture.
-	const GLuint textureID() const;
+	const GLuint GetTextureID() const;
 
 	// Bytes per pixel
 	const unsigned int bpp() const;

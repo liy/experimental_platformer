@@ -169,7 +169,7 @@ void AAnimation::Draw(const Mat4f& mat){
 	glBindVertexArray(_vaoID);
 
 	// bind texture
-	ATextureBinder::GetInstance()->Bind(_texture_sp->textureID());
+	ATextureBinder::GetInstance()->Bind(_texture_sp->GetTextureID());
 
 	// Seems like if we want to update the vbo, only bind vertex array object will not. We need to explicit bind the VBO, then call glBufferSubData to update the VBO
 	int vertexSize = sizeof(Vertex3f);

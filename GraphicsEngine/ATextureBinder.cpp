@@ -18,7 +18,7 @@ void ATextureBinder::Bind( const std::string& key )
 {
 	std::tr1::shared_ptr<ATexture> texture_sp = ATextureCache::GetInstance()->Get(key);
 	if(texture_sp != nullptr){
-		GLuint id = texture_sp->textureID();
+		GLuint id = texture_sp->GetTextureID();
 
 		// _boundedID == 0 ensures that always bind something when nothing is bounded
 		if(_boundedID != id || _boundedID == 0){
