@@ -43,7 +43,7 @@ GLvoid KillGLWindow(GLvoid)							// Properly Kill The Window
 {
 	// start render context clean up
 	// first to check whether we have the reder contex
-	if (hRC)								// Do We Have A Rendering Context?
+	if (hRC)								// Do We Have A Rendering Context?MsgRouter
 	{
 		// Checking whether we can free both DC and RC
 		//
@@ -307,6 +307,7 @@ LRESULT CALLBACK WndProc(	HWND	hWnd,					// Handle For This Window
 			return 0;							// Jump Back
 		}
 
+		/*
 		// We can find what key is hold down by reading wParam
 		case WM_KEYDOWN:						// Is A Key Being Held Down?
 		{
@@ -320,6 +321,7 @@ LRESULT CALLBACK WndProc(	HWND	hWnd,					// Handle For This Window
 			//keys[wParam] = FALSE;					// If So, Mark It As FALSE
 			return 0;							// Jump Back
 		}
+		*/
 
 		// User are resizing the window, so call the ReSizeGLScene() function, get the width and height by using LOWORD() and HIWORD()
 		// HIWORD() and LOWORD() are macros defined by windows that single out the two high bytes (High Word) of a 32 bit value (0xFFFF0000) and the low word (0x0000FFFF) respectively. 

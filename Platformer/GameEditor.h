@@ -35,8 +35,6 @@ public:
 	void RightMouseDown(int x, int y);
 	void RightMouseUp(int x, int y);
 
-	void KeyPressed(unsigned char key, int x, int y);
-
 protected:
 	Game* _game;
 

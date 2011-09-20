@@ -12,8 +12,8 @@ GameEditor::GameEditor(Game* game)
 
 	_uiview = new UIView(1024, 768);
 	awe_webview_focus(_uiview->GetWebview());
-	//_uiview->LoadURL("http://www.google.co.uk");
-	_uiview->LoadURL("E:/GameDev/Platformer/Platformer/Debug/data/ui/editor/generic.html");
+	_uiview->LoadURL("http://www.google.co.uk");
+	//_uiview->LoadURL("E:/GameDev/Platformer/Platformer/Debug/data/ui/editor/generic.html");
 
 	awe_webview_set_transparent(_uiview->GetWebview(), true);
 }
@@ -41,65 +41,15 @@ void GameEditor::Draw()
 	UIViewManager::GetInstance()->Draw();
 }
 
-void GameEditor::MsgHandler( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
-{
-	short x = (short)LOWORD(lParam);
-	short y = (short)HIWORD(lParam);
 
-	switch(uMsg)
-	{
-		case WM_LBUTTONDOWN:
-		{
-			LeftMouseDown(x, y);
-		}
-		case WM_RBUTTONDOWN:
-		{
-			RightMouseDown(x, y);
 
-		}
-		case WM_LBUTTONUP:
-		{
-			LeftMouseUp(x, y);
-		}
-		case WM_RBUTTONUP:
-		{
-			RightMouseUp(x, y);
-		}
-		case WM_MOUSEMOVE:
-		{
-			MouseMoved(x, y);
-		}
-		case WM_CHAR:
-		{
 
-		}
-	}
-}
 
-void GameEditor::MouseMoved( int x, int y )
-{
-	awe_webview_inject_mouse_move(_uiview->GetWebview(), x, y);
-}
 
-void GameEditor::LeftMouseDown(int x, int y )
-{
-	awe_webview_inject_mouse_down(_uiview->GetWebview(), AWE_MB_LEFT);
-}
 
-void GameEditor::LeftMouseUp(int x, int y)
-{
-	awe_webview_inject_mouse_up(_uiview->GetWebview(), AWE_MB_LEFT);
-}
 
-void GameEditor::RightMouseDown(int x, int y )
-{
-	awe_webview_inject_mouse_down(_uiview->GetWebview(), AWE_MB_RIGHT);
-}
 
-void GameEditor::RightMouseUp(int x, int y)
-{
-	awe_webview_inject_mouse_up(_uiview->GetWebview(), AWE_MB_RIGHT);
-}
+
 
 
 void injectSpecialKey(awe_webview* webview, int keyCode)
@@ -131,66 +81,129 @@ void injectSpecialKey(awe_webview* webview, int keyCode)
 }
 
 
-void GameEditor::KeyPressed( unsigned char key, int x, int y )
+void SpecialKeyPressed(awe_webview* webview, int keyCode){
+	injectSpecialKey(webview, keyCode);
+
+}
+
+
+
+
+void GameEditor::MsgHandler( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
-	if(key == 8 || key == 127) // Backspace or Delete key
-	{
-		injectSpecialKey(_uiview->GetWebview(), VK_BACK);
-		return;
-	}
-	else if(key == 9) // Tab key
-	{
-		injectSpecialKey(_uiview->GetWebview(), VK_TAB);
-		return;
-	}
-	else if(key == 13){
-		// enter key
-		injectSpecialKey(_uiview->GetWebview(), 13);
-		return;
-	}
+	short x = (short)LOWORD(lParam);
+	short y = (short)HIWORD(lParam);
 
-	// special key
-	switch(key)
+	switch(msg)
 	{
-	case VK_LEFT:
-		injectSpecialKey(_uiview->GetWebview(), VK_LEFT);
-		break;
-	case VK_UP:
-		injectSpecialKey(_uiview->GetWebview(), VK_UP);
-		return;
-	case VK_RIGHT:
-		injectSpecialKey(_uiview->GetWebview(), VK_RIGHT);
-		return;
-	case VK_DOWN:
-		injectSpecialKey(_uiview->GetWebview(), VK_DOWN);
-		return;
-	case VK_PRIOR:
-		injectSpecialKey(_uiview->GetWebview(), VK_PRIOR);
-		return;
-	case VK_NEXT:
-		injectSpecialKey(_uiview->GetWebview(), VK_NEXT);
-		return;
-	case VK_HOME:
-		injectSpecialKey(_uiview->GetWebview(), VK_HOME);
-		return;
-	case VK_END:
-		injectSpecialKey(_uiview->GetWebview(), VK_END);
-		return;
-	}
+		case WM_LBUTTONDOWN:
+		{
+			LeftMouseDown(x, y);
+			break;
+		}
+		case WM_RBUTTONDOWN:
+		{
+			RightMouseDown(x, y);
+			break;
+		}
+		case WM_LBUTTONUP:
+		{
+			LeftMouseUp(x, y);
+			break;
+		}
+		case WM_RBUTTONUP:
+		{
+			RightMouseUp(x, y);
+			break;
+		}
+		case WM_MOUSEMOVE:
+		{
+			MouseMoved(x, y);
+			break;
+		}
+		case WM_CHAR:
+		case WM_KEYDOWN:
+		case WM_KEYUP:
+			awe_webview_inject_keyboard_event_win(_uiview->GetWebview(), msg, wParam, lParam);
+			break;
+		/*
+		case WM_KEYDOWN:
+		{
+			// special key
+			switch(wParam)
+			{
+			case VK_DELETE:
+			case VK_BACK:
+			case VK_CAPITAL:
+			case VK_LEFT:
+			case VK_UP:
+			case VK_RIGHT:
+			case VK_DOWN:
+			case VK_PRIOR:
+			case VK_NEXT:
+			case VK_HOME:
+			case VK_END:
+			case VK_CONTROL:
+			case VK_SHIFT:
+			case VK_MENU:
+				SpecialKeyPressed(_uiview->GetWebview(), wParam);
+				return;
+			}
+			break;
+		}
+		case WM_CHAR:
+		{
+			// special key triggers in WM_CHAR
+			switch(wParam)
+			{
+			case VK_TAB:
+			case VK_RETURN:
+				SpecialKeyPressed(_uiview->GetWebview(), wParam);
+				return;
+			}
 
-	// injection of normal character keys
-	awe_webkeyboardevent e;
-	e.type = AWE_WKT_CHAR;
-	e.is_system_key = false;
-	e.text[0] = key;
-	e.text[1] = 0;
-	e.text[2] = 0;
-	e.text[3] = 0;
-	e.unmodified_text[0] = 0;
-	e.unmodified_text[1] = 0;
-	e.unmodified_text[2] = 0;
-	e.unmodified_text[3] = 0;
-	e.virtual_key_code = 0;
-	e.native_key_code = 0;
-	awe_webview_inject_keyboard_event(_uiview->GetWebview(), e);
+			// injection of normal character keys
+			awe_webkeyboardevent e;
+			e.type = AWE_WKT_CHAR;
+			e.is_system_key = false;
+			e.text[0] = wParam;
+			e.text[1] = 0;
+			e.text[2] = 0;
+			e.text[3] = 0;
+			e.unmodified_text[0] = 0;
+			e.unmodified_text[1] = 0;
+			e.unmodified_text[2] = 0;
+			e.unmodified_text[3] = 0;
+			e.virtual_key_code = 0;
+			e.native_key_code = 0;
+			awe_webview_inject_keyboard_event(_uiview->GetWebview(), e);
+			break;
+		}
+		*/
+	}
+}
+
+void GameEditor::MouseMoved( int x, int y )
+{
+	awe_webview_inject_mouse_move(_uiview->GetWebview(), x, y);
+}
+
+void GameEditor::LeftMouseDown(int x, int y )
+{
+	awe_webview_inject_mouse_down(_uiview->GetWebview(), AWE_MB_LEFT);
+}
+
+void GameEditor::LeftMouseUp(int x, int y)
+{
+	awe_webview_inject_mouse_up(_uiview->GetWebview(), AWE_MB_LEFT);
+}
+
+void GameEditor::RightMouseDown(int x, int y )
+{
+	awe_webview_inject_mouse_down(_uiview->GetWebview(), AWE_MB_RIGHT);
+}
+
+void GameEditor::RightMouseUp(int x, int y)
+{
+	awe_webview_inject_mouse_up(_uiview->GetWebview(), AWE_MB_RIGHT);
 }
