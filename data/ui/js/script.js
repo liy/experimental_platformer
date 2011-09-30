@@ -41,27 +41,28 @@ function TilePane(w, h) {
 	this.width = w;
 	this.height = h;
 	
-	var tiles = new Array();
+	var tiles = new Array(10);
 }
 
 TilePane.prototype.clear = function(){
-}
+    
+};
 	
 TilePane.prototype.addTile = function(){
-}
+};
 	
 TilePane.prototype.getTile = function(){
-}
+};
 
 TilePane.prototype.resize = function(w, h){
 	this.width = w;
 	this.height = h;
 	console.log("width: " + this.width);
 	console.log("height: " + this.height);
-}
+};
 
 TilePane.prototype.onMouseClick = function(){
-}
+};
 
 var pane1 = new TilePane(100, 100);
 pane1.resize(200, 200);
