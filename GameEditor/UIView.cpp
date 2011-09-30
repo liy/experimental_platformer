@@ -23,6 +23,7 @@ UIView::UIView(unsigned int w, unsigned int h)
 	awe_webview_set_callback_finish_loading(_webview, UIViewManager::OnFinishLoading);
 	awe_webview_set_callback_change_cursor(_webview, UIViewManager::OnChangeCursor);
 	awe_webview_set_callback_open_external_link(_webview, UIViewManager::OnOpenExternalLink);
+	awe_webview_set_callback_request_file_chooser(_webview, UIViewManager::OnRequestFileChooser);
 
 	// Add this UIView to the manager.
 	UIViewManager::GetInstance()->AddUIView(this);
@@ -77,28 +78,30 @@ void UIView::UpdateBuffer()
 
 void UIView::Draw()
 {
-	// save the current model view matrix
-	TransMatrices* matrices = TransMatrices::Instance();
-	matrices->Push();
+	if(!awe_webview_is_loading_page(_webview)){
+		// save the current model view matrix
+		TransMatrices* matrices = TransMatrices::Instance();
+		matrices->Push();
 
-	// concatenate the transformation
-	matrices->modelView.SetIdentity();
+		// concatenate the transformation
+		matrices->modelView.SetIdentity();
 
-	// set the vertex shader's model view matrix ready for drawing.
-	GLuint modelViewUnifo = glGetUniformLocation(AShaderManager::GetInstance()->activatedProgramID, "modelView");
-	glUniformMatrix4fv(modelViewUnifo, 1, GL_FALSE, matrices->modelView);
+		// set the vertex shader's model view matrix ready for drawing.
+		GLuint modelViewUnifo = glGetUniformLocation(AShaderManager::GetInstance()->activatedProgramID, "modelView");
+		glUniformMatrix4fv(modelViewUnifo, 1, GL_FALSE, matrices->modelView);
 
-	// bind the vertex states
-	glBindVertexArray(_vaoID);
-	// bind texture
-	ATextureBinder::GetInstance()->Bind(_texture->GetTextureID());
-	// draw
-	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
-	// unbind the vertex state
-	glBindVertexArray(0);
+		// bind the vertex states
+		glBindVertexArray(_vaoID);
+		// bind texture
+		ATextureBinder::GetInstance()->Bind(_texture->GetTextureID());
+		// draw
+		glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, 0);
+		// unbind the vertex state
+		glBindVertexArray(0);
 
-	// restore original model view matrix.
-	matrices->Pop();
+		// restore original model view matrix.
+		matrices->Pop();
+	}
 
 	GLenum ErrorCheckValue = glGetError();
 	if (ErrorCheckValue != GL_NO_ERROR)
@@ -256,4 +259,14 @@ void UIView::RemoveListener( UIViewListener* listener )
 			break;
 		}
 	}
+}
+
+void UIView::Focus()
+{
+	UIViewManager::GetInstance()->Focus(this);
+}
+
+void UIView::Unfocus()
+{
+	UIViewManager::GetInstance()->Unfocus(this);
 }

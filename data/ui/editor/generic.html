@@ -4,11 +4,39 @@
 <head>
 <title></title>
 <link rel="stylesheet" type="text/css" href="../css/default.css"></link>
+<script src="https://www.google.com/jsapi?key=ABQIAAAAz6T77-DkwM_Qp4CG_eABkRTQbAr4Cc4zRDAzoOWUt1R_YMhG7BSoMSYo1bD59P8R3I5COl4vMdJUKg" type="text/javascript"></script>
 <script type="text/javascript" src="../js/script.js"></script>
 </head>
 
 <body>
-<a class="bubble" href="#" onclick="jsObject.trace('bubble button is clicked!')">This is a link</a>
+<div class="ribbon">
+	<div class="horizontal-group group-colour-grey">
+		<div class="vertical-group">
+			<div><a class="generic-button grey" href="#" onclick="jsObject.trace('button 1 is clicked!')">Open</a></div>
+			<div><a class="generic-button grey" href="#" onclick="jsObject.trace('button 2 is clicked!')">Save</a></div>
+			<div><a class="generic-button grey" href="#" onclick="jsObject.trace('button 2 is clicked!')">Save As</a></div>
+		</div>
+		<div class="vertical-group">
+			<div><a class="generic-button grey" href="#" onclick="jsObject.trace('button 1 is clicked!')">Redo</a></div>
+			<div><a class="generic-button grey" href="#" onclick="jsObject.trace('button 2 is clicked!')">Undo</a></div>
+			<div><a class="generic-button grey" href="#" onclick="jsObject.trace('button 2 is clicked!')"><</a></div>
+			<div><a class="generic-button grey" href="#" onclick="jsObject.trace('button 2 is clicked!')">></a></div>
+		</div>
+	</div>
+	<div id="map-pane-holder" class="horizontal-group flex-group group-colour-white">
+		
+	</div>
+	<div class="horizontal-group last-horizontal-group">
+		<a class="generic-button grey" href="#" onclick="jsObject.trace('button 1 is clicked!')">V</a>
+	</div>
+</div>
+
+<a class="tab green" href="#" onclick="jsObject.trace('tab 1 is clicked!')">Tab one</a>
+
+<div id="map-pane">
+	<p>Draggable</p>
+</div>
+
 </body>
 
 </HTML>

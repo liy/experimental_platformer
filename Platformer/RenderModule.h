@@ -43,6 +43,9 @@ public:
 	// Use orthogonal projection
 	void UseOrthogonal();
 
+	const unsigned int GetScreenWidth() const;
+	const unsigned int GetScreenHeight() const;
+
 protected:
 	// screen width
 	unsigned int _screenWidth;

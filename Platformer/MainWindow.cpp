@@ -32,8 +32,8 @@ char WINDOW_NAME[] = "正义的城管";
 
 Game* _game;
 
-static const unsigned int SCREEN_WIDTH = 1024;
-static const unsigned int SCREEN_HEIGHT = 788;
+static const unsigned int SCREEN_WIDTH = 1280;
+static const unsigned int SCREEN_HEIGHT = 1044; //1024+20
 
 
 
@@ -101,7 +101,7 @@ BOOL CreateGLWindow(char* title, int width, int height, int bits)
 	RECT WindowRect;							
 	WindowRect.left		= (long)300;
 	WindowRect.right	= WindowRect.left + (long)width;		
-	WindowRect.top		= (long)300;							
+	WindowRect.top		= (long)100;							
 	WindowRect.bottom	= WindowRect.top + (long)height;
 
 	hInstance			= GetModuleHandle(NULL);				// Grab An Instance For Our Window

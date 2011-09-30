@@ -3,6 +3,8 @@
 #include <Awesomium/awesomium_capi.h>
 #include "UIView.h"
 #include "AweString.h"
+#include "Game.h"
+#include "RenderModule.h"
 
 GameEditor::GameEditor(Game* game)
 {
@@ -10,12 +12,21 @@ GameEditor::GameEditor(Game* game)
 
 	UIViewManager::GetInstance()->Init();
 
-	_uiview = new UIView(1024, 768);
-	awe_webview_focus(_uiview->GetWebview());
-	_uiview->LoadURL("http://www.google.co.uk");
-	//_uiview->LoadURL("E:/GameDev/Platformer/Platformer/Debug/data/ui/editor/generic.html");
+	_uiview = new UIView(_game->getRenderer().GetScreenWidth(), _game->getRenderer().GetScreenHeight());
+	//_uiview->LoadURL("http://www.google.co.uk");
+	_uiview->LoadURL("E:/GameDev/Platformer/Platformer/Debug/data/ui/editor/generic.html");
+
+	_uiview->Focus();
 
 	awe_webview_set_transparent(_uiview->GetWebview(), true);
+
+	_uiview->AddListener(this);
+
+	AweString objName("jsObject");
+	awe_webview_create_object(_uiview->GetWebview(), objName.awe_str());
+
+	AweString funcName("trace");
+	awe_webview_set_object_callback(_uiview->GetWebview(), objName.awe_str(), funcName.awe_str());
 }
 
 
@@ -41,169 +52,47 @@ void GameEditor::Draw()
 	UIViewManager::GetInstance()->Draw();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-void injectSpecialKey(awe_webview* webview, int keyCode)
-{
-	// Key Down
-	awe_webkeyboardevent e;
-	e.is_system_key = false;
-	e.modifiers = 0;
-
-	e.text[0] = keyCode;
-	e.text[1] = 0;
-	e.text[2] = 0;
-	e.text[3] = 0;
-	e.unmodified_text[0] = keyCode;
-	e.unmodified_text[1] = 0;
-	e.unmodified_text[2] = 0;
-	e.unmodified_text[3] = 0;
-	e.virtual_key_code = keyCode;
-	e.native_key_code = keyCode;
-	e.type = AWE_WKT_KEYDOWN;
-	awe_webview_inject_keyboard_event(webview, e);
-
-	// Key Up
-	e.type = AWE_WKT_KEYUP;
-	awe_webview_inject_keyboard_event(webview, e);
-
-	// update immediately
-	awe_webcore_update();
-}
-
-
-void SpecialKeyPressed(awe_webview* webview, int keyCode){
-	injectSpecialKey(webview, keyCode);
-
-}
-
-
-
-
 void GameEditor::MsgHandler( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
-	short x = (short)LOWORD(lParam);
-	short y = (short)HIWORD(lParam);
+	UIViewManager::GetInstance()->MsgHandler(hWnd, msg, wParam, lParam);
+}
 
-	switch(msg)
-	{
-		case WM_LBUTTONDOWN:
-		{
-			LeftMouseDown(x, y);
-			break;
-		}
-		case WM_RBUTTONDOWN:
-		{
-			RightMouseDown(x, y);
-			break;
-		}
-		case WM_LBUTTONUP:
-		{
-			LeftMouseUp(x, y);
-			break;
-		}
-		case WM_RBUTTONUP:
-		{
-			RightMouseUp(x, y);
-			break;
-		}
-		case WM_MOUSEMOVE:
-		{
-			MouseMoved(x, y);
-			break;
-		}
-		case WM_CHAR:
-		case WM_KEYDOWN:
-		case WM_KEYUP:
-			awe_webview_inject_keyboard_event_win(_uiview->GetWebview(), msg, wParam, lParam);
-			break;
-		/*
-		case WM_KEYDOWN:
-		{
-			// special key
-			switch(wParam)
-			{
-			case VK_DELETE:
-			case VK_BACK:
-			case VK_CAPITAL:
-			case VK_LEFT:
-			case VK_UP:
-			case VK_RIGHT:
-			case VK_DOWN:
-			case VK_PRIOR:
-			case VK_NEXT:
-			case VK_HOME:
-			case VK_END:
-			case VK_CONTROL:
-			case VK_SHIFT:
-			case VK_MENU:
-				SpecialKeyPressed(_uiview->GetWebview(), wParam);
-				return;
-			}
-			break;
-		}
-		case WM_CHAR:
-		{
-			// special key triggers in WM_CHAR
-			switch(wParam)
-			{
-			case VK_TAB:
-			case VK_RETURN:
-				SpecialKeyPressed(_uiview->GetWebview(), wParam);
-				return;
-			}
+void GameEditor::OnBeginNavigation( UIView* uiview, const std::string& url, const std::string& frameName )
+{
 
-			// injection of normal character keys
-			awe_webkeyboardevent e;
-			e.type = AWE_WKT_CHAR;
-			e.is_system_key = false;
-			e.text[0] = wParam;
-			e.text[1] = 0;
-			e.text[2] = 0;
-			e.text[3] = 0;
-			e.unmodified_text[0] = 0;
-			e.unmodified_text[1] = 0;
-			e.unmodified_text[2] = 0;
-			e.unmodified_text[3] = 0;
-			e.virtual_key_code = 0;
-			e.native_key_code = 0;
-			awe_webview_inject_keyboard_event(_uiview->GetWebview(), e);
-			break;
-		}
-		*/
+}
+
+void GameEditor::OnBeginLoading( UIView* uiview, const std::string& url, const std::string& frameName, int status_code, const std::string& mime_type )
+{
+
+}
+
+void GameEditor::OnFinishLoading( UIView* uiview )
+{
+
+}
+
+void GameEditor::OnCallback( UIView* uiview, const std::string& objName, const std::string& callbackName, const awe_jsarray* arguments )
+{
+	if(objName == "jsObject" && callbackName == "trace"){
+		const awe_jsvalue* value = awe_jsarray_get_element(arguments, 0);
+		const awe_string* trace_string = awe_jsvalue_to_string(value);
+
+		std::cout << "javascript trigger c++ function: " << AweString::std_str(trace_string) << std::endl;
 	}
 }
 
-void GameEditor::MouseMoved( int x, int y )
+void GameEditor::OnChangeCursor( UIView* uiview, awe_cursor_type cursor )
 {
-	awe_webview_inject_mouse_move(_uiview->GetWebview(), x, y);
+
 }
 
-void GameEditor::LeftMouseDown(int x, int y )
+void GameEditor::OnOpenExternalLink( UIView* uiview, const std::string& url, std::string& sourceUrl )
 {
-	awe_webview_inject_mouse_down(_uiview->GetWebview(), AWE_MB_LEFT);
+
 }
 
-void GameEditor::LeftMouseUp(int x, int y)
+void GameEditor::OnRequestFileChooser( UIView* caller, bool selectMultipleFiles, const std::string& title, const std::string& defaultPath )
 {
-	awe_webview_inject_mouse_up(_uiview->GetWebview(), AWE_MB_LEFT);
-}
 
-void GameEditor::RightMouseDown(int x, int y )
-{
-	awe_webview_inject_mouse_down(_uiview->GetWebview(), AWE_MB_RIGHT);
-}
-
-void GameEditor::RightMouseUp(int x, int y)
-{
-	awe_webview_inject_mouse_up(_uiview->GetWebview(), AWE_MB_RIGHT);
 }

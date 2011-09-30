@@ -147,3 +147,13 @@ void RenderModule::InitDefaultShaders(){
 		exit(-1);
 	}
 }
+
+const unsigned int RenderModule::GetScreenWidth() const
+{
+	return _screenWidth;
+}
+
+const unsigned int RenderModule::GetScreenHeight() const
+{
+	return _screenHeight;
+}

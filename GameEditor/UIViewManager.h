@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <windows.h>
 
 typedef struct _awe_string awe_string;
 typedef struct _awe_webview awe_webview;
@@ -9,6 +10,8 @@ typedef enum _awe_loglevel awe_loglevel;
 typedef enum _awe_cursor_type awe_cursor_type;
 
 class UIView;
+
+
 
 class UIViewManager
 {
@@ -21,6 +24,10 @@ private:
 	 * Store the mapping between awe_webview and UIView. This is for easy retrieving of the UIView when awe_webview callback is triggered.
 	 */
 	typedef std::map<awe_webview*, UIView*> Map;
+
+
+	///< The focused user interface view
+	UIView* _focusedUIView;
 
 	/**
 	 * Add the UIView to this manager.
@@ -35,6 +42,24 @@ private:
 	 * @param [in,out]	uiview	If non-null, the uiview.
 	 */
 	void RemoveUIView(UIView* uiview);
+
+	/**
+	 * @fn	void UIViewManager::Focus(UIView* uiview);
+	 *
+	 * @brief	Focus.
+	 *
+	 * @param [in,out]	uiview	If non-null, the uiview.
+	 */
+	void Focus(UIView* uiview);
+
+	/**
+	 * @fn	void UIViewManager::Unfocus(UIView* uiview);
+	 *
+	 * @brief	Unfocus.
+	 *
+	 * @param [in,out]	uiview	If non-null, the uiview.
+	 */
+	void Unfocus(UIView* uiview);
 
 public:
 	static UIViewManager* GetInstance(){
@@ -66,6 +91,18 @@ public:
 	 */
 	void Draw();
 
+	/**
+	 * @fn	void UIViewManager::MsgHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	 *
+	 * @brief	Message handler. Mouse event and keyboard event will be injected into focused UIView. Note that only focused UIView will receiving the messages.
+	 *
+	 * @param	hWnd  	Handle of the window.
+	 * @param	msg  	The message.
+	 * @param	wParam	The wParam field of the message.
+	 * @param	lParam	The lParam field of the message.
+	 */
+	void MsgHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 protected:
 	UIViewManager(void);
 
@@ -82,5 +119,7 @@ protected:
 	static void OnChangeCursor(awe_webview* caller, awe_cursor_type cursor);
 
 	static void OnOpenExternalLink(awe_webview* caller, const awe_string* url, const awe_string* source);
+
+	static void OnRequestFileChooser(awe_webview* caller, bool selectMultipleFiles, const awe_string* title, const awe_string* defaultPath);
 };
 

@@ -67,11 +67,6 @@ public:
 	const GLuint UIView::GetTextureID() const;
 
 	/**
-	 * 
-	 */
-	virtual void SetRect(int $x, int $y, int $width, int $height);
-
-	/**
 	 * @fn	virtual void UIView::AddListener(const UIViewListener* listener);
 	 *
 	 * @brief	Adds a listener. 
@@ -98,7 +93,26 @@ public:
 	 */
 	virtual std::vector<UIViewListener*> GetListeners();
 
+	/**
+	 * @fn	void UIView::Focus();
+	 *
+	 * @brief	Focus this UIView so the caret will appear correctly in the text field, and also be able to receive mouse and keyboard event.
+	 */
+	void Focus();
+
+	/**
+	 * @fn	void UIView::Unfocus();
+	 *
+	 * @brief	Unfocus this object. The UIView will not be able to receive any mouse and keyboard event anymore.
+	 */
+	void Unfocus();
+
 protected:
+	/**
+	 * 
+	 */
+	virtual void SetRect(int $x, int $y, int $width, int $height);
+
 	/**
 	 * 
 	 */
