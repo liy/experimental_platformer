@@ -42,6 +42,24 @@ function TilePane(w, h) {
 	this.height = h;
 	
 	var tiles = new Array(10);
+	
+	var jCanvas = jQuery("<canvas/>");
+	jCanvas.attr("id", 'map-canvas');
+	jCanvas.attr("width", this.width);
+	jCanvas.attr("height", this.height);
+	$("#map-pane").append(jCanvas);
+	
+	var canvas = document.getElementById("map-canvas");
+	if(canvas.getContext){
+		var ctx = canvas.getContext('2d');
+		console.log("context get successfully");
+		
+		ctx.fillStyle = "rgb(255, 0, 0)";
+		ctx.fillRect(0,0,this.width, this.height);
+	}
+	else{
+		console.log("can not get context!");
+	}
 }
 
 TilePane.prototype.clear = function(){
@@ -64,11 +82,8 @@ TilePane.prototype.resize = function(w, h){
 TilePane.prototype.onMouseClick = function(){
 };
 
-var pane1 = new TilePane(100, 100);
-pane1.resize(200, 200);
-
-var pane2 = new TilePane(300, 300);
-pane2.resize(400, 400);
+var pane = new TilePane(100, 100);
+pane.resize(200, 200);
 
 
 
