@@ -85,17 +85,14 @@ body {
 
 
 
-#map-pane {
-	background: #CFFCCF;
+#tile-pane {
+	background: #DDD;
 	
 	border-radius: 3px;
 	overflow: hidden;
 	
 	position: absolute;
 }
-
-
-
 
 
 
