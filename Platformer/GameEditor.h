@@ -41,12 +41,12 @@ public:
 	void OnBeginNavigation(UIView* uiview, const std::string& url, const std::string& frameName);
 	void OnBeginLoading(UIView* uiview, const std::string& url, const std::string& frameName, int status_code, const std::string& mime_type);
 	void OnFinishLoading(UIView* uiview);
-	void OnCallback(UIView* uiview, const std::string& objName, const std::string& callbackName, const awe_jsarray* arguments);
 	void OnChangeCursor(UIView* uiview, awe_cursor_type cursor);
 	void OnOpenExternalLink(UIView* uiview, const std::string& url, std::string& sourceUrl);
 
 	void OnRequestFileChooser(UIView* caller, bool selectMultipleFiles, const std::string& title, const std::string& defaultPath);
 
+	void OnJSCallback(UIView* uiview, const std::string& objName, const std::string& callbackName, const awe_jsarray* arguments);
 protected:
 	Game* _game;
 

@@ -22,11 +22,16 @@ GameEditor::GameEditor(Game* game)
 
 	_uiview->AddListener(this);
 
-	AweString objName("jsObject");
-	awe_webview_create_object(_uiview->GetWebview(), objName.awe_str());
+	//AweString objName("jsObject");
+	//awe_webview_create_object(_uiview->GetWebview(), objName.awe_str());
 
-	AweString funcName("trace");
-	awe_webview_set_object_callback(_uiview->GetWebview(), objName.awe_str(), funcName.awe_str());
+	//AweString funcName("trace");
+	//awe_webview_set_object_callback(_uiview->GetWebview(), objName.awe_str(), funcName.awe_str());
+
+	//AweString clickHandler("clickHandler");
+	//awe_webview_set_object_callback(_uiview->GetWebview(), objName.awe_str(), clickHandler.awe_str());
+	
+	_uiview->SetJSCallback("jsObject", "clickHandler", this, reinterpret_cast<FuncPtr>(&GameEditor::OnJSCallback));
 }
 
 
@@ -72,14 +77,17 @@ void GameEditor::OnFinishLoading( UIView* uiview )
 
 }
 
-void GameEditor::OnCallback( UIView* uiview, const std::string& objName, const std::string& callbackName, const awe_jsarray* arguments )
+void GameEditor::OnJSCallback( UIView* uiview, const std::string& objName, const std::string& callbackName, const awe_jsarray* arguments )
 {
+	std::cout << "objName: " << objName << " callbackName: " << callbackName << std::endl;
+	/*
 	if(objName == "jsObject" && callbackName == "trace"){
 		const awe_jsvalue* value = awe_jsarray_get_element(arguments, 0);
 		const awe_string* trace_string = awe_jsvalue_to_string(value);
 
 		std::cout << "javascript trigger c++ function: " << AweString::std_str(trace_string) << std::endl;
 	}
+	*/
 }
 
 void GameEditor::OnChangeCursor( UIView* uiview, awe_cursor_type cursor )

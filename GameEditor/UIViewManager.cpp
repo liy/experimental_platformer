@@ -69,14 +69,10 @@ void UIViewManager::Draw()
 	}
 }
 
-void UIViewManager::OnCallback( awe_webview* caller, const awe_string* object_name, const awe_string* callback_name, const awe_jsarray* arguments )
+void UIViewManager::OnJSCallback( awe_webview* caller, const awe_string* object_name, const awe_string* callback_name, const awe_jsarray* arguments )
 {
 	UIView* uiview = UIViewManager::GetInstance()->GetUIView(caller);
-	std::vector<UIViewListener*> listeners = uiview->GetListeners();
-	int len = listeners.size();
-	for(int i=0; i<len; ++i){
-		listeners[i]->OnCallback(uiview, AweString::std_str(object_name), AweString::std_str(callback_name), arguments);
-	}
+	uiview->OnJSCallback(AweString::std_str(object_name), AweString::std_str(callback_name), arguments);
 }
 
 void UIViewManager::OnBeginLoading( awe_webview* caller, const awe_string* url, const awe_string* frame_name, int status_code, const awe_string* mime_type )

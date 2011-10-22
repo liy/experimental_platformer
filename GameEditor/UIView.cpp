@@ -8,6 +8,7 @@
 #include "AShaderManager.h"
 #include "ATexture.h"
 #include "ATextureBinder.h"
+#include "AweString.h"
 
 UIView::UIView(unsigned int w, unsigned int h)
 {
@@ -17,7 +18,7 @@ UIView::UIView(unsigned int w, unsigned int h)
 	_webview = awe_webcore_create_webview(w, h, false);
 
 	// add some callback function, the manager will take care of finding correct corresponding UIView and notify its listeners.
-	awe_webview_set_callback_js_callback(_webview, UIViewManager::OnCallback);
+	awe_webview_set_callback_js_callback(_webview, UIViewManager::OnJSCallback);
 	awe_webview_set_callback_begin_loading(_webview, UIViewManager::OnBeginLoading);
 	awe_webview_set_callback_begin_navigation(_webview, UIViewManager::OnBeginNavigation);
 	awe_webview_set_callback_finish_loading(_webview, UIViewManager::OnFinishLoading);
@@ -269,4 +270,35 @@ void UIView::Focus()
 void UIView::Unfocus()
 {
 	UIViewManager::GetInstance()->Unfocus(this);
+}
+
+void UIView::SetJSCallback( const std::string& jsObjName, const std::string& jsFuncName, void* receiver, FuncPtr funcPtr )
+{
+	// create javascript object and the method 
+	AweString objName(jsObjName);
+	if(jsObjName != ""){
+		awe_webview_create_object(_webview, objName.awe_str());
+	}
+	AweString funcName(jsFuncName);
+	awe_webview_set_object_callback(_webview, objName.awe_str(), funcName.awe_str());
+
+	// store the callback delegation to the map
+	std::stringstream ss;
+	ss << jsObjName << jsFuncName;
+	std::string key = ss.str();
+	_delegateMap[key] = new JSDelegate(receiver, funcPtr);
+}
+
+void UIView::OnJSCallback(const std::string& jsObjName, const std::string& jsFuncName, const awe_jsarray* jsArgs)
+{
+	std::stringstream ss;
+	ss << jsObjName << jsFuncName;
+	std::string key = ss.str();
+
+	std::map<std::string, JSDelegate*>::iterator itr = _delegateMap.find(key);
+	if(itr != _delegateMap.end()){
+		JSDelegate* delegate = itr->second;
+		// invoke the callback function
+		delegate->Invoke(this, jsObjName, jsFuncName, jsArgs);
+	}
 }

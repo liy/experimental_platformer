@@ -108,7 +108,7 @@ protected:
 
 	Map _uiViewsMap;
 
-	static void OnCallback(awe_webview* caller, const awe_string* object_name, const awe_string* callback_name, const awe_jsarray* arguments);
+	static void OnJSCallback(awe_webview* caller, const awe_string* object_name, const awe_string* callback_name, const awe_jsarray* arguments);
 
 	static void OnBeginLoading(awe_webview* caller, const awe_string* url, const awe_string* frame_name, int status_code, const awe_string* mime_type);
 

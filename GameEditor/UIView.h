@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <map>
 #include <vector>
+#include "JSDelegate.h"
 
 typedef unsigned int GLuint;
 typedef unsigned char GLubyte;
@@ -67,11 +68,11 @@ public:
 	const GLuint UIView::GetTextureID() const;
 
 	/**
-	 * @fn	virtual void UIView::AddListener(const UIViewListener* listener);
+	 * @fn	virtual void UIView::AddListener(UIViewListener* listener);
 	 *
 	 * @brief	Adds a listener. 
 	 *
-	 * @param	listener	The listener.
+	 * @param [in,out]	listener	If non-null, the listener.
 	 */
 	virtual void AddListener(UIViewListener* listener);
 
@@ -107,7 +108,13 @@ public:
 	 */
 	void Unfocus();
 
+	void SetJSCallback(const std::string& jsObjName, const std::string& jsFuncName, void* receiver, FuncPtr funcPtr);
+
 protected:
+
+
+	void OnJSCallback(const std::string& jsObjName, const std::string& jsFuncName, const awe_jsarray* jsArgs);
+
 	/**
 	 * 
 	 */
@@ -158,5 +165,8 @@ protected:
 
 
 	std::vector<UIViewListener*> _listeners;
+
+	///< The js delegate map
+	std::map<std::string, JSDelegate*> _delegateMap;
 };
 

@@ -72,21 +72,28 @@ TilePane.prototype.setMargin = function(value) {
 
 
 // tile pane class
-function Tile(w, h) {
+function Tile(idx, w, h) {
+	this.index = idx;
 	this.width = w;
 	this.height = h;
 	
 	var tiles = new Array(10);
 	
-	var jCanvas = jQuery("<canvas/>");
-	jCanvas.attr("width", this.width);
-	jCanvas.attr("height", this.height);
-	jCanvas.css("margin", tileMargin+"px");
-	jCanvas.css("float", "left");
-	$("#tile-pane").append(jCanvas);
+	this.canvas = jQuery("<canvas/>");
+	this.canvas.attr("width", this.width);
+	this.canvas.attr("height", this.height);
+	this.canvas.css("margin", tileMargin+"px");
+	this.canvas.css("float", "left");
+	$("#tile-pane").append(this.canvas);
 	
-	if(jCanvas[0].getContext){
-		var ctx = jCanvas[0].getContext('2d');
+	// bind the click event handler
+	this.canvas.bind("click", this.clickHandler);
+	
+	// reference the tile in the DOM object
+	this.canvas[0].tile = this;
+	
+	if(this.canvas[0].getContext){
+		var ctx = this.canvas[0].getContext('2d');
 		
 		ctx.fillStyle = "rgb(255, 0, 0)";
 		ctx.fillRect(0,0,this.width, this.height);
@@ -94,13 +101,17 @@ function Tile(w, h) {
 	else{
 		console.log("can not get context!");
 	}
+}
+
+Tile.prototype.clickHandler = function(){
+	console.log("tile index: " + this.tile.index);
+	jsObject.clickHandler();
 	
-	// bind the click event handler
-	jCanvas.bind("click", function(){
-		console.log("tile " + $(this).offset().left);
-	});
-	
-	console.log("height: " + $("#tile-pane").css("width"));
+	mapPane.clickHandler();
+}
+
+Tile.prototype.setRect = function(r){
+	this.rect = r;
 }
 
 var tilePane = new TilePane(48, 48);
@@ -125,7 +136,7 @@ $("#tile-pane").hover(
 // create tiles and tile pane
 var tileArr = new Array();
 for(var i=0; i<100; ++i){
-	var tile = new Tile(48, 48);
+	var tile = new Tile(i, 48, 48);
 	tileArr.push(tile);
 }
 tilePane.setTiles(tileArr);
